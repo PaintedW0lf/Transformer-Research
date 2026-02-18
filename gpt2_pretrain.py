@@ -25,12 +25,16 @@ def build_gpt2_from_scratch(
 ) -> tuple[GPT2LMHeadModel, LMDataset, SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
-    all_ids: List[int] = []
+    blocks: List[List[int]] = []
     for text in texts:
-        all_ids.extend(encoding.encode(text))
-        all_ids.append(eos_id)
-
-    blocks = make_blocks(all_ids, block_size)
+        ids = encoding.encode(text) + [eos_id]
+        text_blocks = make_blocks(ids, block_size)
+        if text_blocks:
+            blocks.extend(text_blocks)
+            continue
+        if len(ids) < block_size:
+            padded = ids + [eos_id] * (block_size - len(ids))
+            blocks.append(padded)
     dataset = LMDataset(blocks)
 
     config = GPT2Config(
