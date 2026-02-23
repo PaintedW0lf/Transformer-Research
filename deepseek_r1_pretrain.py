@@ -18,13 +18,13 @@ from lm_utils import (
 
 
 def build_deepseek_r1_from_scratch(
-    texts: Union[Iterable[str], str, Path] = None,
+    texts: Iterable[str] = None,
     data_dir: Union[str, Path] = None,
     block_size: int = 2048,
     model_id: str = "deepseek-ai/DeepSeek-R1",
     use_streaming: bool = False,
     shuffle_buffer: int = 10000,
-) -> tuple[AutoModelForCausalLM, LMDataset, SimpleLMDataCollator]:
+) -> tuple[AutoModelForCausalLM, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)

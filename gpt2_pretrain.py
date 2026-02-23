@@ -19,7 +19,7 @@ from lm_utils import (
 
 
 def build_gpt2_from_scratch(
-    texts: Union[Iterable[str], str, Path] = None,
+    texts: Iterable[str] = None,
     data_dir: Union[str, Path] = None,
     block_size: int = 1024,
     n_layer: int = 12,
@@ -27,7 +27,7 @@ def build_gpt2_from_scratch(
     n_embd: int = 768,
     use_streaming: bool = False,
     shuffle_buffer: int = 10000,
-) -> tuple[GPT2LMHeadModel, LMDataset, SimpleLMDataCollator]:
+) -> tuple[GPT2LMHeadModel, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
     

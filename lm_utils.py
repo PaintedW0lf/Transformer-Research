@@ -58,6 +58,11 @@ class StreamingLMDataset(IterableDataset):
         block_size: int = 1024,
         shuffle_buffer: int = 10000,
     ):
+        if shuffle_buffer < 1:
+            raise ValueError(f"shuffle_buffer must be positive, got {shuffle_buffer}")
+        if block_size < 1:
+            raise ValueError(f"block_size must be positive, got {block_size}")
+        
         self.data_dir = Path(data_dir)
         self.tokenizer = tokenizer
         self.eos_id = eos_id
