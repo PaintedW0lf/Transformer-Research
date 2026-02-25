@@ -68,8 +68,8 @@ if __name__ == "__main__":
     model, dataset, collator = build_deepseek_r1_from_scratch(
         data_dir="data",
         use_streaming=True,
-        block_size=4096,
-        shuffle_buffer=50000,
+        block_size=2048,
+        shuffle_buffer=20000,
     )
     
     trainer = build_trainer(
