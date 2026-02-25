@@ -73,8 +73,8 @@ if __name__ == "__main__":
     model, dataset, collator = build_gpt2_from_scratch(
         data_dir="data",
         use_streaming=True,
-        block_size=1024,
-        shuffle_buffer=10000,
+        block_size=2048,
+        shuffle_buffer=50000,
     )
     
     trainer = build_trainer(
