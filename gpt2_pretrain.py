@@ -26,7 +26,7 @@ def build_gpt2_from_scratch(
     n_head: int = 12,
     n_embd: int = 768,
     use_streaming: bool = False,
-    shuffle_buffer: int = 10000,
+    shuffle_buffer: int = 20000,
 ) -> tuple[GPT2LMHeadModel, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
