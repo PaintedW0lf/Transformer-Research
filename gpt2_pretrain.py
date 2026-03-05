@@ -65,24 +65,47 @@ def build_gpt2_from_scratch(
 
 
 if __name__ == "__main__":
-    # Option 1: Load all into memory (default)
-    # texts = load_texts_from_data_dir("data")
-    # model, dataset, collator = build_gpt2_from_scratch(texts)
+    import argparse
     
-    # Option 2: Streaming mode (for large datasets)
+    parser = argparse.ArgumentParser(description="GPT-2 pretraining")
+    parser.add_argument("--data-dir", type=str, default="data", help="Data directory")
+    parser.add_argument("--output-dir", type=str, default="./outputs/gpt2_scratch")
+    parser.add_argument("--block-size", type=int, default=1024)
+    parser.add_argument("--max-steps", type=int, default=100)
+    parser.add_argument("--learning-rate", type=float, default=5e-4)
+    parser.add_argument("--streaming", action="store_true", help="Use streaming mode")
+    parser.add_argument("--shuffle-buffer", type=int, default=10000)
+    parser.add_argument("--n-layer", type=int, default=12)
+    parser.add_argument("--n-head", type=int, default=12)
+    parser.add_argument("--n-embd", type=int, default=768)
+    args = parser.parse_args()
+    
     model, dataset, collator = build_gpt2_from_scratch(
-        data_dir="data",
-        use_streaming=True,
-        block_size=2048,
-        shuffle_buffer=50000,
+        data_dir=args.data_dir if args.streaming else None,
+        texts=None if args.streaming else load_texts_from_data_dir(args.data_dir),
+        block_size=args.block_size,
+        n_layer=args.n_layer,
+        n_head=args.n_head,
+        n_embd=args.n_embd,
+        use_streaming=args.streaming,
+        shuffle_buffer=args.shuffle_buffer,
     )
     
     trainer = build_trainer(
         model,
         dataset,
         collator,
-        output_dir="./outputs/gpt2_scratch",
+        output_dir=args.output_dir,
+        max_steps=args.max_steps,
+        learning_rate=args.learning_rate,
     )
-
+    
+    print(f"Model: {sum(p.numel() for p in model.parameters()):,} parameters")
+    print(f"Data dir: {args.data_dir}")
+    print(f"Streaming: {args.streaming}")
+    print(f"Block size: {args.block_size}")
+    print(f"Max steps: {args.max_steps}")
+    print()
+    
     # Uncomment to start training.
-    # trainer.train()
+    trainer.train()
