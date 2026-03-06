@@ -32,10 +32,19 @@ class SimpleLMDataCollator:
     def __init__(self, pad_id: int):
         self.pad_id = pad_id
 
-    def __call__(self, features: List[LMExample]) -> dict:
-        max_len = max(len(f.input_ids) for f in features)
-        input_ids = [f.input_ids + [self.pad_id] * (max_len - len(f.input_ids)) for f in features]
-        input_tensor = torch.tensor(input_ids, dtype=torch.long)
+    def __call__(self, features) -> dict:
+        # Handle both LMExample objects (from LMDataset) and raw tensors (from StreamingLMDataset)
+        if isinstance(features[0], torch.Tensor):
+            # StreamingLMDataset yields tensors directly
+            input_tensor = torch.stack(features)
+        elif isinstance(features[0], LMExample):
+            # LMDataset yields LMExample objects
+            max_len = max(len(f.input_ids) for f in features)
+            input_ids = [f.input_ids + [self.pad_id] * (max_len - len(f.input_ids)) for f in features]
+            input_tensor = torch.tensor(input_ids, dtype=torch.long)
+        else:
+            raise TypeError(f"Unexpected feature type: {type(features[0])}")
+        
         return {
             "input_ids": input_tensor,
             "labels": input_tensor.clone(),
@@ -146,7 +155,9 @@ def build_trainer(
         warmup_steps=100,
         weight_decay=0.1,
         fp16=torch.cuda.is_available(),
-        report_to=[],
+        use_cpu=not torch.cuda.is_available(),
+        report_to=["tensorboard"],
+        run_name="llm_training",
     )
     return Trainer(
         model=model,
