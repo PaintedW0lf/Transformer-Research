@@ -26,7 +26,8 @@ def build_gpt2_from_scratch(
     n_head: int = 12,
     n_embd: int = 768,
     use_streaming: bool = False,
-    shuffle_buffer: int = 10000,
+    shuffle_buffer: int = 20000,
+    subdir: str = None,
 ) -> tuple[GPT2LMHeadModel, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
@@ -40,6 +41,7 @@ def build_gpt2_from_scratch(
             eos_id=eos_id,
             block_size=block_size,
             shuffle_buffer=shuffle_buffer,
+            subdir=subdir,
         )
     else:
         if texts is None:
@@ -75,6 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--streaming", action="store_true", help="Use streaming mode")
     parser.add_argument("--shuffle-buffer", type=int, default=20000)
+    parser.add_argument("--subdir", type=str, default=None, help="Subdirectory within data_dir (e.g., 'western' or 'eastern')")
     parser.add_argument("--n-layer", type=int, default=12)
     parser.add_argument("--n-head", type=int, default=12)
     parser.add_argument("--n-embd", type=int, default=768)
@@ -89,6 +92,7 @@ if __name__ == "__main__":
         n_embd=args.n_embd,
         use_streaming=args.streaming,
         shuffle_buffer=args.shuffle_buffer,
+        subdir=args.subdir,
     )
     
     trainer = build_trainer(
@@ -102,6 +106,7 @@ if __name__ == "__main__":
     
     print(f"Model: {sum(p.numel() for p in model.parameters()):,} parameters")
     print(f"Data dir: {args.data_dir}")
+    print(f"Subdir: {args.subdir}")
     print(f"Streaming: {args.streaming}")
     print(f"Block size: {args.block_size}")
     print(f"Max steps: {args.max_steps}")
