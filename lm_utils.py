@@ -146,6 +146,7 @@ def build_trainer(
         warmup_steps=100,
         weight_decay=0.1,
         fp16=torch.cuda.is_available(),
+        no_cuda=not torch.cuda.is_available(),
         report_to=["tensorboard"],
         run_name="llm_training",
     )
