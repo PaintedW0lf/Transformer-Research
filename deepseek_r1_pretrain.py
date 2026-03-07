@@ -17,14 +17,15 @@ from lm_utils import (
 
 def build_deepseek_r1_from_scratch(
     texts: Iterable[str],
-    block_size: int = 2048,
+    block_size: int = 4096,
     model_id: str = "deepseek-ai/DeepSeek-R1",
 ) -> tuple[AutoModelForCausalLM, LMDataset, SimpleLMDataCollator]:
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    config.max_position_embeddings = block_size
-
+    # Use model's default max_position_embeddings (16384 for DeepSeek-R1)
+    # but set a smaller training block_size below
+    
     all_ids: List[int] = []
     eos_id = tokenizer.eos_token_id
     if eos_id is None:
