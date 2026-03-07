@@ -42,14 +42,38 @@ def build_deepseek_r1_from_scratch(
 
 
 if __name__ == "__main__":
-    texts = load_texts_from_data_dir("data")
-    model, dataset, collator = build_deepseek_r1_from_scratch(texts)
-    trainer = build_trainer(
-        model,
-        dataset,
-        collator,
-        output_dir="./outputs/deepseek_r1_scratch",
+    # Train on Eastern philosophical texts
+    print("\n=== Training on Eastern texts ===")
+    east_texts = load_texts_from_data_dir("data/east")
+    model_east, dataset_east, collator_east = build_deepseek_r1_from_scratch(east_texts)
+    trainer_east = build_trainer(
+        model_east,
+        dataset_east,
+        collator_east,
+        output_dir="./outputs/deepseek_r1_east",
+        per_device_train_batch_size=4,  # DeepSeek-R1 is larger, use smaller batch
+        gradient_accumulation_steps=8,  # Effective batch size: 4*8*2 GPUs = 64
+        learning_rate=3e-4,
+        max_steps=1000,
     )
+    # Uncomment to train on Eastern texts
+    # trainer_east.train()
 
-    # Uncomment to start training.
-    # trainer.train()
+    # Train on Western philosophical texts
+    print("\n=== Training on Western texts ===")
+    west_texts = load_texts_from_data_dir("data/west")
+    model_west, dataset_west, collator_west = build_deepseek_r1_from_scratch(west_texts)
+    trainer_west = build_trainer(
+        model_west,
+        dataset_west,
+        collator_west,
+        output_dir="./outputs/deepseek_r1_west",
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=8,
+        learning_rate=3e-4,
+        max_steps=1000,
+    )
+    # Uncomment to train on Western texts
+    # trainer_west.train()
+    
+    # To use both GPUs, run: torchrun --nproc_per_node=2 deepseek_r1_pretrain.py
