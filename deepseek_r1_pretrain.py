@@ -24,7 +24,7 @@ from lm_utils import (
 def build_deepseek_r1_from_scratch(
     texts: Iterable[str],
     block_size: int = 4096,
-    model_id: str = "deepseek-ai/DeepSeek-R1",
+    model_id: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
 ) -> tuple[AutoModelForCausalLM, LMDataset, SimpleLMDataCollator]:
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
