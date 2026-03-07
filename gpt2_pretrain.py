@@ -65,8 +65,7 @@ if __name__ == "__main__":
         learning_rate=6e-4,
         max_steps=1000,
     )
-    # Uncomment to train on Eastern texts
-    # trainer_east.train()
+    trainer_east.train()
 
     # Train on Western philosophical texts
     print("\n=== Training on Western texts ===")
@@ -82,7 +81,4 @@ if __name__ == "__main__":
         learning_rate=6e-4,
         max_steps=1000,
     )
-    # Uncomment to train on Western texts
-    # trainer_west.train()
-    
-    # To use both GPUs, run: torchrun --nproc_per_node=2 gpt2_pretrain.py
+    trainer_west.train()

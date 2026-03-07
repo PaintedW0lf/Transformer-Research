@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from typing import Iterable, List
 
+import logging
+
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+
+logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR)
 
 from lm_utils import (
     LMDataset,
@@ -23,8 +27,11 @@ def build_deepseek_r1_from_scratch(
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    # Use model's default max_position_embeddings (16384 for DeepSeek-R1)
-    # but set a smaller training block_size below
+    # Fix rope_scaling integer fields that must be floats
+    if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
+        for key in ("factor", "beta_fast", "beta_slow"):
+            if key in config.rope_scaling:
+                config.rope_scaling[key] = float(config.rope_scaling[key])
     
     all_ids: List[int] = []
     eos_id = tokenizer.eos_token_id
@@ -57,8 +64,7 @@ if __name__ == "__main__":
         learning_rate=3e-4,
         max_steps=1000,
     )
-    # Uncomment to train on Eastern texts
-    # trainer_east.train()
+    trainer_east.train()
 
     # Train on Western philosophical texts
     print("\n=== Training on Western texts ===")
@@ -74,7 +80,4 @@ if __name__ == "__main__":
         learning_rate=3e-4,
         max_steps=1000,
     )
-    # Uncomment to train on Western texts
-    # trainer_west.train()
-    
-    # To use both GPUs, run: torchrun --nproc_per_node=2 deepseek_r1_pretrain.py
+    trainer_west.train()
