@@ -5,12 +5,12 @@ from __future__ import annotations
 from typing import Iterable, List
 
 import logging
-import warnings
 
+import transformers
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
-logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR)
-warnings.filterwarnings("ignore", message=".*rope_parameters.*")
+transformers.logging.set_verbosity_error()
+logging.getLogger("transformers").setLevel(logging.ERROR)
 
 from lm_utils import (
     LMDataset,
