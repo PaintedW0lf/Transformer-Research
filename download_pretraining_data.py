@@ -113,6 +113,57 @@ def html_to_text(html: str) -> str:
     return p.get_text()
 
 
+def _english_stats(text: str) -> tuple[float, float, float, int]:
+    """Return lightweight English-likelihood stats for downloaded text.
+
+    Metrics:
+    - ascii_ratio: fraction of characters in ASCII range
+    - latin_alpha_ratio: fraction of alphabetic chars that are ASCII/Latin
+    - stopword_ratio: share of tokens in a small English stopword set
+    - word_count: number of alphabetic tokens
+    """
+    if not text.strip():
+        return 0.0, 0.0, 0.0, 0
+
+    char_count = len(text)
+    ascii_ratio = sum(1 for c in text if ord(c) < 128) / char_count
+
+    alpha_chars = [c for c in text if c.isalpha()]
+    if alpha_chars:
+        latin_alpha_ratio = sum(1 for c in alpha_chars if ord(c) < 128) / len(alpha_chars)
+    else:
+        latin_alpha_ratio = 0.0
+
+    words = re.findall(r"[A-Za-z']+", text.lower())
+    if not words:
+        return ascii_ratio, latin_alpha_ratio, 0.0, 0
+
+    common_words = {
+        "the", "and", "of", "to", "in", "that", "is", "for", "with", "as", "on",
+        "by", "from", "this", "be", "are", "was", "were", "it", "not", "or", "at",
+        "an", "which", "but", "have", "has", "had", "we", "you", "they", "he", "she",
+    }
+    stopword_ratio = sum(1 for w in words if w in common_words) / len(words)
+    return ascii_ratio, latin_alpha_ratio, stopword_ratio, len(words)
+
+
+def _is_probably_english(text: str) -> bool:
+    """Heuristic language guard to reject non-English or OCR-garble downloads."""
+    ascii_ratio, latin_alpha_ratio, stopword_ratio, word_count = _english_stats(text)
+
+    # Extremely short text is never useful for training.
+    if word_count < 200:
+        return False
+
+    # Keep thresholds permissive enough for old translations with diacritics,
+    # but strict enough to reject non-English scripts and OCR noise.
+    return (
+        ascii_ratio >= 0.85
+        and latin_alpha_ratio >= 0.90
+        and stopword_ratio >= 0.04
+    )
+
+
 # ---------------------------------------------------------------------------
 # HTTP helper
 # ---------------------------------------------------------------------------
@@ -131,6 +182,15 @@ def _save(label: str, text: str, region: str = "west") -> None:
     text = clean_whitespace(text)
     if not text:
         print(f"  [SKIP] {label}: empty after cleaning")
+        return
+    if not _is_probably_english(text):
+        ascii_ratio, latin_alpha_ratio, stopword_ratio, word_count = _english_stats(text)
+        print(
+            "  [SKIP] "
+            f"{label}: rejected by English filter "
+            f"(ascii={ascii_ratio:.3f}, latin_alpha={latin_alpha_ratio:.3f}, "
+            f"stopwords={stopword_ratio:.3f}, words={word_count})"
+        )
         return
     folder = EAST_DIR if region == "east" else WEST_DIR
     out = folder / f"{label}.txt"
@@ -204,7 +264,7 @@ def fetch_internet_archive(query: str, label: str, region: str = "west", max_can
     """
     search_url = (
         "https://archive.org/advancedsearch.php"
-        f"?q={quote_plus(query)}+mediatype:texts"
+        f"?q={quote_plus(query)}+mediatype:texts+language:English"
         f"&output=json&rows={max_candidates}"
         "&fl[]=identifier&fl[]=title&fl[]=filesize"
     )
@@ -412,10 +472,6 @@ SOURCES: list[tuple] = [
     # ── INDIA: Upanishads ─────────────────────────────────────────────────
     # SBE Vol 15 (Müller) contains both Brihadaranyaka and Chandogya
     (fetch_gutenberg_id, 2034, "upanishads_muller_sbe15", "east"),
-    (fetch_internet_archive, "Brihadaranyaka Upanishad Cowell translation",
-     "brihadaranyaka_cowell", "east"),
-    (fetch_internet_archive, "Chandogya Upanishad Hume translation",
-     "chandogya_hume", "east"),
 
     # ── INDIA: Pali Canon ─────────────────────────────────────────────────
     # Rhys Davids — Dialogues of the Buddha (PG #38399)
@@ -488,8 +544,6 @@ SOURCES: list[tuple] = [
      "aristotle_physics"),
     (fetch_internet_archive, "Aristotle De Anima On the Soul translation",
      "aristotle_de_anima"),
-    (fetch_internet_archive, "Aristotle Metaphysics Ross public domain",
-     "aristotle_metaphysics_ia"),
 
     # ── PERSIA: Avesta ────────────────────────────────────────────────────
     # Darmesteter — sacred-texts.com (SBE Vol 4 = Vendidad, Vol 23 = Yasts + Gathas)
