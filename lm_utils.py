@@ -137,7 +137,6 @@ def build_trainer(
     max_steps: int = 100,
 ) -> Trainer:
     """Build trainer optimized for RTX 6000 Ada GPUs.
-
     Default settings:
     - bf16: Better numerical stability than fp16 on Ada architecture
     - batch_size=8 * gradient_accumulation=4 = effective batch size of 32 per GPU

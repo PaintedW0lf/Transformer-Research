@@ -38,7 +38,6 @@ def build_deepseek_r1_from_scratch(
         for key in ("factor", "beta_fast", "beta_slow"):
             if key in config.rope_scaling:
                 config.rope_scaling[key] = float(config.rope_scaling[key])
-
     eos_id = tokenizer.eos_token_id
     if eos_id is None:
         raise ValueError("Tokenizer must define eos_token_id for causal LM pretraining.")
@@ -69,24 +68,34 @@ def build_deepseek_r1_from_scratch(
 
 
 if __name__ == "__main__":
-    # Option 1: Load all into memory (default)
-    # texts = load_texts_from_data_dir("data")
-    # model, dataset, collator = build_deepseek_r1_from_scratch(texts)
-    
-    # Option 2: Streaming mode (for large datasets)
-    model, dataset, collator = build_deepseek_r1_from_scratch(
-        data_dir="data",
-        use_streaming=True,
-        block_size=2048,
-        shuffle_buffer=10000,
+    # Train on Eastern philosophical texts
+    print("\n=== Training on Eastern texts ===")
+    east_texts = load_texts_from_data_dir("data/east")
+    model_east, dataset_east, collator_east = build_deepseek_r1_from_scratch(east_texts)
+    trainer_east = build_trainer(
+        model_east,
+        dataset_east,
+        collator_east,
+        output_dir="./outputs/deepseek_r1_east",
+        per_device_train_batch_size=4,  # DeepSeek-R1 is larger, use smaller batch
+        gradient_accumulation_steps=8,  # Effective batch size: 4*8*2 GPUs = 64
+        learning_rate=3e-4,
+        max_steps=1000,
     )
-    
-    trainer = build_trainer(
-        model,
-        dataset,
-        collator,
-        output_dir="./outputs/deepseek_r1_scratch",
-    )
+    trainer_east.train()
 
-    # Uncomment to start training.
-    # trainer.train()
+    # Train on Western philosophical texts
+    print("\n=== Training on Western texts ===")
+    west_texts = load_texts_from_data_dir("data/west")
+    model_west, dataset_west, collator_west = build_deepseek_r1_from_scratch(west_texts)
+    trainer_west = build_trainer(
+        model_west,
+        dataset_west,
+        collator_west,
+        output_dir="./outputs/deepseek_r1_west",
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=8,
+        learning_rate=3e-4,
+        max_steps=1000,
+    )
+    trainer_west.train()

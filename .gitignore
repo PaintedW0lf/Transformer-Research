@@ -13,7 +13,6 @@ venv/
 .env/
 .pytest_cache/
 # Training outputs
-outputs/
 
 # Local data
 data/
