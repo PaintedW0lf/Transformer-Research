@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
-from typing import Iterable, List, Union
+from typing import Iterable, List
 
+import transformers
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+
+transformers.logging.set_verbosity_error()
+logging.getLogger("transformers").setLevel(logging.ERROR)
 
 from lm_utils import (
     LMDataset,
@@ -18,17 +23,21 @@ from lm_utils import (
 
 
 def build_deepseek_r1_from_scratch(
-    texts: Iterable[str] = None,
-    data_dir: Union[str, Path] = None,
-    block_size: int = 2048,
-    model_id: str = "deepseek-ai/DeepSeek-R1",
+    texts: Iterable[str] | None = None,
+    data_dir: str | Path | None = None,
+    block_size: int = 4096,
+    model_id: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     use_streaming: bool = False,
     shuffle_buffer: int = 10000,
-) -> tuple[AutoModelForCausalLM, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
+) -> tuple[AutoModelForCausalLM, LMDataset | StreamingLMDataset, SimpleLMDataCollator]:
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    config.max_position_embeddings = block_size
+    # Fix rope_scaling integer fields that must be floats
+    if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
+        for key in ("factor", "beta_fast", "beta_slow"):
+            if key in config.rope_scaling:
+                config.rope_scaling[key] = float(config.rope_scaling[key])
 
     eos_id = tokenizer.eos_token_id
     if eos_id is None:
