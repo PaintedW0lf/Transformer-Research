@@ -15,8 +15,8 @@ ssh your_username@Cmps03.ok.ubc.ca
 
 # Run setup
 cd ~/LLMTraining
-chmod +x cluster_setup.sh
-./cluster_setup.sh
+chmod +x scripts/cluster_setup.sh
+./scripts/cluster_setup.sh
 ```
 
 ## Prepare Data
