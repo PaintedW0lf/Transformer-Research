@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Iterable, List
 
 import tiktoken
@@ -10,6 +11,7 @@ from transformers import GPT2Config, GPT2LMHeadModel
 from lm_utils import (
     LMDataset,
     SimpleLMDataCollator,
+    StreamingLMDataset,
     build_trainer,
     load_texts_from_data_dir,
     make_blocks,
@@ -17,25 +19,42 @@ from lm_utils import (
 
 
 def build_gpt2_from_scratch(
-    texts: Iterable[str],
+    texts: Iterable[str] | None = None,
+    data_dir: str | Path | None = None,
     block_size: int = 1024,
     n_layer: int = 12,
     n_head: int = 12,
     n_embd: int = 768,
-) -> tuple[GPT2LMHeadModel, LMDataset, SimpleLMDataCollator]:
+    use_streaming: bool = False,
+    shuffle_buffer: int = 10000,
+) -> tuple[GPT2LMHeadModel, LMDataset | StreamingLMDataset, SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
-    blocks: List[List[int]] = []
-    for text in texts:
-        ids = encoding.encode(text) + [eos_id]
-        text_blocks = make_blocks(ids, block_size)
-        if text_blocks:
-            blocks.extend(text_blocks)
-            continue
-        if len(ids) < block_size:
-            padded = ids + [eos_id] * (block_size - len(ids))
-            blocks.append(padded)
-    dataset = LMDataset(blocks)
+    
+    if use_streaming:
+        if data_dir is None:
+            raise ValueError("data_dir must be provided when use_streaming=True")
+        dataset = StreamingLMDataset(
+            data_dir=data_dir,
+            tokenizer=encoding,
+            eos_id=eos_id,
+            block_size=block_size,
+            shuffle_buffer=shuffle_buffer,
+        )
+    else:
+        if texts is None:
+            raise ValueError("texts must be provided when use_streaming=False")
+        blocks: List[List[int]] = []
+        for text in texts:
+            ids = encoding.encode(text) + [eos_id]
+            text_blocks = make_blocks(ids, block_size)
+            if text_blocks:
+                blocks.extend(text_blocks)
+                continue
+            if len(ids) < block_size:
+                padded = ids + [eos_id] * (block_size - len(ids))
+                blocks.append(padded)
+        dataset = LMDataset(blocks)
 
     config = GPT2Config(
         vocab_size=encoding.n_vocab,

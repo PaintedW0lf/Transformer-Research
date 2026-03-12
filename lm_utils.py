@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List
 
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, IterableDataset
 from transformers import Trainer, TrainingArguments
 
 
@@ -42,6 +43,82 @@ class SimpleLMDataCollator:
         }
 
 
+class StreamingLMDataset(IterableDataset):
+    """Memory-efficient streaming dataset for large corpora.
+    
+    Reads text files on-the-fly instead of loading everything into memory.
+    Supports optional buffer shuffling for better randomization.
+    """
+    
+    def __init__(
+        self,
+        data_dir: str | Path,
+        tokenizer,
+        eos_id: int,
+        block_size: int = 1024,
+        shuffle_buffer: int = 10000,
+    ):
+        if shuffle_buffer < 1:
+            raise ValueError(f"shuffle_buffer must be positive, got {shuffle_buffer}")
+        if block_size < 1:
+            raise ValueError(f"block_size must be positive, got {block_size}")
+        
+        self.data_dir = Path(data_dir)
+        self.tokenizer = tokenizer
+        self.eos_id = eos_id
+        self.block_size = block_size
+        self.shuffle_buffer = shuffle_buffer
+        
+        if not self.data_dir.exists() or not self.data_dir.is_dir():
+            raise FileNotFoundError(f"Expected a data directory at: {self.data_dir}")
+
+    def _encode_text(self, text: str) -> List[int]:
+        """Tokenize text without forcing tokenizer-specific kwargs."""
+        try:
+            return self.tokenizer.encode(text, add_special_tokens=False)
+        except TypeError:
+            return self.tokenizer.encode(text)
+    
+    def __iter__(self):
+        worker_info = torch.utils.data.get_worker_info()
+        
+        # Get list of files (sorted for reproducibility)
+        txt_files = sorted(self.data_dir.rglob("*.txt"))
+        if not txt_files:
+            raise FileNotFoundError("No .txt files found in data directory.")
+        
+        # If in a worker process, split files across workers
+        if worker_info is not None:
+            txt_files = txt_files[worker_info.id :: worker_info.num_workers]
+        
+        # Shuffle file order for variety
+        txt_files = list(txt_files)
+        random.shuffle(txt_files)
+        
+        buffer: List[torch.Tensor] = []
+        
+        for file_path in txt_files:
+            text = file_path.read_text(encoding="utf-8")
+            ids = self._encode_text(text) + [self.eos_id]
+            
+            # Yield blocks from this file
+            for i in range(0, len(ids) - self.block_size + 1, self.block_size):
+                block = torch.tensor(ids[i:i + self.block_size], dtype=torch.long)
+                
+                if len(buffer) < self.shuffle_buffer:
+                    buffer.append(block)
+                else:
+                    # Randomly replace from buffer to maintain ~shuffle_buffer size
+                    idx = random.randint(0, self.shuffle_buffer - 1)
+                    yield buffer[idx]
+                    buffer[idx] = block
+        
+        # Drain remaining buffer (shuffled)
+        random.shuffle(buffer)
+        for block in buffer:
+            yield block
+
+
 def make_blocks(token_ids: List[int], block_size: int) -> List[List[int]]:
     blocks = []
     for i in range(0, len(token_ids) - block_size + 1, block_size):
@@ -60,7 +137,6 @@ def build_trainer(
     max_steps: int = 100,
 ) -> Trainer:
     """Build trainer optimized for RTX 6000 Ada GPUs.
-    
     Default settings:
     - bf16: Better numerical stability than fp16 on Ada architecture
     - batch_size=8 * gradient_accumulation=4 = effective batch size of 32 per GPU
