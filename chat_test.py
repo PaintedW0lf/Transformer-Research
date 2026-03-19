@@ -25,10 +25,12 @@ def generate(
 ) -> str:
     input_ids = encoding.encode(prompt)
     input_tensor = torch.tensor([input_ids], dtype=torch.long, device=device)
+    attention_mask = torch.ones_like(input_tensor)
 
     with torch.no_grad():
         output = model.generate(
             input_tensor,
+            attention_mask=attention_mask,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
