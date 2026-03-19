@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
-from typing import Iterable, List, Union
+from typing import Iterable, List
 
+import transformers
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+
+transformers.logging.set_verbosity_error()
+logging.getLogger("transformers").setLevel(logging.ERROR)
 
 from lm_utils import (
     LMDataset,
@@ -18,18 +23,21 @@ from lm_utils import (
 
 
 def build_deepseek_r1_from_scratch(
-    texts: Iterable[str] = None,
-    data_dir: Union[str, Path] = None,
-    block_size: int = 2048,
-    model_id: str = "deepseek-ai/DeepSeek-R1",
+    texts: Iterable[str] | None = None,
+    data_dir: str | Path | None = None,
+    block_size: int = 4096,
+    model_id: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     use_streaming: bool = False,
     shuffle_buffer: int = 10000,
-) -> tuple[AutoModelForCausalLM, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
+) -> tuple[AutoModelForCausalLM, LMDataset | StreamingLMDataset, SimpleLMDataCollator]:
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    config.max_position_embeddings = block_size
-
+    # Fix rope_scaling integer fields that must be floats
+    if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
+        for key in ("factor", "beta_fast", "beta_slow"):
+            if key in config.rope_scaling:
+                config.rope_scaling[key] = float(config.rope_scaling[key])
     eos_id = tokenizer.eos_token_id
     if eos_id is None:
         raise ValueError("Tokenizer must define eos_token_id for causal LM pretraining.")
@@ -60,24 +68,22 @@ def build_deepseek_r1_from_scratch(
 
 
 if __name__ == "__main__":
-    # Option 1: Load all into memory (default)
-    # texts = load_texts_from_data_dir("data")
-    # model, dataset, collator = build_deepseek_r1_from_scratch(texts)
-    
-    # Option 2: Streaming mode (for large datasets)
+    # Streaming is strongly preferred for a 7B model — avoids OOM on tokenization
     model, dataset, collator = build_deepseek_r1_from_scratch(
         data_dir="data",
         use_streaming=True,
         block_size=4096,
         shuffle_buffer=50000,
     )
-    
+
     trainer = build_trainer(
         model,
         dataset,
         collator,
         output_dir="./outputs/deepseek_r1_scratch",
+        per_device_train_batch_size=4,   # 7B model — keep batches small
+        gradient_accumulation_steps=8,   # Effective batch: 4 * 8 * 2 GPUs = 64
+        learning_rate=3e-4,
+        max_steps=1000,
     )
-
-    # Uncomment to start training.
-    # trainer.train()
+    trainer.train()

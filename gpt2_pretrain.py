@@ -19,19 +19,19 @@ from lm_utils import (
 
 
 def build_gpt2_from_scratch(
-    texts: Iterable[str] = None,
-    data_dir: Union[str, Path] = None,
+    texts: Iterable[str] | None = None,
+    data_dir: str | Path | None = None,
     block_size: int = 1024,
     n_layer: int = 12,
     n_head: int = 12,
     n_embd: int = 768,
     use_streaming: bool = False,
-    shuffle_buffer: int = 20000,
+    shuffle_buffer: int = 10000,
     subdir: str = None,
 ) -> tuple[GPT2LMHeadModel, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
-    
+
     if use_streaming:
         if data_dir is None:
             raise ValueError("data_dir must be provided when use_streaming=True")
@@ -46,11 +46,16 @@ def build_gpt2_from_scratch(
     else:
         if texts is None:
             raise ValueError("texts must be provided when use_streaming=False")
-        all_ids: List[int] = []
+        blocks: List[List[int]] = []
         for text in texts:
-            all_ids.extend(encoding.encode(text))
-            all_ids.append(eos_id)
-        blocks = make_blocks(all_ids, block_size)
+            ids = encoding.encode(text) + [eos_id]
+            text_blocks = make_blocks(ids, block_size)
+            if text_blocks:
+                blocks.extend(text_blocks)
+                continue
+            if len(ids) < block_size:
+                padded = ids + [eos_id] * (block_size - len(ids))
+                blocks.append(padded)
         dataset = LMDataset(blocks)
 
     config = GPT2Config(
@@ -68,7 +73,7 @@ def build_gpt2_from_scratch(
 
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="GPT-2 pretraining")
     parser.add_argument("--data-dir", type=str, default="data", help="Data directory")
     parser.add_argument("--output-dir", type=str, default="./outputs/gpt2_scratch")
@@ -76,13 +81,13 @@ if __name__ == "__main__":
     parser.add_argument("--max-steps", type=int, default=100000)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--streaming", action="store_true", help="Use streaming mode")
-    parser.add_argument("--shuffle-buffer", type=int, default=20000)
-    parser.add_argument("--subdir", type=str, default=None, help="Subdirectory within data_dir (e.g., 'western' or 'eastern')")
+    parser.add_argument("--shuffle-buffer", type=int, default=10000)
+    parser.add_argument("--subdir", type=str, default=None, help="Subdirectory within data_dir (e.g., 'east' or 'west')")
     parser.add_argument("--n-layer", type=int, default=12)
     parser.add_argument("--n-head", type=int, default=12)
     parser.add_argument("--n-embd", type=int, default=768)
     args = parser.parse_args()
-    
+
     model, dataset, collator = build_gpt2_from_scratch(
         data_dir=args.data_dir if args.streaming else None,
         texts=None if args.streaming else load_texts_from_data_dir(args.data_dir),
@@ -94,7 +99,7 @@ if __name__ == "__main__":
         shuffle_buffer=args.shuffle_buffer,
         subdir=args.subdir,
     )
-    
+
     trainer = build_trainer(
         model,
         dataset,
@@ -103,14 +108,13 @@ if __name__ == "__main__":
         max_steps=args.max_steps,
         learning_rate=args.learning_rate,
     )
-    
+
     print(f"Model: {sum(p.numel() for p in model.parameters()):,} parameters")
     print(f"Data dir: {args.data_dir}")
-    print(f"Subdir: {args.subdir}")
+    print(f"Subdir:   {args.subdir}")
     print(f"Streaming: {args.streaming}")
     print(f"Block size: {args.block_size}")
     print(f"Max steps: {args.max_steps}")
     print()
-    
-    # Uncomment to start training.
+
     trainer.train()
