@@ -33,7 +33,7 @@ def build_deepseek_r1_from_scratch(
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    # Fix rope_scaling integer fields that must be floats
+    # Keep rope_scaling numeric fields as float for compatibility.
     if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
         for key in ("factor", "beta_fast", "beta_slow"):
             if key in config.rope_scaling:
@@ -77,8 +77,8 @@ if __name__ == "__main__":
         dataset_east,
         collator_east,
         output_dir="./outputs/deepseek_r1_east",
-        per_device_train_batch_size=4,  # DeepSeek-R1 is larger, use smaller batch
-        gradient_accumulation_steps=8,  # Effective batch size: 4*8*2 GPUs = 64
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=8,
         learning_rate=3e-4,
         max_steps=1000,
     )

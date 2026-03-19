@@ -57,6 +57,7 @@ class StreamingLMDataset(IterableDataset):
         eos_id: int,
         block_size: int = 1024,
         shuffle_buffer: int = 10000,
+        subdir: str = None,
     ):
         if shuffle_buffer < 1:
             raise ValueError(f"shuffle_buffer must be positive, got {shuffle_buffer}")
@@ -64,6 +65,8 @@ class StreamingLMDataset(IterableDataset):
             raise ValueError(f"block_size must be positive, got {block_size}")
         
         self.data_dir = Path(data_dir)
+        if subdir:
+            self.data_dir = self.data_dir / subdir
         self.tokenizer = tokenizer
         self.eos_id = eos_id
         self.block_size = block_size
@@ -134,7 +137,10 @@ def build_trainer(
     per_device_train_batch_size: int = 8,
     gradient_accumulation_steps: int = 4,
     learning_rate: float = 5e-4,
-    max_steps: int = 100,
+    max_steps: int = 100000,
+    save_steps: int = 1000,
+    logging_steps: int = 10,
+    save_total_limit: int = 3,
 ) -> Trainer:
     """Build trainer optimized for RTX 6000 Ada GPUs.
     Default settings:
@@ -149,9 +155,11 @@ def build_trainer(
         gradient_accumulation_steps=gradient_accumulation_steps,
         learning_rate=learning_rate,
         max_steps=max_steps,
-        logging_steps=10,
-        save_steps=50,
-        warmup_steps=10,
+        logging_steps=logging_steps,
+        save_steps=save_steps,
+        save_strategy="steps",
+        save_total_limit=save_total_limit,
+        warmup_steps=100,
         weight_decay=0.1,
         # Use bfloat16 for Ada architecture (better than fp16)
         bf16=torch.cuda.is_available() and torch.cuda.is_bf16_supported(),

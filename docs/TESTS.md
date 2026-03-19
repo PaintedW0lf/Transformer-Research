@@ -17,3 +17,7 @@ This document is a quick reference for what this test suite exists to protect an
 
 3. `tests/conftest.py`
    - Keeps imports stable by adding the repo root to `sys.path` during tests.
+
+4. `tests/chat_test.py`
+   - Interactive utility to chat with a trained GPT-2 checkpoint.
+   - Not part of the automated pytest suite by default.
