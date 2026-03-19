@@ -74,6 +74,13 @@ class StreamingLMDataset(IterableDataset):
         
         if not self.data_dir.exists() or not self.data_dir.is_dir():
             raise FileNotFoundError(f"Expected a data directory at: {self.data_dir}")
+
+    def _encode_text(self, text: str) -> List[int]:
+        """Tokenize text without forcing tokenizer-specific kwargs."""
+        try:
+            return self.tokenizer.encode(text, add_special_tokens=False)
+        except TypeError:
+            return self.tokenizer.encode(text)
     
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
@@ -95,7 +102,7 @@ class StreamingLMDataset(IterableDataset):
         
         for file_path in txt_files:
             text = file_path.read_text(encoding="utf-8")
-            ids = self.tokenizer.encode(text) + [self.eos_id]
+            ids = self._encode_text(text) + [self.eos_id]
             
             # Yield blocks from this file
             for i in range(0, len(ids) - self.block_size + 1, self.block_size):
@@ -136,7 +143,6 @@ def build_trainer(
     save_total_limit: int = 3,
 ) -> Trainer:
     """Build trainer optimized for RTX 6000 Ada GPUs.
-    
     Default settings:
     - bf16: Better numerical stability than fp16 on Ada architecture
     - batch_size=8 * gradient_accumulation=4 = effective batch size of 32 per GPU

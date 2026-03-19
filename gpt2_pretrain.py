@@ -113,4 +113,12 @@ if __name__ == "__main__":
         learning_rate=args.learning_rate,
     )
 
+    print(f"Model: {sum(p.numel() for p in model.parameters()):,} parameters")
+    print(f"Data dir: {args.data_dir}")
+    print(f"Subdir:   {args.subdir}")
+    print(f"Streaming: {args.streaming}")
+    print(f"Block size: {args.block_size}")
+    print(f"Max steps: {args.max_steps}")
+    print()
+
     trainer.train()

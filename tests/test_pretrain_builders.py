@@ -73,3 +73,37 @@ def test_build_deepseek_from_scratch(monkeypatch) -> None:
     assert isinstance(model, DummyModel)
     assert len(dataset) == 1
     assert collator.pad_id == 2
+
+
+def test_build_gpt2_streaming_returns_streaming_dataset(tmp_path) -> None:
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    (data_dir / "sample.txt").write_text("hello world", encoding="utf-8")
+
+    _model, dataset, _collator = gpt2.build_gpt2_from_scratch(
+        data_dir=data_dir,
+        use_streaming=True,
+        block_size=4,
+        shuffle_buffer=8,
+    )
+
+    assert isinstance(dataset, gpt2.StreamingLMDataset)
+
+
+def test_build_deepseek_streaming_returns_streaming_dataset(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(deepseek, "AutoTokenizer", DummyAutoTokenizer)
+    monkeypatch.setattr(deepseek, "AutoConfig", DummyAutoConfig)
+    monkeypatch.setattr(deepseek, "AutoModelForCausalLM", DummyAutoModel)
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    (data_dir / "sample.txt").write_text("hello world", encoding="utf-8")
+
+    _model, dataset, _collator = deepseek.build_deepseek_r1_from_scratch(
+        data_dir=data_dir,
+        use_streaming=True,
+        block_size=4,
+        shuffle_buffer=8,
+    )
+
+    assert isinstance(dataset, deepseek.StreamingLMDataset)
