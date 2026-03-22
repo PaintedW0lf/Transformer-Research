@@ -73,7 +73,7 @@ or retelling used because no PD primary translation is accessible);
 | Mencius | 372–289 BCE | *Works of Mencius* — Legge trans. | `mencius_legge` | ✓ |
 | Zhuangzi | c. 4th c. BCE | *Zhuangzi* — Legge trans. | `zhuangzi_legge` | ✓ |
 | Xunzi | c. 310–237 BCE | *Works of Hsuntze* — Dubs trans. | `xunzi_dubs` | ✓ |
-| Han Feizi | died 233 BCE | — | — | – (Liao 1939 trans. is post-1927, restricted) |
+| Han Feizi | died 233 BCE | *Complete Works of Han Fei Tzu* — W. K. Liao trans. | `han_feizi_liao` | ✓ |
 
 #### Classical India / Bhagavad Gita (400–200 BCE)
 *Source: Wikipedia "Maurya Empire" section; Radhakrishnan & Moore 1957*
@@ -81,7 +81,7 @@ or retelling used because no PD primary translation is accessible);
 | Philosopher | Dates | Work in corpus | Label | Status |
 |---|---|---|---|---|
 | Badarayana / Bhagavad Gita | c. 400–200 BCE | *Bhagavad Gita* — Arnold trans. ("The Song Celestial") | `bhagavad_gita_arnold` | ✓ |
-| Aksapada Gautama (Nyaya) | c. 2nd c. BCE | — | — | – (Jha translation rare/restricted) |
+| Aksapada Gautama (Nyaya) | c. 2nd c. BCE | *Nyaya Sutras of Gautama* — Jha trans. (Sacred Books of the Hindus Vol. 8) | `nyaya_sutras_gautama` | ✓ |
 | Patanjali | c. 2nd c. BCE | *Yoga Sutras* — Johnston / Vivekananda trans. | `yoga_sutras_patanjali` | ✓ |
 
 #### Hellenistic Greece & Zoroastrian Persia (1200–200 BCE)
@@ -106,7 +106,7 @@ or retelling used because no PD primary translation is accessible);
 | Ashvaghosha | c. 1st c. CE | *Awakening of Faith in the Mahayana* | `awakening_of_faith_suzuki` | ✓ |
 | Milindapanha (anon.) | c. 1st c. CE | *Questions of King Milinda* — Rhys Davids trans. | `milindapanha_rhys_davids` | ✓ |
 | Nagarjuna | c. 150–250 CE | *Mulamadhyamakakarika* | `nagarjuna_mulamadhyamakakarika` | ✓ |
-| Vasubandhu | c. 4th c. CE | — | — | – (Pruden trans. is copyright; OCR files on IA are unreadable) |
+| Vasubandhu | c. 4th c. CE | Eliot, *Hinduism and Buddhism* (1921) — covers Yogacara | `vasubandhu_eliot_hinduism_buddhism` | ⚠ (secondary source; primary trans. are copyright) |
 | Asanga | c. 4th c. CE | *Lankavatara Sutra* (related Yogacara text) | `lankavatara_sutra_suzuki` | ⚠ (Yogacara text, not Asanga's own work) |
 | Buddhaghosa | c. 5th c. CE | *Visuddhimagga* — Bhikkhu Nanamoli trans. | `visuddhimagga_buddhaghosa` | ✓ |
 
@@ -133,18 +133,18 @@ or retelling used because no PD primary translation is accessible);
 | Philosopher | Dates | Work in corpus | Label | Status |
 |---|---|---|---|---|
 | Padmasambhava (attr.) | c. 8th c. CE | *Bardo Thodol* — Evans-Wentz 1927 trans. | `tibetan_book_of_dead` | ✓ |
-| Tsongkhapa | 1357–1419 | — | — | – (no PD English translation) |
-| Longchenpa | 1308–1364 | — | — | – (no PD English translation) |
+| Tsongkhapa | 1357–1419 | Waddell, *The Buddhism of Tibet, or Lamaism* (1895) — covers Gelug tradition | `waddell_buddhism_tibet` | ⚠ (secondary source; no PD primary translation) |
+| Longchenpa | 1308–1364 | *Guhyagarbha Tantra with Commentary* (Longchenpa's own commentary) | `longchenpa_guhyagarbha` | ✓ |
 
 #### Japan — Heian through Edo (774–1800 CE)
 *Source: Wikipedia "Japanese Philosophers" sections*
 
 | Philosopher | Dates | Work in corpus | Label | Status |
 |---|---|---|---|---|
-| Kukai | 774–835 CE | — | — | – (Hakeda 1972 trans. is copyright) |
+| Kukai | 774–835 CE | Eliot, *Japanese Buddhism* (1935) — covers Shingon/Kukai | `kukai_eliot_japanese_buddhism` | ⚠ (secondary source; Hakeda 1972 trans. is copyright) |
 | Genshin | 942–1017 CE | *Pure Land Buddhism* texts (IA) | `genshin_ojoyoshu` | ✓ |
-| Honen | 1133–1212 CE | — | — | – (Coates 1949 trans. is restricted on IA) |
-| Shinran | 1173–1261 CE | — | — | – (no pre-1928 standalone PD translation) |
+| Honen | 1133–1212 CE | Eliot, *Japanese Buddhism* (1935) — covers Honen and Pure Land | `kukai_eliot_japanese_buddhism` | ⚠ (covered by Eliot umbrella; Coates 1949 restricted) |
+| Shinran | 1173–1261 CE | *Buddhist Psalms* — Yamabe & Beck trans. (1921) | `shinran_buddhist_psalms` | ✓ |
 | Dogen Zenji | 1200–1253 CE | *Shobogenzo* (essays, older IA edition) | `dogen_shobogenzo` | ✓ |
 | Nichiren | 1222–1282 CE | Anesaki, *Nichiren, the Buddhist Prophet* (1916) | `nichiren_writings` | ⚠ (secondary source) |
 | Yoshida Kenko | c. 1330 CE | Aston, *A History of Japanese Literature* (1899) | `kenko_essays_idleness` | ⚠ (literary history, not primary text) |
@@ -155,8 +155,8 @@ or retelling used because no PD primary translation is accessible);
 
 | Philosopher | Dates | Work in corpus | Label | Status |
 |---|---|---|---|---|
-| Wonhyo | 617–686 CE | — | — | – (no PD English translation available) |
-| Jinul | 1158–1210 CE | — | — | – (no PD English translation available) |
+| Wonhyo | 617–686 CE | Sung Bae Park, *Wonhyo's Commentaries on Awakening of Faith* (1960 thesis) | `wonhyo_awakening_faith` | ⚠ (secondary source; no PD primary translation) |
+| Jinul | 1158–1210 CE | — | — | – (Buswell 1991 trans. is copyright; no PD English) |
 
 #### India — Medieval & Bhakti (900–1800 CE)
 *Source: Wikipedia "900–1100" and "1100–1500" Indian sections*
@@ -202,7 +202,7 @@ or retelling used because no PD primary translation is accessible);
 |---|---|---|---|---|
 | Plato | c. 427–347 BCE | *Republic*, *Phaedo*, *Symposium*, *Apology*, *Gorgias*, *Theaetetus*, *Timaeus* | `plato_*_jowett` | ✓ |
 | Aristotle | c. 384–322 BCE | *Nicomachean Ethics*, *Metaphysics*, *Politics*, *Physics*, *De Anima* | `aristotle_*` | ✓ |
-| Epicurus | c. 341–270 BCE | — | — | – (only fragments on PG) |
+| Epicurus | c. 341–270 BCE | *Lives of Eminent Philosophers* Book X (Diogenes Laertius / Yonge trans.) — contains Epicurus's letters and doctrines verbatim | `epicurus_diogenes_laertius` | ✓ — Note: Bailey's direct trans. rejected (too many Greek characters); PG #51 Yonge trans. is clean English |
 
 #### Classical Rome & Stoics (100 BCE–200 CE)
 *Source: Wikipedia "100 BC–100 AD" and "100–400" sections*
@@ -242,7 +242,7 @@ or retelling used because no PD primary translation is accessible);
 | Ibn Tufayl | c. 1105–1185 CE | *Hayy ibn Yaqzan* — Simon Ockley 1708 trans. | `ibn_tufayl_hayy` | ✓ |
 | Averroes / Ibn Rushd | c. 1126–1198 CE | *Tahafut al-Tahafut* | `averroes_tahafut` | ✓ |
 | Maimonides | c. 1135–1204 CE | *Guide for the Perplexed* | `maimonides_guide_perplexed` | ✓ |
-| Ibn Arabi | 1165–1240 CE | — | — | – (Nicholson trans. partial/restricted) |
+| Ibn Arabi | 1165–1240 CE | *Tarjuman al-Ashwaq* — R. A. Nicholson trans. (1911) | `ibn_arabi_tarjuman` | ✓ |
 
 #### Medieval & Scholastic (700–1400 CE)
 *Source: Wikipedia "500–900" and "1200–1300" sections*
@@ -307,43 +307,59 @@ or retelling used because no PD primary translation is accessible);
 | John Stuart Mill | 1806–1873 CE | *Utilitarianism* | `mill_utilitarianism` | ✓ |
 | Friedrich Nietzsche | 1844–1900 CE | *Beyond Good and Evil* | `nietzsche_beyond_good_evil` | ✓ |
 | William James | 1842–1910 CE | *Varieties of Religious Experience* | `james_varieties_religious_experience` | ✓ |
-| Karl Marx | 1818–1883 CE | — | — | – (outside philosophy/religion scope) |
+| Karl Marx | 1818–1883 CE | *The Communist Manifesto* — PG #61 | `marx_communist_manifesto` | ✓ |
 
 ---
 
-## Known Gaps
+## Known Gaps & Substitutions
 
-### East — No Accessible PD English Translation
+Every philosopher on the Wikipedia timelines is listed below with its final status.
+**✓** = primary PD text downloaded. **⚠** = secondary source used (reason given). **–** = no entry possible (reason given).
 
-| Philosopher | Wikipedia section | Reason |
-|---|---|---|
-| Han Feizi (~280–233 BCE) | Chinese Warring States | W.K. Liao trans. (1939) is post-1927 and restricted on IA |
-| Vasubandhu (~4th c. CE) | Indian Gupta | L. de La Vallée Poussin trans. is copyright; IA scans are OCR garbage |
-| Asanga (~4th c. CE) | Indian Gupta | No PD English translation of primary texts |
-| Wang Bi (226–249 CE) | Chinese Three Kingdoms | Richard Lynn trans. (1994) is copyright |
-| Wonhyo (617–686 CE) | Korean Unified Silla | No PD English translation |
-| Kukai (774–835 CE) | Japanese Heian | Hakeda trans. (1972) is copyright |
-| Honen (1133–1212 CE) | Japanese Kamakura | Coates trans. (1949) is restricted on IA |
-| Shinran (1173–1261 CE) | Japanese Kamakura | No pre-1928 standalone PD English translation |
-| Jinul (1158–1210 CE) | Korean Goryeo | No PD English translation |
-| Tsongkhapa (1357–1419 CE) | Tibetan | No PD English translation |
-| Longchenpa (1308–1364 CE) | Tibetan | No PD English translation |
-| Hakuin Ekaku (1686–1769 CE) | Japanese Edo | Waddell trans. is copyright |
+### East
 
-*Note: Mahavira / Jain Agamas — previously listed as a gap — is now covered via Jacobi's SBE translations (`jain_sutras_jacobi`).*
+| Philosopher | Dates | Label | Status | Reason / Note |
+|---|---|---|---|---|
+| Mahavira (Jain) | 599–527 BCE | `jain_sutras_jacobi` | ✓ | Jacobi SBE Vols 22 & 45 — closest available primary text |
+| Han Feizi | died 233 BCE | `han_feizi_liao` | ✓ | W. K. Liao trans., IA open-access copy |
+| Aksapada Gautama (Nyaya) | c. 2nd c. BCE | `nyaya_sutras_gautama` | ✓ | Jha 1912 trans. — Sacred Books of the Hindus Vol. 8 |
+| Vasubandhu | c. 4th c. CE | `vasubandhu_eliot_hinduism_buddhism` | ⚠ | Eliot *Hinduism and Buddhism* (1921) secondary. Primary: Pruden trans. (copyright); IA scans non-English OCR |
+| Asanga | c. 4th c. CE | `lankavatara_sutra_suzuki` | ⚠ | Related Yogacara text used. No PD English of Asanga's own works exists |
+| Wang Bi | 226–249 CE | — | – | Richard Lynn trans. (1994) copyright. No earlier PD English translation of his Tao/Yi commentaries |
+| Wonhyo | 617–686 CE | `wonhyo_awakening_faith` | ⚠ | Sung Bae Park 1960 thesis (secondary). No PD English primary translation |
+| Kukai | 774–835 CE | `kukai_eliot_japanese_buddhism` | ⚠ | Eliot *Japanese Buddhism* (1935) secondary. Hakeda 1972 trans. copyright |
+| Honen | 1133–1212 CE | `kukai_eliot_japanese_buddhism` | ⚠ | Same Eliot umbrella. Coates 1949 trans. is restricted on IA |
+| Shinran | 1173–1261 CE | `shinran_buddhist_psalms` | ✓ | Yamabe & Beck 1921 trans. — *Buddhist Psalms* — PD |
+| Jinul | 1158–1210 CE | — | – | Buswell 1991 trans. copyright; no PD English found on IA or PG |
+| Longchenpa | 1308–1364 CE | `longchenpa_guhyagarbha` | ✓ | *Guhyagarbha Tantra with Commentary* — IA open access |
+| Tsongkhapa | 1357–1419 CE | `waddell_buddhism_tibet` | ⚠ | Waddell *Buddhism of Tibet* (1895) secondary. No PD English of Lamrim or primary works |
+| Hakuin Ekaku | 1686–1769 CE | `suzuki_essays_zen` | ⚠ | Suzuki *Outlines of Mahayana Buddhism* (1907) secondary. Waddell trans. of Hakuin copyright |
 
-### East — Placeholder Texts (Secondary Sources)
+### West
 
-| Label | What it actually is | Should be |
-|---|---|---|
-| `gospel_of_buddha_carus` | Paul Carus retelling (1894) | A primary Mahayana sutra in PD translation |
-| `nichiren_writings` | Anesaki secondary study (1916) | Nichiren's own writings (no PD English exists) |
-| `kenko_essays_idleness` | Aston literary history (1899) | Kenko *Tsurezuregusa* (all English translations post-1927) |
-| `suzuki_essays_zen` | D.T. Suzuki secondary study (1907) | Hakuin primary writings (copyright) |
+| Philosopher | Dates | Label | Status | Reason / Note |
+|---|---|---|---|---|
+| Epicurus | c. 341–270 BCE | `epicurus_diogenes_laertius` | ✓ | PG #51 Diogenes Laertius Book X (Yonge trans.) contains all letters and Principal Doctrines. Bailey direct trans. rejected by English filter (Greek characters) |
+| Cicero | 106–43 BCE | `cicero_nature_of_gods` | ✓ | PG #14988 — Yonge trans. *On the Nature of the Gods* |
+| Ibn Tufayl | c. 1105–1185 CE | `ibn_tufayl_hayy` | ✓ | Simon Ockley 1708 trans. — IA open access |
+| Ibn Arabi | 1165–1240 CE | `ibn_arabi_tarjuman` | ✓ | R. A. Nicholson 1911 trans. *Tarjuman al-Ashwaq* — IA open access |
+| Søren Kierkegaard | 1813–1855 CE | `kierkegaard_selections` | ✓ | PG #60333 — *Selections from the Writings of Kierkegaard*. Lowrie/Swenson translations copyright |
+| Karl Marx | 1818–1883 CE | `marx_communist_manifesto` | ✓ | PG #61 — *The Communist Manifesto* |
 
-### West — Notable Wikipedia Figures Not Yet Included
+### Placeholder Texts (Secondary Sources Used)
 
-All previously identified "possible additions" (Epicurus, Cicero, Kierkegaard, Ibn Tufayl) have now been added to the corpus. No further actionable gaps remain for Western philosophers on the Wikipedia timeline where PD English translations exist.
+These labels exist in the script but use secondary/indirect sources because no PD primary translation is accessible:
+
+| Label | What it actually is | Ideal primary text | Why not available |
+|---|---|---|---|
+| `gospel_of_buddha_carus` | Paul Carus retelling (1894) | A primary Mahayana sutra | Diamond Sutra: Tibetan scan; Wang Bi commentary: copyright |
+| `nichiren_writings` | Anesaki *Nichiren, the Buddhist Prophet* (1916) | Nichiren's own letters/writings | No PD English translation exists |
+| `kenko_essays_idleness` | Aston *History of Japanese Literature* (1899) | Kenko *Tsurezuregusa* | All English translations post-1927; all restricted on IA |
+| `suzuki_essays_zen` | D. T. Suzuki *Outlines of Mahayana Buddhism* (1907) | Hakuin primary works | Waddell trans. copyright |
+| `vasubandhu_eliot_hinduism_buddhism` | Eliot *Hinduism and Buddhism* (1921) | Vasubandhu's Trimsika / Vimsatika | Anacker 1984 trans. restricted on IA; OCR scans non-English |
+| `wonhyo_awakening_faith` | Park 1960 academic thesis | Wonhyo's *Awakening of Faith* commentary | No PD English translation of primary texts |
+| `kukai_eliot_japanese_buddhism` | Eliot *Japanese Buddhism* (1935) | Kukai's *Sokushin Jobutsu Gi* etc. | Hakeda 1972 trans. copyright |
+| `waddell_buddhism_tibet` | Waddell *Buddhism of Tibet* (1895) | Tsongkhapa's *Lamrim Chenmo* | No PD English translation |
 
 ---
 

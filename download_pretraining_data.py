@@ -542,6 +542,12 @@ SOURCES: list[tuple] = [
      "https://www.accesstoinsight.org/tipitaka/",
      "pali_thanissaro_ati", "east", -480),
 
+    # ── INDIA: Nyaya Sutras / Aksapada Gautama (~200 BCE) ────────────────
+    # Sacred Books of the Hindus Vol. 8 — Ganganatha Jha trans. (1912, PD)
+    # Authority: Radhakrishnan & Moore 1957, pp. 356–394; Wikipedia "Nyaya" section
+    (fetch_internet_archive, "Sacred Books Hindus Nyaya Sutras Gautama",
+     "nyaya_sutras_gautama", "east", -200),
+
     # ── INDIA: Bhagavad Gita (~400–200 BCE) ──────────────────────────────
     # Edwin Arnold trans. "The Song Celestial" (1885) — PG #2388
     # Authority: Radhakrishnan & Moore 1957, pp. 101–163; Scharfstein 1998, ch. 3
@@ -568,6 +574,12 @@ SOURCES: list[tuple] = [
     # Authority: Fung Yu-lan 1952, vol. I ch. 12
     (fetch_internet_archive, "Works Hsuntze",
      "xunzi_dubs", "east", -300),
+
+    # ── CHINA: Han Feizi (~280–233 BCE) ──────────────────────────────────
+    # W. K. Liao trans. "The Complete Works of Han Fei Tzu" — IA open-access copy
+    # Authority: Fung Yu-lan 1952, vol. I ch. 13; Wikipedia "Warring States" section
+    (fetch_internet_archive, "Complete Works Han Fei Tzu Liao",
+     "han_feizi_liao", "east", -280),
 
     # ── CHINA: Mozi (~470 BCE) ────────────────────────────────────────────
     # Authority: Fung Yu-lan 1952, vol. I ch. 5
@@ -687,6 +699,11 @@ SOURCES: list[tuple] = [
     # Use the Hokei Idumi 1922 translation available on IA
     (fetch_internet_archive, "Vimalakirti Sutra Nirdesa Mahayana",
      "vimalakirti_sutra", "east", 300),
+    # Vasubandhu — Yogacara (~4th c. CE) — Eliot "Hinduism and Buddhism" (1921, PD)
+    # covers Yogacara/Vasubandhu systematically; no PD primary English translation exists
+    # Authority: Radhakrishnan & Moore 1957, pp. 338–344; Wikipedia "Vasubandhu" section
+    (fetch_internet_archive, "Hinduism Buddhism Eliot historical sketch",
+     "vasubandhu_eliot_hinduism_buddhism", "east", 350),
     # WEST
     # Augustine — Confessions (~397 CE)
     (fetch_gutenberg_id, 3296, "augustine_confessions", "west", 397),
@@ -726,6 +743,12 @@ SOURCES: list[tuple] = [
      "benedict_rule", "west", 530),
 
     # ── 600–700 CE ────────────────────────────────────────────────────────────
+    # EAST
+    # Wonhyo (617–686 CE) Korean Buddhist — commentary on Awakening of Faith
+    # No primary PD translation; using 1960 Sung Bae Park thesis (IA open access)
+    # Authority: Deutsch & Bontekoe 1997, ch. 14; Wikipedia "Korean Philosophers" section
+    (fetch_internet_archive, "Wonhyo Korean Awakening Faith Mahayana",
+     "wonhyo_awakening_faith", "east", 650),
     # WEST
     # The Quran (~632 CE) — Rodwell translation
     (fetch_internet_archive, "Koran Quran Rodwell translation",
@@ -739,6 +762,11 @@ SOURCES: list[tuple] = [
     # Platform Sutra of the Sixth Patriarch / Huineng (~750 CE)
     (fetch_internet_archive, "Platform sutra patriarch",
      "platform_sutra_huineng", "east", 750),
+    # Kukai (774–835 CE) Japanese Shingon esoteric Buddhist
+    # Hakeda 1972 trans. is copyright; using Charles Eliot "Japanese Buddhism" (1935)
+    # as umbrella covering Kukai and Shingon. Authority: Wikipedia "Japanese Philosophers"
+    (fetch_internet_archive, "Japanese Buddhism Eliot",
+     "kukai_eliot_japanese_buddhism", "east", 805),
     # WEST
     # John of Damascus — Orthodox Faith (~730 CE) — Salmond translation (Nicene Fathers vol 9)
     (fetch_internet_archive, "John Damascus Exposition Orthodox Faith Salmond",
@@ -808,6 +836,10 @@ SOURCES: list[tuple] = [
 
     # ── 1200–1300 CE ──────────────────────────────────────────────────────────
     # EAST
+    # Shinran (1173–1261 CE) Japanese Pure Land — "Buddhist Psalms" (Yamabe & Beck trans., 1921)
+    # Authority: Wikipedia "Japanese Philosophers — Kamakura" section
+    (fetch_internet_archive, "Buddhist Psalms Shinran 1921",
+     "shinran_buddhist_psalms", "east", 1200),
     # Dogen — Shobogenzo (~1231–1253 CE) — modern translations are copyright; use older essays
     (fetch_internet_archive, "Dogen Soto Zen essays",
      "dogen_shobogenzo", "east", 1250),
@@ -815,12 +847,20 @@ SOURCES: list[tuple] = [
     (fetch_internet_archive, "Nichiren Buddhist prophet Anesaki",
      "nichiren_writings", "east", 1270),
     # WEST
+    # Ibn Arabi (1165–1240 CE) Sufi mystic — "Tarjuman al-Ashwaq" (Nicholson trans., 1911)
+    # Authority: Corbin 1993, ch. 7; Wikipedia "Timeline of Western Philosophers — 1100–1200"
+    (fetch_internet_archive, "Tarjuman Ibn Arabi Nicholson",
+     "ibn_arabi_tarjuman", "west", 1200),
     # Thomas Aquinas — Summa Theologica (~1265–1274 CE)
     (fetch_internet_archive, "Summa Theologica Aquinas",
      "aquinas_summa_theologica", "west", 1270),
 
     # ── 1300–1400 CE ──────────────────────────────────────────────────────────
     # EAST
+    # Longchenpa (1308–1364 CE) Tibetan Nyingma — Guhyagarbha Tantra commentary
+    # IA open-access edition; Authority: Wikipedia "Tibetan Philosophers" section
+    (fetch_internet_archive, "Guhyagarbha Tantra Longchenpa",
+     "longchenpa_guhyagarbha", "east", 1340),
     # Aston — History of Japanese Literature (~1899, PD) — contains Kenko and other medieval texts
     # Kenko's Essays in Idleness: all English translations are post-1923 (restricted on IA)
     (fetch_internet_archive, "History Japanese literature Aston",
@@ -841,6 +881,11 @@ SOURCES: list[tuple] = [
 
     # ── 1400–1500 CE ──────────────────────────────────────────────────────────
     # EAST
+    # Tsongkhapa (1357–1419 CE) Tibetan Buddhist — no PD primary translation; using
+    # Waddell "The Buddhism of Tibet, or Lamaism" (1895) as umbrella covering Gelug tradition
+    # Authority: Deutsch & Bontekoe 1997, ch. 9; Wikipedia "Tibetan Philosophers" section
+    (fetch_internet_archive, "Buddhism Tibet Waddell Lamaism",
+     "waddell_buddhism_tibet", "east", 1390),
     # Kabir — Songs and Poems (~1440–1518 CE) — Tagore translation (1915), public domain
     (fetch_internet_archive, "Kabir Tagore poems",
      "kabir_songs_tagore", "east", 1480),
@@ -937,6 +982,9 @@ SOURCES: list[tuple] = [
     # Only PD English translation on Gutenberg (Lowrie/Swenson translations copyright)
     # Authority: Wikipedia "Timeline of Western Philosophers — 1800–1850"
     (fetch_gutenberg_id, 60333, "kierkegaard_selections", "west", 1843),
+    # Karl Marx — The Communist Manifesto (~1848 CE) — PG #61
+    # Authority: Wikipedia "Timeline of Western Philosophers — 1800–1850"
+    (fetch_gutenberg_id, 61, "marx_communist_manifesto", "west", 1848),
     # John Stuart Mill — Utilitarianism (~1863 CE)
     (fetch_gutenberg_id, 11224, "mill_utilitarianism", "west", 1863),
     # Nietzsche — Beyond Good and Evil (~1886 CE)
