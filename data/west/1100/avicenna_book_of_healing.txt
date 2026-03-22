@@ -1,0 +1,625 @@
+Iranian Red Crescent MedicalJournal 
+
+REVIEW ARTICLE 
+
+Avicenna and Cataracts: A New Analysis of Contributions 
+to Diagnosis and Treatment from the Canon 
+
+M Nejabat, B Maleki, M Nimrouzi, A Mahbodi, A Salehi* 
+
+Research Center for Traditional Medicine and History of Medicine, Shiraz University of Medical 
+Sciences, Shiraz, Iran 
+
+Abstract 
+
+Background: Physicians in ancient Persia played an important role in the development of medicine in the medi- 
+eval era. One of the most influential figures of this era was Abu AN Sina or Ibn Sina, known as Avicenna in the 
+western world. The author of more than 200 books on medicine and philosophy, Avicenna followed and further 
+expanded on the tradition of western philosophy and medicine introduced by Aristotle, Hippocrates and Galen. 
+Few researchers have looked into the different medical issues in his best known work, the Canon of Medicine, 
+particularly with regard to ophthalmology. In this analysis, Avicenna's views on and contributions to the diagnosis 
+and treatment of cataracts in his Canon were elucidated. 
+
+Methods: We first reviewed an electronic copy of the Canon and then reviewed other important sources in tradi- 
+tional medicine including the Kamel-al-Sanaeh, Al-Havi (Continents) and Zakhireh-kharazmshahi, available in the 
+Avicenna Special Traditional Medicine Library of Shiraz University of Medical Sciences. We also searched Med- 
+line, Embase, Scopus, Iranmedex and Science Iranian Database (SID) with these keywords: "traditional medi- 
+cine," "Avicenna," "cataract", "Canon", "history", "ophthalmology" and "eye disorders". 
+
+Results: According to the Canon, nozul-al-maa or cataract is an obstructive disease in which external moisture 
+accumulates between the aqueous humor and the corneal membrane and prevents images from entering the 
+eye. Avicenna classified cataracts on the basis of size, density and color. According to size, he identified two 
+types of cataracts including complete and partial obstruction. According to the Canon, surgical intervention was 
+necessary only for certain indications. Avicenna believed that opacity in the initial stages of cataract could be 
+diminished by medicines and foods, and described several medicines for cataracts. He believed that surgery 
+should be postponed until the liquid accumulation stopped, and the cataract reached its mature state. After sur- 
+gery, according to Avicenna, the patient should avoid headache-inducing situations because headaches could 
+lead to edema of the layers of the eye. He further emphasized that the patient's psychological status played an 
+important role in the success of surgery. 
+
+Conclusion: An important aspect of Avicenna's contribution to the medical management of cataracts was that 
+he believed they could be cured by medication and nutrition in their early stages without the need for surgery. He 
+also considered the patient's mental status as an important factor contributing to the postoperative prognosis. 
+Our review of Avicenna's writings on eye disorders in the Canon of Medicine suggests that he had a rigorous 
+approach to the diagnosis and management of patients suffering from eye disorders. 
+
+Keywords: Avicenna; Cataract; Traditional medicine; Canon; History; Ophthalmology; Eye disorders 
+
+Introduction 
+
+Physicians in ancient Persia played an important role 
+
+"Correspondence: Alireza Salehi, MD, MPH, PhD, Research 
+Center for Traditional Medicine and History of Medicine, Shiraz 
+University of Medical Sciences, PO Box: 7134845794, Shiraz, 
+Iran. Tel: +98-711-2337589, Fax: +98-711-2338476, 
+e-mail: salehialireza45@yahoo.com 
+
+Received: November 8, 2011 Accepted: January 10, 2012 
+
+in the development of medicine in the medieval era. 
+One of the most influential figures in this era is Abu 
+Ali Sina or Ibn Sina (980-1037 BC), known as Avi- 
+cenna in the western world. Avicenna published more 
+than 200 books on medicine and philosophy. His 
+masterpiece in medicine is the al-Qanun fi'l-tibb or 
+the Canon of Medicine, which was completed in 
+1025. 23 This work presented a clearly organized 
+summary of all medical knowledge of that time. 4 ' 5 
+
+Iran Red Crescent Med J 2012; 14(5):265-270 ©Iranian Red Crescent Medical Journal 
+
+Nejabat et al. 
+
+Originally written in Arabic, the book was later trans- 
+lated into a number of other languages including Per- 
+sian, Latin, Chinese, Hebrew, German, French, and 
+English. 6 Avicenna was one of the most eminent Mus- 
+lim physicians and philosophers of his days, whose 
+influence on Islamic and European medicine persisted 
+for centuries. 7 
+
+Avicenna followed and expanded on the tradition 
+of western philosophy and medicine introduced by 
+Aristotle, Hippocrates and Galen. 8 He created a sys- 
+tem of medicine that is known as holistic medicine 
+today. 9 His Canon contains some of the most illumi- 
+nating ideas pertaining to the distinction between 
+mediastinitis and pleurisy, the contagious nature of 
+phthisis, and disease transmission through water and 
+soil, in addition to careful descriptions of skin prob- 
+lems, sexual diseases and nervous ailments. 1 The 
+Canon was translated into Latin by Gerard of Cre- 
+mona in the 12th century. Its encyclopedic content, 
+systematic arrangement and philosophical plan soon 
+earned it a pre-eminent position in the medical liter- 
+ature of Europe, displacing the works of Galen and 
+becoming the preferred textbook for medical educa- 
+tion in schools throughout Europe, including the 
+Universities of Montpellier (France) and Leuven 
+(Belgium), as late as the year 1650. 1 The Canon re- 
+tained its authority as a source of medical 
+knowledge until the 18th century and early 19th cen- 
+tury. 10 ' 11 The influential Canadian physician Sir Wil- 
+liam Osier described the Canon as "the most famous 
+medical textbook ever written", noting that it re- 
+mained "a medical bible for a longer time than any 
+other work." 12 
+
+In recent times, researchers have taken a new look 
+into different medical topics in the Canon. For exam- 
+ple, different types of pulses 13 and trigeminal neural- 
+gia 14 have been described in ways very similar to Av- 
+icenna's reports in his Canon. Savage referred to Avi- 
+cenna in his discussion of surgical methods during the 
+medieval era. 15 In the field of endocrinology, it is said 
+that Avicenna was the first physician to describe thy- 
+roid-related orbitopathy 16 Musculoskeletal disorders 
+in the Canon, such as rheumatologic diseases, have 
+also been investigated. 17 Khodadoost argued that Ira- 
+nian scientists including Avicenna played a major 
+role in the development of ophthalmology in ancient 
+Persia. 18 Madineh described bladder diseases in the 
+Canon and compared Avicenna' s creative approach to 
+the diagnosis and treatment of urologic disorders with 
+conventional treatments. 19 Avicenna's recommended 
+treatment for tuberculosis (honey) has been the sub- 
+
+ject of some research in the field of respiratory tract 
+infections. 20 Hatami explained the principles of clini- 
+cal epidemiology in the Canon and Avicenna's in- 
+sights into the need for scientific experiments in med- 
+icine. 21 Avicenna's innovative ideas on public health 
+and preventive medicine have been the subject of oth- 
+er studies. 22 ' 23 The Canon also devoted a chapter to 
+the care of newborn infants, their hygiene, breastfeed- 
+ing and upbringing. 7 In the field of neurosurgery, Av- 
+icenna provided extremely systematic knowledge on 
+head traumas through his observations and experienc- 
+es. 24 
+
+Despites these modern analyses, other areas of the 
+Canon have received much less attention from mod- 
+ern historians. One such area is ophthalmology, 
+which Avicenna covered in considerable detail in 
+volumes one and three, presented detailed discussions 
+of ophthalmic anatomy and diseases. Here we present 
+Avicenna's approach to the diagnosis and treatment 
+of cataracts, with a special focus on the role of foods 
+and medicines in the control of the early stages of 
+cataract, and the methods of surgery to treat cataract 
+in its mature states (Figure 1 and 2). 
+
+Materials and Methods 
+
+We first reviewed an electronic copy of the Canon and 
+then examined important traditional Iranian medical 
+sources such as the Majoosi-e-Ahwazi's Kamel-al- 
+Sanaeh, Rhazes' Al-Havi (Continents) and Jorjani's 
+Zakhireh-kharazmshahi, all of which are held in the Av- 
+icenna Special Traditional Medicine Library of Shiraz 
+University of Medical Sciences. We also searched Med- 
+line, Embase, Scopus, Iranmedex and Science Iranian 
+Database (SID) with the related keywords "traditional 
+medicine," "Avicenna," "cataract", "Canon", "history", 
+"ophthalmology" and "eye disorders". 
+
+Results and Discussion 
+
+Definition of cataracts in the Canon 
+
+Galen, the Roman physician who considered the 
+lens to be essential to vision, believed that cataracts 
+were thickenings of the humor on the surface of the lens. 
+He proposed that "the dark retina lined the posterior 
+surface of the lens, thus forming a mirror from which 
+objects were reflected and on which impressions were 
+registered and transmitted by the visual spirit through 
+the hypothetic hollow optic nerves to the brain." 25 
+
+266 
+
+WWW.ircmj.com Vol 14 May 2012 
+
+Avicenna and cataracts 
+
+Fig. 1 : This picture of cataract surgery from the Resaleh fi-alein shows a patient during the operation above, and 
+another patient below after surgery, with an eye dressing probably made of egg yolk violet oil (banafsaj). 
+
+Fig. 2: This illustration from the Resaleh fi-alein shows the normal anatomy of the eye according to Avicenna. A, 
+Conjunctiva; B, Optic nerve; C, Aqueous in anterior chamber; D, Aqueous in posterior chamber E, Vitreous. 
+
+The name "crystalline" was first mentioned by Cel- 
+sus (25 BC- 50 AD). The Canon was influenced by the 
+writings of both Galen and Hippocrates. As a result, 
+
+Avicenna's definition of cataracts was very similar to 
+the definition offered by Galen. The latter paid particu- 
+lar attention to the crystalline lens, which he described 
+
+WWW.ircmj.com Vol 14 May 2012 
+
+267 
+
+Nejabat et al. 
+
+as a round lens in the middle of the eye. He conclud- 
+ed, "The crystalline lens was the principal instrument 
+of vision which lied between the crystalline humor 
+and the cornea and interfered with vision." 25 Avicen- 
+na wrote, "Nozul-al-maa or cataract is an obstructive 
+disease in which external (gharibeh) moisture accu- 
+mulates between the aqueous humor and the corneal 
+membrane at the pupil and prevents images from en- 
+tering the eye". By "external moisture" Avicenna ap- 
+parently meant moisture that did not originate from 
+the body and cannot be absorbed by body tissues and 
+organs, and so accumulated as a source of infection or 
+organ dysfunction. 
+
+Grading of cataracts 
+
+Avicenna classified cataracts on the basis of their 
+size, density and color. According to size, he 
+distinguished two types of cataracts: Complete 
+obstruction, in which the opacity covered the entire 
+pupil, and partial obstruction, in which the opacity 
+covered part of the pupil. He also defined two types 
+of densities of cataracts: Thin, in which light was not 
+blocked completely, and dense, in which the light was 
+completely blocked. Avicenna also mentioned ten 
+different colors of the opacity. According to the 
+Canon, some types of cataracts were treatable by 
+surgery (ghadh) with a specific instrument (a 
+meghdahah), whereas others were resistant to surgical 
+intervention. He noted that the bright colors 
+responded well whereas the dark colors responded 
+poorly to ghadh. Dense cataracts, which were hard 
+and solid, were considered untreatable. Although his 
+classification seems very simple in comparison with 
+modern classifications, it was accurate enough for his 
+major goal, i.e. to determine the method of treatment. 2 
+
+Symptoms of cataracts 
+
+Avicenna mentioned the following symptoms of 
+cataracts: seeing small floating objects of fixed size 
+and position, blurred vision, especially in only one 
+eye, and doubled vision of shiny objects. 2 
+
+Treatments 
+
+Medication and nutrition 
+
+Avicenna believed that opacity could be 
+diminished in the initial stages without surgery, and 
+with medicines and foods only. As an example of this 
+approach, Avicenna described a man who was treated 
+by warding off inappropriate humors (istifragh), 
+abstinence (hemiyah), decreasing his food intake, and 
+abstaining from porridge (amraagh) and moist foods 
+
+(morattibat). The patient was advised to eat only 
+roasted meat (mashviyyai) and fried meat (ghalaya), 
+and was given topical medicines to dilute (molattif) 
+external moisture and corrode it (mohallil). His sight 
+was successfully restored with this treatment. 
+Avicenna added, "The person who has cataracts should 
+avoid fullness and drinking and sexual intercourse. He 
+should eat just one meal (lunch) per day and must 
+avoid eating fish and fruit and heavy meat." 2 
+
+Avicenna also introduced several medicines for 
+cataracts in the Canon which are potential research 
+topics for ophthalmologists and pharmacologists. He 
+noted that fennel juice mixed with honey and wild 
+marjoram is effective in treating the initial stages of 
+cataract. 2 Rhazes also mentioned in Al-Havi that wild 
+marjoram was beneficial in the treatment of cataract. 
+He maintained that corn cockle (Agrostemma 
+githago), when mixed with orris root oil, is helpful to 
+treat the initial stages of cataracts. 26 Orris contains 
+flavenoids and isoflavones. It has been studied that 
+herbal medicines containing flavenoids may slow 
+down progression of cataracts in rats. 27 ' 28 Javadzadeh 
+et al. found that selenite-induced cataract in rats can 
+be prevented by an eyewash prepared form onion 
+juice which contains high content of flavenoids. 27 
+Another study by Goodarzi et al. showed that the 
+consumption of some flavenoids such as quercetin 
+reduced the accumulation of sorbitol in the lens of 
+diabetic rats, and as a result slowed cataract 
+progression. Tectorigenin and irigenin, two other 
+isoflavone compounds, had similar results. 28 In 
+addition to the Canon, many cataracts remedies were 
+compiled in traditional Persian sources such as the 
+Eksir-e-aazam, Gharabadin-e-kabir, Moalejat-e- 
+Aghili and many other books, which are intriguing 
+potential sources for further research. 29 ' 30 Their 
+authors were followers of Avicenna who explained 
+his views in detail. 
+
+Cataract surgery 
+
+Avicenna believed that certain conditions must be 
+met to make a patient eligible for surgery. He men- 
+tioned that operations for pearl white, grayish white 
+and turquoise white cataracts would result in good 
+outcomes, whereas operating on chalky, green, dark 
+and dense black cataracts would have a dismal prog- 
+nosis. He also proposed an examination to determine 
+whether the patient was appropriate for surgery: "If 
+you examine the patient under half-shadow (shadow 
+beside light) and press your finger gently on the eye, 
+the cataract moves quickly under pressure and returns 
+
+268 
+
+WWW.ircmj.com Vol 14 May 2012 
+
+Avicenna and cataracts 
+
+as soon as you remove your finger. Do not conduct this 
+examination frequently because it may detach the 
+opacity and make surgery very difficult" 2 
+
+Patient selection 
+
+According to Avicenna' s Canon of Medicine, the 
+disease was the result of an imbalance in the four 
+humors, and if a cataract was not due to trauma, it 
+must be the result of humor imbalance and the accu- 
+mulation of bad humors in the body generally and in 
+the eyes locally. Treating patients without considera- 
+tion of this fact almost ensured recurrence of the dis- 
+ease, according to him. Accordingly, the body should 
+be cleansed of bad humors (phlegm and black bile). 
+This could be facilitated by using medications such as 
+ayarejat (purgatives which ward off bad humors via 
+the bowels), and considering the patient's status, the 
+physician may decide to use fasd (a kind of phlebot- 
+omy performed with a special scalpel to open the ap- 
+propriate vein and allow bad humors to exit the body). 
+Regarding the cause of cataracts, Avicenna main- 
+tained, "If the cataract develops due to a fall or brain 
+injuries, it is very difficult to cure it by surgery." 2 
+
+Preoperative surveillance 
+
+The patient who is a candidate for surgery must 
+not undergo iasd just before the procedure. Avicenna 
+believed that surgery should be postponed until fluid 
+collection had stopped and the cataract had reached 
+maturity, and recommended that the surgeon should 
+wait until the opacity reached an appropriate density 
+(neither too dilute nor too dense). Eating pea porridge 
+(nokhodab) was recommended to protect the site 
+where the surgical instrument penetrates the eye infe- 
+riorly. The patient who is a candidate for surgery 
+should start eating fresh fish, moist foods, tonics and 
+foods which will help revive him after the procedure. 
+After these preoperative measures, ghadh can be con- 
+sidered for the patient. 2 
+
+Operative technique 
+
+According to the Canon, the cataract operation 
+should not take place in a very bright room or in front 
+of a window. The patient must focus his gaze toward 
+his medial canthus or his nose. The surgeon should 
+insert the surgical instrument (meghdaha) from the 
+limbus into the anterior chamber and proceed toward 
+the pupil. He should then mobilize the visible opaci- 
+ties with the tip of the surgical instrument and push 
+them to the lower angle of the anterior chamber until 
+the patient's vision becomes clear. He should use the 
+
+surgical instrument to hold the opacities in their new 
+position until they become stable. If the opacities move 
+again after the surgical instrument is withdrawn, the 
+surgeon should repeat the steps described above. 
+
+In surgical methods commonly used for cataracts 
+in Avicenna' s era, the lens opacities were collected in 
+the lower angle of the anterior chamber and surgeons 
+did not remove them from the eye. If they had wished 
+to do so, they would have had to make a larger inci- 
+sion in the eyeball, and this would have increased the 
+risk surgical complications. 2 
+
+Postoperative measures 
+
+After ghadh, the patient was instructed to avoid 
+situations that could cause headaches, because this 
+could lead to edema of the eye layers. Acute rage and 
+coughing could result in early recurrence. The patient 
+was advised to avoid drinking, sexual intercourse and 
+bathing. After the operation, the eye was immediately 
+covered with a piece of cotton, which was smeared 
+with a mixture of egg yolk and violet oil (banafsaj). 
+The intact eye was also covered to prevent eye 
+movements. The patient was advised to lie on his 
+back in a dark place for at least 3 days until he felt no 
+discomfort. The bandage was changed every 3 days. 
+The patient's mental and psychological status played 
+an important role in the success of surgery. 2 
+
+Conclusions and Suggestions for Further 
+Research 
+
+Although the procedure and instruments used by 
+Avicenna seem primitive in comparison to modern 
+methods and equipment, they were considered effec- 
+tive and innovative one thousand years ago. 31 An 
+important aspect of Avicenna' s views about cata- 
+racts is that he emphasized the treatment of cataracts 
+in its early stages through medication and nutrition 
+without the need for surgery. He also considered the 
+role of the patient's mental and psychological status 
+in the success of surgery. These elements of patient 
+care are potentially worthwhile topics for further 
+research. Our review of the section on the treatment 
+of eye disorders in the Canon of Medicine reveals 
+that Avicenna had a meticulous approach to diagno- 
+sis and management for patients who suffered from 
+eye disorders. Ultimately, his decision regarding the 
+choice of the most appropriate method of treatment 
+was based on precise clinical observation and exam- 
+ination. 2 
+
+WWW.ircmj.com Vol 14 May 2012 
+
+269 
+
+Nejabat et al. 
+
+Acknowledgments 
+
+We thank the Research Center for Traditional Medi- 
+cine and History of Medicine of Shiraz University of 
+Medical Sciences for their guidance and support, and 
+K. Shashok (Author AID in the Eastern 
+
+Mediterranean) for improving the use of English in 
+the manuscript. The Research Center for Traditional 
+Medicine and history of Medicine, Shiraz University 
+of Medical Sciences, Shiraz, Iran. 
+
+Conflict of interest: None declared. 
+
+References 
+
+1 Najm Abadi M. History of Medicine 
+in Iran, 1 st edition. Tehran: Tehran 
+University Publication: 1976; pp. 
+673-697, 685. 
+
+2 Avicenna, Al-Qanun fi'l-tibb. In: 
+Hesan Ja'far,, editor. Al-Hilal, Bei- 
+rut: Dar-ol-Behar; 2009. 
+
+3 Avicenna, The Canon (Persian 
+translation), 3 rd edition. Tehran: Min- 
+istry of Health and Medical Educa- 
+tion of Iran, Committee of Comput- 
+erizing Medicine and Hygiene, 2007. 
+
+4 Finger S. Origins of Neuroscience: 
+A History of Explorations in to Brain 
+Function. Oxford: Oxford University 
+Press, 1994; p. 70. 
+
+5 Shoja MM, Rashidi MR, Tubbs RS, 
+Etemadi J, Abbasnejad F, Agutter 
+PS. Legacy of Avicenna and evi- 
+dence-based medicine. Int J Cardiol 
+2011;150:243-6. [21093081] [doi. 
+org/10. 1016/j.ijcard.2010. 10.019] 
+
+6 Shoja MM, Tubbs RS, Loukas M, 
+Khalili M, Alakbarli F, Cohen-Gadol 
+AA. Vasovagal syncope in the Can- 
+on of Avicenna: the first mention of 
+carotid artery hypersensitivity. Int J 
+Cardiol 2009;134:297-301. [19332 
+359] [doi .org/1 0.101 6/j .ijcard.2009. 
+02.035] 
+
+7 Amr SS, Tbakhi A. Ibn Sina (Avi- 
+cenna): the prince of physicians. 
+Ann Saudi Med 2007;27:134-5. 
+[17420624] [doi.org/1 0.41 03/0256- 
+4947.51520] 
+
+8 Modanlou HD. Avicenna (AD 980 to 
+1037) and the care of the newborn 
+infant and breastfeeding. J Perinatol 
+2008;28:3-6. [17805338] [doi.org/ 
+10.1038/sj.jp.7211832] 
+
+9 Majeed A. How Islam changed med- 
+icine. BMJ 2005;331:1486-7. 
+[1 6373721 ] [doi.org/1 0.11 36/bmj.3 
+31.7531.1486] 
+
+10 Polizzi F. Avicenna, a forerunner of 
+hygiene and preventive medicine. 
+
+Ann Ig 1994;6:357-64. [8611206] 
+
+11 Haque A. Psychology from Islamic 
+Perspective: Contributions of Early 
+Muslim Scholars and Challenges to 
+Contemporary Muslim Psychologists. 
+J Religion Health 2004;43: 357-77. 
+[doi.org/1 0. 1 007/s1 0943-004^302-z] 
+
+12 Osier W. The Evolution of Modern 
+Medicine. New Haven: Kessinger 
+Publishing, 2004; p. 71. 
+
+13 Katsenovich RA, Mirzaev NL. Car- 
+diological legacy of Abu Ali Ibn-Sina 
+(on the millenium of his birth). Kar- 
+diologiia 1980;20:120-2. [6449612] 
+
+14 Ameli NO. Avicenna and trigeminal 
+neuralgia. J Neurol Sci 1965;2:105- 
+7. [4862205] [doi.org/10. 1016/0022- 
+510X(65)90074-2] 
+
+15 Savage-Smith E. The practice of 
+surgery in Islamic lands: myth and 
+reality. Soc Hist Med 2000;13:307- 
+21. [14535259] [doi.org/10.1093/ 
+shm/1 3.2.307] 
+
+16 Nabipour I, Burger A, Moharreri M, 
+Azizi F. Avicenna, the first to de- 
+scribe thyroid-related orbitopathy. 
+Thyroid 2009;19:7-8. [19119980] 
+[doi.org/1 0.1 089/thy.2008.0299] 
+
+17 Usmanova RA. Avicenna on the mus- 
+culoskeletal system. Arkh Anat Gistol 
+Embriol 1 980;79: 1 1 2-4. [64491 90] 
+
+18 Khodadoust AA. Ophthalmology 
+from ancient Persia to the modern 
+era. Arch Ophthalmol 2006;124: 
+1481-3. [17030718] [doi.org/10. 
+1001/archopht.124.10.1481] 
+
+19 Madineh SM. Avicenna's Canon of 
+Medicine and Modern Urology: part 
+I: bladder and its diseases. Urol J 
+2008;5:284-93. [19101908] 
+
+20 Asadi-Pooya AA, Pnjehshahin MR, 
+Beheshti S. The antimycobacterial 
+effect of honey: an in vitro study. Riv 
+Biol 2003;96:491-5. [15055885] 
+
+21 Hatami H. Principles of clinical epi- 
+demiology in Avicenna's Canon. 
+
+Kermanshah: Kermanshah University 
+of Medical Sciences; 2000. 
+
+22 Sajadi MM, Mansouri D, Sajadi MR. 
+Ibn Sina and the clinical trial. Ann In- 
+tern Med 2009;150:640-3. [19414844] 
+
+23 Hatami H. Public hygiene and preven- 
+tive medicine from Avicenna's point of 
+view. Kermanshah: Kermanshah Uni- 
+versity of Medical Sciences. 
+
+24 Aciduman A, Arda B, Ozakturk FG, 
+Telatar UF. What does Al-Qanun Fi 
+Al-Tibb (The Canon of Medicine) 
+say on head injuries? Neurosurg 
+Rev 2009;32:255-63. [19437052] [doi. 
+org/1 0. 1 007/sl 0 1 43-009-0205-5] 
+
+25 Gordon BL. The problem of crystal- 
+line lens. Arch Ophthal 1936; 15: 
+859-89. [doi.org/10.1001/archopht. 
+1936.00840170071008] 
+
+26 Zakariyaye Razi AM. Al-Havi fe Teb. 
+1 st edition. Bambaee: Matbae Os- 
+maniye; 1886. 
+
+27 Javadzadeh A, Ghorbanihaghjo A, 
+Bonyadi S, Rashidi MR, Mesgari M, 
+Rashtchizadeh N, Argani H. Preven- 
+tive effect of onion juice on selenite- 
+induced experimental cataract. Indi- 
+an J Ophthalmol 2009;57:185-9. 
+[1 938401 1] [doi.org/1 0.41 03/0301 - 
+4738.49391] 
+
+28 Goodarzi MT, Zal F, Malakooti M, 
+Safari MR, Sadeghian S. Inhibtory 
+activity of flavenioids on the lens al- 
+dose reductase of healthy and dia- 
+betic rats. Acta Medica Iranica 
+2006;44:41-5. 
+
+29 Nazem Jahan Mohammad AK. Eksire 
+Azam. Dehli: Nami Monshi Nolkshur; 
+Book Facsimile edition.; 1315. 
+
+30 Modaberi M. Aghili Alavi Khorasani 
+and Makhzan Al-Adviyeh. J Faculty 
+Letters Humanities 2002;8-9:6-6. 
+
+31 Tabei SZ, Riazi A. Medical sciences 
+in the third millennium: An Avicenni- 
+an approach. Iran Red Crescent 
+Med J 2009;11:4-9. 
+
+270 
+
+WWW.ircmj.com Vol 14 May 2012
