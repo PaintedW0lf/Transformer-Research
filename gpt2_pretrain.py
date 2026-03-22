@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Union
 
 import tiktoken
 from transformers import GPT2Config, GPT2LMHeadModel
@@ -27,9 +27,9 @@ def build_gpt2_from_scratch(
     n_head: int = 12,
     n_embd: int = 768,
     use_streaming: bool = False,
-    shuffle_buffer: int = 20000,
-    subdir: str | None = None,
-) -> tuple[GPT2LMHeadModel, LMDataset | StreamingLMDataset, SimpleLMDataCollator]:
+    shuffle_buffer: int = 10000,
+    subdir: str = None,
+) -> tuple[GPT2LMHeadModel, Union[LMDataset, StreamingLMDataset], SimpleLMDataCollator]:
     encoding = tiktoken.get_encoding("gpt2")
     eos_id = encoding.eot_token
 
@@ -73,6 +73,8 @@ def build_gpt2_from_scratch(
 
 
 if __name__ == "__main__":
+    import argparse
+
     parser = argparse.ArgumentParser(description="GPT-2 pretraining")
     parser.add_argument("--data-dir", type=str, default="data", help="Data directory")
     parser.add_argument("--output-dir", type=str, default="./outputs/gpt2_scratch")
@@ -80,13 +82,8 @@ if __name__ == "__main__":
     parser.add_argument("--max-steps", type=int, default=100000)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--streaming", action="store_true", help="Use streaming mode")
-    parser.add_argument("--shuffle-buffer", type=int, default=20000)
-    parser.add_argument(
-        "--subdir",
-        type=str,
-        default=None,
-        help="Subdirectory within data_dir (e.g., 'west' or 'east')",
-    )
+    parser.add_argument("--shuffle-buffer", type=int, default=10000)
+    parser.add_argument("--subdir", type=str, default=None, help="Subdirectory within data_dir (e.g., 'east' or 'west')")
     parser.add_argument("--n-layer", type=int, default=12)
     parser.add_argument("--n-head", type=int, default=12)
     parser.add_argument("--n-embd", type=int, default=768)
