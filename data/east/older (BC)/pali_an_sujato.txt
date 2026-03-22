@@ -43,8 +43,8 @@ The Chapter on Giving Up the Hindrances
 “Mendicants, I do not see a single thing that gives rise to sensual desire, or, when it has arisen, makes it increase and grow like the feature of beauty. 
 When you apply the mind irrationally to the feature of beauty, sensual desire arises, and once arisen it increases and grows.” 
 12 
-“Mendicants, I do not see a single thing that gives rise to ill will, or, when it has arisen, makes it increase and grow like the feature of harshness. 
-When you apply the mind irrationally to the feature of harshness, ill will arises, and once arisen it increases and grows.” 
+“Mendicants, I do not see a single thing that gives rise to ill will, or, when it has arisen, makes it increase and grow like the feature of aversion. 
+When you apply the mind irrationally to the feature of aversion, ill will arises, and once arisen it increases and grows.” 
 13 
 “Mendicants, I do not see a single thing that gives rise to dullness and drowsiness, or, when they have arisen, makes them increase and grow like discontent, sloth, yawning, sleepiness after eating, and mental sluggishness. 
 When you have a sluggish mind, dullness and drowsiness arise, and once arisen they increase and grow.” 
@@ -3265,11 +3265,11 @@ What three?
 The blind, the one-eyed, and the two-eyed. 
 Who is the blind individual? 
 It’s someone who doesn’t have the kind of vision that’s needed to acquire more wealth or to increase the wealth they’ve already acquired. 
-Nor do they have the kind of vision that’s needed to know the difference between qualities that are skillful and unskillful, blameworthy and blameless, inferior and superior, and those on the side of dark and bright. 
+Nor do they have the kind of vision that’s needed to know the difference between qualities that are skillful and unskillful, blameworthy and blameless, inferior and superior, and those with a portion of dark or bright. 
 This is called a blind individual. 
 Who is the individual with one eye? 
 It’s someone who has the kind of vision that’s needed to acquire more wealth and to increase the wealth they’ve already acquired. 
-But they don’t have the kind of vision that’s needed to know the difference between qualities that are skillful and unskillful, blameworthy and blameless, inferior and superior, and those on the side of dark and bright. 
+But they don’t have the kind of vision that’s needed to know the difference between qualities that are skillful and unskillful, blameworthy and blameless, inferior and superior, and those with a portion of dark or bright. 
 This is called a one-eyed individual. 
 Who is the individual with two eyes? 
 It’s someone who has the kind of vision that’s needed to acquire more wealth and to increase the wealth they’ve already acquired. 
@@ -4621,7 +4621,7 @@ These are the three high and luxurious beds that I get these days when I want, w
 “But what, worthy Gotama, is the heavenly high and luxurious bed?” 
 “Brahmin, when I am living supported by a village or town, I robe up in the morning and, taking my bowl and robe, enter the town or village for alms. 
 After the meal, on my return from almsround, I enter within a forest. 
-I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and establishing mindfulness in my presence. 
+I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and bringing mindfulness to the present. 
 Quite secluded from sensual pleasures, secluded from unskillful qualities, I enter and remain in the first absorption, which has the rapture and bliss born of seclusion, while placing the mind and keeping it connected. 
 As the placing of the mind and keeping it connected are stilled, I enter and remain in the second absorption, which has the rapture and bliss born of immersion, with internal clarity and mind at one, without placing the mind and keeping it connected. 
 And with the fading away of rapture, I enter and remain in the third absorption, where I meditate with equanimity, mindful and aware, personally experiencing the bliss of which the noble ones declare, ‘Equanimous and mindful, one meditates in bliss.’ 
@@ -4636,7 +4636,7 @@ Who but the worthy Gotama could get such a heavenly high and luxurious bed when 
 But what, worthy Gotama, is the divine high and luxurious bed?” 
 “Brahmin, when I am living supported by a village or town, I robe up in the morning and, taking my bowl and robe, enter the town or village for alms. 
 After the meal, on my return from almsround, I enter within a forest. 
-I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and establishing mindfulness in my presence. 
+I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and bringing mindfulness to the present. 
 I meditate spreading a heart full of love to one direction, and to the second, and to the third, and to the fourth. In the same way above, below, across, everywhere, all around, I spread a heart full of love to the whole world—abundant, expansive, limitless, free of enmity and ill will. 
 I meditate spreading a heart full of compassion to one direction, and to the second, and to the third, and to the fourth. In the same way above, below, across, everywhere, all around, I spread a heart full of compassion to the whole world—abundant, expansive, limitless, free of enmity and ill will. 
 I meditate spreading a heart full of rejoicing to one direction, and to the second, and to the third, and to the fourth. In the same way above, below, across, everywhere, all around, I spread a heart full of rejoicing to the whole world—abundant, expansive, limitless, free of enmity and ill will. 
@@ -4651,7 +4651,7 @@ Who but the worthy Gotama could get such a divine high and luxurious bed when he
 “But what, worthy Gotama, is the noble high and luxurious bed?” 
 “Brahmin, when I am living supported by a village or town, I robe up in the morning and, taking my bowl and robe, enter the town or village for alms. 
 After the meal, on my return from almsround, I enter within a forest. 
-I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and establishing mindfulness in his presence. 
+I gather up some grass or leaves into a pile and sit down cross-legged, setting my body straight, and bringing mindfulness to the present. 
 I know this: 
 ‘I’ve given up greed, hate, and delusion, cut them off at the root, made them like a palm stump, obliterated them, so they’re unable to arise in the future.’ 
 
@@ -5009,8 +5009,8 @@ You should say: ‘The beautiful feature of things.
 When you apply the mind irrationally to the beautiful feature of things, greed arises, and once arisen it increases and grows. 
 This is the cause, this is the reason why greed arises, and once arisen it increases and grows.’ 
 And if they ask: ‘What is the cause, what is the reason why hate arises, and once arisen it increases and grows?’ 
-You should say: ‘The feature of harshness. 
-When you apply the mind irrationally to the feature of harshness, hate arises, and once arisen it increases and grows. 
+You should say: ‘The feature of aversion. 
+When you apply the mind irrationally to the feature of aversion, hate arises, and once arisen it increases and grows. 
 This is the cause, this is the reason why hate arises, and once arisen it increases and grows.’ 
 And if they ask: ‘What is the cause, what is the reason why delusion arises, and once arisen it increases and grows?’ 
 You should say: ‘Irrational application of mind. 
@@ -8422,7 +8422,7 @@ Doṇa saw that the Buddha’s footprints had thousand-spoked wheels, with rims 
 It occurred to him, 
 “Oh lord, how incredible, how amazing! 
 Surely these couldn’t be the footprints of a human being?” 
-The Buddha had left the road and sat at the root of a tree cross-legged, setting his body straight, and establishing mindfulness in his presence. 
+The Buddha had left the road and sat at the root of a tree cross-legged, setting his body straight, and bringing mindfulness to the present. 
 Then Doṇa, following the Buddha’s footprints, saw him sitting at the tree root—impressive and inspiring, with peaceful faculties and heart, attained to the highest self-control and serenity, like an elephant with tamed, guarded, and controlled faculties. 
 He went up to the Buddha and said to him: 
 “Sir, might you be a god?” 

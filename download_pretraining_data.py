@@ -613,6 +613,25 @@ SOURCES: list[tuple] = [
     (fetch_internet_archive, "Avesta Mills Zend",
      "avesta_mills", "west", -1200),
 
+    # ── INDIA: Jain Canon / Agamas — placeholder (~600 BCE) ──────────────
+    # Mahavira (599–527 BCE) is on Wikipedia Eastern timeline.
+    # No full PD English translation of Agamas exists; Jacobi's SBE Vol 22/45
+    # contains Acaranga Sutra and Uttaradhyayana — use those as closest substitute.
+    # Authority: Deutsch & Bontekoe 1997, ch. 6; Wikipedia "Jainism" section
+    (fetch_internet_archive, "Jaina Sutras Jacobi Sacred Books East",
+     "jain_sutras_jacobi", "east", -527),
+
+    # ── GREECE: Epicurus (~341–270 BCE) ──────────────────────────────────
+    # Letters and Principal Doctrines preserved in Diogenes Laertius Book X (Yonge trans.)
+    # PG #51 = "Lives of Eminent Philosophers" — clean English, Book X = Epicurus
+    # Authority: Wikipedia "Timeline of Western Philosophers — Hellenistic Era"
+    (fetch_gutenberg_id, 51, "epicurus_diogenes_laertius", "west", -270),
+
+    # ── ROME: Cicero (~106–43 BCE) ────────────────────────────────────────
+    # On the Nature of the Gods — PG #14988 (Yonge trans.)
+    # Authority: Wikipedia "Timeline of Western Philosophers — Classical Rome"
+    (fetch_gutenberg_id, 14988, "cicero_nature_of_gods", "west", -55),
+
     # =========================================================================
     # CE TEXTS — 100-YEAR INTERVALS (0–1900 CE)
     # =========================================================================
@@ -776,6 +795,10 @@ SOURCES: list[tuple] = [
     (fetch_internet_archive, "I Ching Legge",
      "i_ching_legge", "east", 1175),
     # WEST
+    # Ibn Tufayl — Hayy ibn Yaqzan (~1160 CE) — Simon Ockley 1708 trans. (PD)
+    # Authority: Wikipedia "Timeline of Western Philosophers — 1000–1100"; Corbin 1993, ch. 5
+    (fetch_internet_archive, "Hayy ibn Yaqzan Ockley",
+     "ibn_tufayl_hayy", "west", 1160),
     # Averroes — Incoherence of the Incoherence (~1180 CE)
     (fetch_internet_archive, "Averroes Tahafut incoherence",
      "averroes_tahafut", "west", 1180),
@@ -811,6 +834,10 @@ SOURCES: list[tuple] = [
     # Julian of Norwich — Revelations of Divine Love (~1395 CE)
     (fetch_gutenberg_search, "Julian Norwich Revelations Divine Love",
      "julian_norwich_revelations", "west", 1395),
+    # William of Ockham — Summa Logicae (~1323 CE) — IA search (no PG entry; Loux 1974 is copyright)
+    # Authority: Wikipedia Timeline of Western Philosophers; Copleston History of Philosophy vol. 3
+    (fetch_internet_archive, "Ockham Summa Logicae logic",
+     "ockham_summa_logicae", "west", 1323),
 
     # ── 1400–1500 CE ──────────────────────────────────────────────────────────
     # EAST
@@ -846,6 +873,10 @@ SOURCES: list[tuple] = [
     (fetch_internet_archive, "Bankei unborn Zen",
      "bankei_unborn_zen", "east", 1690),
     # WEST
+    # Francis Bacon — Novum Organum (~1620 CE)
+    # Authority: Wikipedia Timeline of Western Philosophers; Scharfstein 1998, ch. 14
+    (fetch_gutenberg_search, "Novum Organum Bacon",
+     "bacon_novum_organum", "west", 1620),
     # Descartes — Discourse on Method (~1637 CE)
     (fetch_gutenberg_id, 59, "descartes_discourse_method", "west", 1637),
     # Hobbes — Leviathan (~1651 CE)
@@ -867,6 +898,10 @@ SOURCES: list[tuple] = [
     # WEST
     # Berkeley — Principles of Human Knowledge (~1710 CE)
     (fetch_gutenberg_id, 4723, "berkeley_principles_human_knowledge", "west", 1710),
+    # Leibniz — Monadology (~1714 CE) + Discourse on Metaphysics (~1686 CE)
+    # Authority: Wikipedia Timeline of Western Philosophers; Scharfstein 1998, ch. 15
+    (fetch_internet_archive, "Leibniz philosophical writings Monadology",
+     "leibniz_monadology", "west", 1714),
     # Hume — Treatise of Human Nature (~1739 CE)
     (fetch_gutenberg_id, 4705, "hume_treatise_human_nature", "west", 1739),
     # Hume — Enquiry Concerning Human Understanding (~1748 CE)
@@ -874,6 +909,13 @@ SOURCES: list[tuple] = [
     # Adam Smith — Theory of Moral Sentiments (~1759 CE)
     (fetch_gutenberg_search, "Adam Smith Theory Moral Sentiments",
      "adam_smith_moral_sentiments", "west", 1759),
+    # Rousseau — The Social Contract (~1762 CE)
+    # Authority: Wikipedia Timeline of Western Philosophers; Scharfstein 1998, ch. 16
+    (fetch_gutenberg_search, "Rousseau Social Contract",
+     "rousseau_social_contract", "west", 1762),
+    # Wollstonecraft — A Vindication of the Rights of Woman (~1792 CE)
+    # Authority: Wikipedia Timeline of Western Philosophers
+    (fetch_gutenberg_id, 3420, "wollstonecraft_vindication", "west", 1792),
     # Kant — Critique of Pure Reason (~1781 CE)
     (fetch_gutenberg_id, 4280, "kant_critique_pure_reason", "west", 1781),
 
@@ -891,6 +933,10 @@ SOURCES: list[tuple] = [
      "hegel_phenomenology_spirit", "west", 1807),
     # Schopenhauer — World as Will and Representation (~1818 CE)
     (fetch_gutenberg_id, 38427, "schopenhauer_world_will_representation", "west", 1818),
+    # Søren Kierkegaard — Selections from the Writings (~1843–1846 CE) — PG #60333
+    # Only PD English translation on Gutenberg (Lowrie/Swenson translations copyright)
+    # Authority: Wikipedia "Timeline of Western Philosophers — 1800–1850"
+    (fetch_gutenberg_id, 60333, "kierkegaard_selections", "west", 1843),
     # John Stuart Mill — Utilitarianism (~1863 CE)
     (fetch_gutenberg_id, 11224, "mill_utilitarianism", "west", 1863),
     # Nietzsche — Beyond Good and Evil (~1886 CE)

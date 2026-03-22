@@ -74,7 +74,7 @@ Such is an ordinary person’s praise of the Realized One.
 The shorter section on ethics is finished. 
 2.2. The Middle Section on Ethics 
 ‘There are some ascetics and brahmins who, while enjoying food given in faith, still engage in injuring plants and seeds. 
-These include plants propagated from roots, stems, cuttings, or joints; and those from regular seeds as the fifth. 
+These include plants propagated from roots, trunks, cuttings, or joints; and those from regular seeds as the fifth. 
 The ascetic Gotama refrains from such injury to plants and seeds.’ 
 Such is an ordinary person’s praise of the Realized One. 
 ‘There are some ascetics and brahmins who, while enjoying food given in faith, still engage in storing up goods for their own use. 
@@ -342,7 +342,7 @@ And what is the second ground on which they rely?
 It’s when some ascetic or brahmin doesn’t truly understand what is skillful and what is unskillful. 
 They think: 
 ‘I don’t truly understand what is skillful and what is unskillful. 
-If I were to declare that something was skillful or unskillful I might feel desire or greed or hate or repulsion. 
+If I were to declare that something was skillful or unskillful I might feel desire or greed or hate or aversion. 
 That would be grasping on my part. 
 That would be stressful for me, 
 and that stress would be an obstacle.’ 
@@ -968,7 +968,7 @@ This pertains to their ethics.
 The shorter section on ethics is finished. 
 4.3.1.2. The Middle Section on Ethics 
 There are some ascetics and brahmins who, while enjoying food given in faith, still engage in injuring plants and seeds. 
-These include plants propagated from roots, stems, cuttings, or joints; and those from regular seeds as the fifth. They refrain from such injury to plants and seeds. 
+These include plants propagated from roots, trunks, cuttings, or joints; and those from regular seeds as the fifth. They refrain from such injury to plants and seeds. 
 This pertains to their ethics. 
 There are some ascetics and brahmins who, while enjoying food given in faith, still engage in storing up goods for their own use. 
 This includes such things as food, drink, clothes, vehicles, bedding, fragrance, and things of the flesh. 
@@ -1066,7 +1066,7 @@ That’s how a mendicant is content.
 4.3.2.4. Giving Up the Hindrances 
 When they have this entire spectrum of noble ethics, this noble sense restraint, this noble mindfulness and situational awareness, and this noble contentment, 
 they frequent a secluded lodging—a wilderness, the root of a tree, a hill, a ravine, a mountain cave, a charnel ground, a forest, the open air, a heap of straw. 
-After the meal, they return from almsround, sit down cross-legged, set their body straight, and establish mindfulness in their presence. 
+After the meal, they return from almsround, sit down cross-legged, set their body straight, and bring mindfulness to the present. 
 Giving up covetousness for the world, they meditate with a heart rid of covetousness, cleansing the mind of covetousness. 
 Giving up ill will and malevolence, they meditate with a mind rid of ill will, full of sympathy for all living beings, cleansing the mind of ill will. 
 Giving up dullness and drowsiness, they meditate with a mind rid of dullness and drowsiness, perceiving light, mindful and aware, cleansing the mind of dullness and drowsiness. 
@@ -3166,7 +3166,7 @@ In the same way, a mendicant is content with robes to look after the body and al
 That’s how a mendicant is content. 
 When they have this entire spectrum of noble ethics, this noble sense restraint, this noble mindfulness and situational awareness, and this noble contentment, 
 they frequent a secluded lodging—a wilderness, the root of a tree, a hill, a ravine, a mountain cave, a charnel ground, a forest, the open air, a heap of straw. 
-After the meal, they return from almsround, sit down cross-legged, set their body straight, and establish mindfulness in their presence. 
+After the meal, they return from almsround, sit down cross-legged, set their body straight, and bring mindfulness to the present. 
 Giving up covetousness for the world, they meditate with a heart rid of covetousness, cleansing the mind of covetousness. 
 Giving up ill will and malevolence, they meditate with a mind rid of ill will, full of sympathy for all living beings, cleansing the mind of ill will. 
 Giving up dullness and drowsiness, they meditate with a mind rid of dullness and drowsiness, perceiving light, mindful and aware, cleansing the mind of dullness and drowsiness. 
@@ -3483,7 +3483,7 @@ fire and air have no footing;
 regarding this, long and short, 
 fine and coarse, beautiful and ugly. 
 Regarding this, name and form 
-ceases with nothing left over—
+ceases with no residue left behind—
 with the cessation of consciousness, 
 they cease in reference to this.”’” 
 That is what the Buddha said. 
@@ -6852,11 +6852,11 @@ The Buddha hasn’t declared his passing.
 It would be good to do so, for many people would gain confidence, and so be reborn in a good place. 
 Besides, the Buddha was awakened in Magadha; 
 so why hasn’t he declared the rebirth of the Magadhan devotees? 
-If he fails to do so, they will be dejected.” 
+If he fails to do so, they will be disheartened.” 
 
 After pondering the fate of the Magadhan devotees alone in private, Ānanda rose at the crack of dawn and went to see the Buddha. He bowed, sat down to one side, and told the Buddha of his concerns, finishing by saying, 
 
-“Why hasn’t the Buddha declared the rebirth of the Magadhan devotees? If he fails to do so, they will be dejected.” 
+“Why hasn’t the Buddha declared the rebirth of the Magadhan devotees? If he fails to do so, they will be disheartened.” 
 Then Ānanda, after making this suggestion regarding the Magadhan devotees, got up from his seat, bowed, and respectfully circled the Buddha, keeping him on his right, before leaving. 
 Soon after Ānanda had left, the Buddha robed up in the morning and, taking his bowl and robe, entered Ñātika for alms. 
 He wandered for alms in Ñātika. After the meal, on his return from almsround, he washed his feet and entered the brick house. He paid attention, applied the mind, and concentrated wholeheartedly on the fate of Magadhan devotees, and sat on the seat spread out, thinking, 
@@ -7034,7 +7034,7 @@ like the joy that’s born from gladness.
 
 This is the second opportunity for achieving happiness. 
 Next, take someone who doesn’t truly understand what is skillful and what is unskillful, 
-what is blameworthy and what is blameless, what should be cultivated and what should not be cultivated, what is inferior and what is superior, and what is on the side of dark and the side of bright. 
+what is blameworthy and what is blameless, what should be cultivated and what should not be cultivated, what is inferior and what is superior, and what has a portion of dark or bright. 
 After some time they hear the teaching of the noble ones, rationally apply the mind to how it applies to them, and practice in line with the teaching. 
 They truly understand what is skillful and what is unskillful, and so on. 
 
@@ -7136,7 +7136,7 @@ I don’t see any Teacher, past or present, who has such sympathy for the world,
 Also, the Buddha has explained the teaching well—apparent in the present life, immediately effective, inviting inspection, relevant, so that sensible people can know it for themselves. 
 I don’t see any Teacher, past or present, who explains such a relevant teaching, apart from the Buddha. 
 Also, the Buddha has well described what is skillful and what is unskillful, 
-what is blameworthy and what is blameless, what should be cultivated and what should not be cultivated, what is inferior and what is superior, and what is on the side of dark and the side of bright. 
+what is blameworthy and what is blameless, what should be cultivated and what should not be cultivated, what is inferior and what is superior, and what has a portion of dark or bright. 
 I don’t see any Teacher, past or present, who so clearly describes all these things, apart from the Buddha. 
 Also, the Buddha has well described the practice that leads to extinguishment for his disciples. And extinguishment converges with the practice, 
 as the waters of the Ganges join together and converge with the waters of the Yamuna. 
@@ -8438,7 +8438,7 @@ They meditate observing an aspect of principles—keen, aware, and mindful, rid 
 1. Observing the Body 
 1.1. Mindfulness of Breathing 
 And how does a mendicant meditate observing an aspect of the body? 
-It’s when a mendicant—gone to a wilderness, or to the root of a tree, or to an empty hut—sits down cross-legged, sets their body straight, and establishes mindfulness in their presence. 
+It’s when a mendicant—gone to a wilderness, or to the root of a tree, or to an empty hut—sits down cross-legged, sets their body straight, and brings mindfulness to the present. 
 Just mindful, they breathe in. Mindful, they breathe out. 
 Breathing in heavily they know: ‘I’m breathing in heavily.’ Breathing out heavily they know: ‘I’m breathing out heavily.’ 
 When breathing in lightly they know: ‘I’m breathing in lightly.’ Breathing out lightly they know: ‘I’m breathing out lightly.’ 
@@ -8727,7 +8727,7 @@ considerations regarding ideas in the world seem nice and pleasant, and it is th
 This is called the noble truth of the origin of suffering. 
 4.5.3. The Cessation of Suffering 
 And what is the noble truth of the cessation of suffering? 
-It’s the fading away and cessation of that very same craving with nothing left over; giving it away, letting it go, releasing it, and not clinging to it. 
+It’s the fading away and cessation of that very same craving with no residue left behind; giving it away, letting it go, releasing it, and not clinging to it. 
 
 Whatever in the world seems nice and pleasant, it is there that craving is given up and ceases. 
 And what in the world seems nice and pleasant? 
@@ -8779,7 +8779,7 @@ Or mindfulness is established that principles exist, to the extent necessary for
 That’s how a mendicant meditates by observing an aspect of principles with respect to the four noble truths. 
 
 Anyone who develops these four kinds of mindfulness meditation in this way for seven years can expect one of two results: 
-enlightenment in this very life, or if there’s something left over, non-return. 
+enlightenment in this very life, or if there’s residue left behind, non-return. 
 Let alone seven years, 
 anyone who develops these four kinds of mindfulness meditation in this way for six years … 
 five years … 
@@ -8799,7 +8799,7 @@ one month …
 a fortnight … 
 Let alone a fortnight, 
 anyone who develops these four kinds of mindfulness meditation in this way for seven days can expect one of two results: 
-enlightenment in this very life, or if there’s something left over, non-return. 
+enlightenment in this very life, or if there’s residue left behind, non-return. 
 ‘The four kinds of mindfulness meditation are the path to convergence. They are in order to purify sentient beings, to get past sorrow and crying, to make an end of pain and sadness, to discover the system, and to realize extinguishment.’ 
 That’s what I said, and this is why I said it.” 
 That is what the Buddha said. 
@@ -10126,7 +10126,7 @@ Furthermore, a mortifier undertakes a practice of mortification out of longing f
 This too is a defect in that mortifier. 
 Furthermore, a mortifier rebukes a certain ascetic or brahmin, 
 ‘What is it with this one living in abundance, devouring everything—
-plants propagated from roots, stems, cuttings, or joints; and those from regular seeds as the fifth. According to this ascetic’s doctrine, the crown of the tooth is forked lightning!’ 
+plants propagated from roots, trunks, cuttings, or joints; and those from regular seeds as the fifth. According to this ascetic’s doctrine, the crown of the tooth is forked lightning!’ 
 This too is a defect in that mortifier. 
 Furthermore, a mortifier sees a certain ascetic or brahmin being honored, respected, esteemed, and venerated among good families. 
 They think, 
@@ -10185,7 +10185,7 @@ Furthermore, a mortifier doesn’t undertake a practice of mortification out of 
 So they’re pure on that point. 
 Furthermore, a mortifier doesn’t rebuke a certain ascetic or brahmin, 
 ‘What is it with this one living in abundance, devouring everything—
-plants propagated from roots, stems, cuttings, or joints; and those from regular seeds as the fifth. According to this ascetic’s doctrine, the crown of the tooth is like forked lightning!’ 
+plants propagated from roots, trunks, cuttings, or joints; and those from regular seeds as the fifth. According to this ascetic’s doctrine, the crown of the tooth is like forked lightning!’ 
 So they’re pure on that point. 
 Furthermore, a mortifier sees a certain ascetic or brahmin being honored, respected, esteemed, and venerated among good families. 
 It never occurs to them, 
@@ -10235,7 +10235,7 @@ That’s how a mortifier is restrained in the fourfold constraint.
 When a mortifier is restrained in the fourfold constraint, that is their mortification. 
 They step forward, not falling back. 
 They frequent a secluded lodging—a wilderness, the root of a tree, a hill, a ravine, a mountain cave, a charnel ground, a forest, the open air, a heap of straw. 
-After the meal, they return from almsround, sit down cross-legged, set their body straight, and establish mindfulness in their presence. 
+After the meal, they return from almsround, sit down cross-legged, set their body straight, and bring mindfulness to the present. 
 Giving up covetousness for the world, they meditate with a heart rid of covetousness, cleansing the mind of covetousness. 
 Giving up ill will and malevolence, they meditate with a mind rid of ill will, full of sympathy for all living beings, cleansing the mind of ill will. 
 Giving up dullness and drowsiness, they meditate with a mind rid of dullness and drowsiness, perceiving light, mindful and aware, cleansing the mind of dullness and drowsiness. 
@@ -11143,24 +11143,24 @@ This is unsurpassable when it comes to a person’s ethical behavior.
 1.10. Responsiveness to Instruction 
 And moreover, sir, how the Buddha teaches the different degrees of responsiveness to instruction is unsurpassable. 
 There are these four degrees of responsiveness to instruction. 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘By practicing as instructed this individual will, with the ending of three fetters, become a stream-enterer, not liable to be reborn in the underworld, destined for awakening.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘By practicing as instructed this individual will, with the ending of three fetters, and the weakening of greed, hate, and delusion, become a once-returner. They will come back to this world once only, then make an end of suffering.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside to another individual: 
 ‘By practicing as instructed this individual will, with the ending of the five lower fetters, be reborn spontaneously. They will be extinguished there, and are not liable to return from that world.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘By practicing as instructed this individual will realize the undefiled freedom of heart and freedom by wisdom in this very life, and live having realized it with their own insight due to the ending of defilements.’ 
 This is unsurpassable when it comes to the different degrees of responsiveness to instruction. 
 1.11. The Knowledge and Freedom of Others 
 And moreover, sir, how the Buddha teaches the knowledge and freedom of other individuals is unsurpassable. 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘With the ending of three fetters this individual will become a stream-enterer, not liable to be reborn in the underworld, destined for awakening.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘With the ending of three fetters, and the weakening of greed, hate, and delusion, this individual will become a once-returner. They will come back to this world once only, then make an end of suffering.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘With the ending of the five lower fetters, this individual will be reborn spontaneously. They will be extinguished there, and are not liable to return from that world.’ 
-The Buddha knows by rationally applying the mind to another individual: 
+The Buddha knows by investigating inside another individual: 
 ‘This individual will realize the undefiled freedom of heart and freedom by wisdom in this very life, and live having realized it with their own insight due to the ending of defilements.’ 
 This is unsurpassable when it comes to the knowledge and freedom of other individuals. 
 1.12. Eternalism 
@@ -13743,9 +13743,9 @@ This is the seventh plane of consciousness.
 <em>Seven individuals worthy of a religious donation:</em> 
 one freed both ways, one freed by wisdom, a direct witness, one attained to view, one freed by faith, a follower of teachings, and a follower by faith. 
 <em>Seven underlying tendencies:</em> 
-sensual desire, repulsion, views, doubt, conceit, desire for continued existence, and ignorance. 
+sensual desire, aversion, views, doubt, conceit, desire for continued existence, and ignorance. 
 <em>Seven fetters:</em> 
-attraction, repulsion, views, doubt, conceit, desire for continued existence, and ignorance. 
+attraction, aversion, views, doubt, conceit, desire for continued existence, and ignorance. 
 <em>Seven principles for the settlement of any disciplinary issues that might arise:</em> 
 Resolution face-to-face to be applied. Resolution through recollection to be granted. Resolution because of past insanity to be granted. Acting according to what has been admitted. Majority decision. Further penalty. Covering over as if with grass. 
 These are the teachings grouped by seven that have been rightly explained by the Buddha. 
@@ -14523,7 +14523,7 @@ This is the seventh plane of consciousness.
 
 <em>What seven things should be given up?</em> 
 Seven underlying tendencies: 
-sensual desire, repulsion, views, doubt, conceit, desire for continued existence, and ignorance. 
+sensual desire, aversion, views, doubt, conceit, desire for continued existence, and ignorance. 
 
 <em>What seven things make things worse?</em> 
 Seven bad qualities: 
