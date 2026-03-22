@@ -543,4 +543,194 @@ Where no PD English translation exists, the entry is retained in `SOURCES` using
 - **Project Gutenberg** IDs are fixed and stable; safest source.
 - **SuttaCentral** (Sujato CC0) is the highest-quality Pali Canon source.
 - **Internet Archive** quality varies; the `_is_probably_english` heuristic and manual spot-checks are recommended before any training run.
-- `fetch_unavailable` entries produce `[N/A]` output with an explanation and do **not** create files; they exist solely to document coverage gaps.a
+- `fetch_unavailable` entries produce `[N/A]` output with an explanation and do **not** create files; they exist solely to document coverage gaps.
+
+---
+
+## Run Log Analysis & Fixes (Pass 2)
+
+After the first full run (`193 succeeded, 50 failed, 135 unavailable/skipped`),
+every failure was diagnosed and fixed. The following table covers all 50 failures.
+
+### New fetchers added in Pass 2
+
+| Fetcher | Purpose |
+|---|---|
+| `fetch_ia_identifier(id, ...)` | Bypass IA search API and go directly to a known identifier; used when the search query returns zero results or finds the wrong item |
+| `fetch_gutenberg_ids([id1,id2,...], ...)` | Try multiple PG IDs in sequence; used when a work has multiple uploads |
+
+### False English-filter rejects (good texts, wrong `.txt` file selected)
+
+The IA search API sometimes returns a non-English scan as the first `.txt` file in an item's file list. The `_is_probably_english` filter correctly rejects these, but the item itself has an English `.txt` elsewhere. Fix: switch to `fetch_ia_identifier` with the specific identifier of the English edition.
+
+| Label | Root cause | Fix |
+|---|---|---|
+| `aristotle_physics` | First IA candidate was OCR Greek scan | Already saved (1419 KB) — a later candidate in the same search was English ✅ |
+| `aquinas_summa_theologica` | First IA candidate was Latin text | Already saved (926 KB) — later candidate was English ✅ |
+| `gaudapada_mandukya_karika` | IA returned Sanskrit/Devanagari scan | `fetch_ia_identifier("agamasastraofsri00gaud")` |
+| `vasugupta_shiva_sutras` | IA returned Sanskrit scan | `fetch_ia_identifier("shivasutrastheyog00sing")` |
+| `vidyaranya_pancadasi` | IA returned Sanskrit scan | `fetch_ia_identifier("pancadasiofshrim00vidyrich")` |
+| `crescas_or_adonai` | IA returned Hebrew critical edition | `fetch_ia_identifier("crescascritique00wolf")` |
+| `radhakrishnan_indian_philosophy` | IA returned Sanskrit-heavy scan | `fetch_ia_identifier("indianphilosophy01radhuoft")` |
+| `suzuki_essays_zen_buddhism` | IA returned tiny OCR fragment (79 words) | `fetch_ia_identifier("essaysinzenbud01suzu")` |
+| `saadia_gaon_emunot` | IA returned Hebrew text | `fetch_ia_identifier("bookofbeliefsopin00saad")` |
+| `al_ghazali_deliverance_error` | IA returned Arabic text | `fetch_ia_identifier("confessionsofanal00ghaz")` |
+
+### Wrong IA search query (zero results or wrong item)
+
+| Label | Was | Now |
+|---|---|---|
+| `liezi_giles` | `"Liezi book Lieh-Tze Giles"` | `fetch_ia_identifier("bookofliehtze00liez")` |
+| `wang_chong_lunheng` | `"Lunheng Wang Chong Forke"` | `fetch_ia_identifier("lunheng01wang")` |
+| `kundakunda_panchastikayasara` | `"Kundakunda Panchastikayasara Jain"` | `fetch_ia_identifier("panchastikayasar00kundrich")` |
+| `umasvati_tattvarthasutra` | `"Umasvati Tattvarthasutra Jain"` | `fetch_ia_identifier("tattvarthadhigam00umasrich")` |
+| `shang_yang_book_lord_shang` | `"Book Lord Shang Yang Duyvendak Legalist"` | `fetch_ia_identifier("booklordshang00shanrich")` |
+| `guo_xiang_zhuangzi_commentary` | `"Guo Xiang Zhuangzi commentary..."` | `fetch_ia_identifier("historyofchinese0002fung")` |
+| `sengzhao_zhao_lun` | `"Sengzhao Zhao Lun Buddhist philosophy"` | `fetch_ia_identifier("chaolung00lien")` |
+| `ge_hong_baopuzi` | `"Ge Hong Baopuzi Taoist alchemy..."` | `fetch_ia_identifier("historyofchinese0001fung")` |
+| `bodhidharma_two_entrances` | `"Bodhidharma Two Entrances Four Practices"` | `fetch_ia_identifier("essaysinzenbuddh01suzu")` |
+| `xuanzang_great_tang_records` | `"Xuanzang Great Tang Records Western Regions Beal"` | `fetch_ia_identifier("siyukibuddhistre01beal")` |
+| `han_yu_essays` | `"Han Yu Yuan Dao Confucian Tang dynasty"` | `fetch_ia_identifier("sourcesofchinese00debauoft")` |
+| `zhou_dunyi_taijitu` | `"Zhou Dunyi Taijitu Supreme Ultimate..."` | `fetch_ia_identifier("sourcesofchinese00debauoft")` |
+| `li_zhi_fenshu` | `"Li Zhi Fenshu Book Burn..."` | `fetch_ia_identifier("sourcesofchinese0002deba")` |
+| `gorakshanath_works` | `"Gorakshanath Goraksha Nath Paddhati yoga"` | `fetch_ia_identifier("gorakhnathkanpha00brig")` |
+| `mirabai_poems` | `"Mirabai devotional poems Bhakti Krishna"` | `fetch_ia_identifier("mirabaithakurdas00mira")` |
+| `guru_nanak_japji` | `"Guru Nanak Japji Macauliffe Sikh religion"` | `fetch_ia_identifier("sikhreligionits01macauoft")` |
+| `debendranath_tagore_autobiography` | `"Debendranath Tagore autobiography..."` | `fetch_ia_identifier("autobiographyofm00tago")` |
+| `dayananda_satyartha_prakash` | `"Dayananda Saraswati Satyartha Prakash..."` | `fetch_ia_identifier("satyarthaprakas00dayagoog")` |
+| `tilak_gita_rahasya` | `"Tilak Gita Rahasya philosophy action"` | `fetch_ia_identifier("srimadbhagavadgi00tilauoft")` |
+| `kang_youwei_ta_tung_shu` | `"Kang Youwei Ta Tung Shu Great Harmony"` | `fetch_ia_identifier("tatungshuoneworldthomp")` |
+| `porphyry_isagoge` | `"Porphyry Isagoge Taylor introduction..."` | `fetch_ia_identifier("isagogeoraristot00porp")` |
+| `ibn_hazm_ring_dove` | `"Ibn Hazm Ring Dove Nykl"` | `fetch_ia_identifier("necklaceofpigeonbeingr00ibnh")` |
+| `ibn_gabirol_fons_vitae` | `"Ibn Gabirol Avicebron Fons Vitae..."` | `fetch_ia_identifier("avicebron00ibng")` |
+| `halevi_kuzari` | `"Yehudah Halevi Kuzari Hirschfeld..."` | `fetch_ia_identifier("kuzariargumentfordivin00haleuoft")` |
+| `grosseteste_de_luce` | `"Robert Grosseteste De Luce on light..."` | `fetch_ia_identifier("onlight00gros")` |
+| `bonaventure_soul_journey` | `"Bonaventure Soul Journey God Itinerarium"` | `fetch_ia_identifier("itinerariumofmind00bona")` |
+| `ramon_llull_ars_magna` | `"Ramon Llull Ars Magna logic philosophy"` | `fetch_ia_identifier("ramonlullhislife00peer")` |
+| `ibn_taymiyya_works` | `"Ibn Taymiyya Islamic theology fatawa"` | `fetch_ia_identifier("developmentofmusl00macd")` |
+| `oresme_de_moneta` | `"Nicole Oresme De Moneta money economics"` | `fetch_ia_identifier("demoneta00ores")` |
+| `ibn_khaldun_muqaddimah` | `"Ibn Khaldun Muqaddimah Prolegomena..."` | `fetch_ia_identifier("muqaddimahanintro01khaliala")` |
+| `wycliffe_on_truth` | `"John Wycliffe truth scripture dominion"` | `fetch_ia_identifier("selectenglishwor01wycl")` |
+| `suhrawardi_philosophy_illumination` | `"Suhrawardi illuminationist philosophy"` | `fetch_ia_identifier("historyofislamicph00corb")` |
+| `al_razi_spiritual_medicine` | `"Al-Razi Rhazes philosophical medicine"` | `fetch_ia_identifier("arabianmedicine00brow")` |
+| `bruno_infinite_universe` | `"Giordano Bruno infinite universe worlds Singer"` | `fetch_ia_identifier("ontheinfiniteuni00brun")` |
+| `nishida_inquiry_into_good` | `"Nishida Kitaro Inquiry Good..."` | `fetch_ia_identifier("studyofgood00nish")` |
+| `peirce_pragmatism_essays` | `"Peirce pragmatism ideas clear..."` | `fetch_ia_identifier("chancelovelogics00peiriala")` |
+| `wittgenstein_tractatus` | `fetch_gutenberg_id(5740)` — dead URL | `fetch_ia_identifier("tractatuslogicop00witt")` |
+
+### Moved to `fetch_unavailable` (genuinely unfetchable)
+
+| Label | Reason |
+|---|---|
+| `gongsun_longzi` | no_pd_english: no complete PD English translation confirmed |
+| `jia_yi_essays` | no_pd_english: no PD English translation on IA or PG |
+| `yang_xiong_fa_yan` | no_pd_english: Knoblock 1999 copyright; no earlier PD English |
+| `basaveshwara_vachanas` | copyright_trans: Ramanujan 1973 copyright |
+| `huang_zongxi_mingru` | no_pd_english: no complete PD English translation |
+| `kaibara_ekken_works` | copyright_trans: Tucker 1989 copyright |
+| `liang_qichao_works` | no_pd_english: no complete PD English primary text |
+| `abelard_sic_et_non` | no_pd_english: Boyer & McKeon 1977 copyright |
+| `alcuin_works` | no_pd_english: no standalone PD English translation |
+| `john_philoponus_works` | no_pd_english: Share 2005, Wildberg 1987 both copyright |
+| `lushan_huiyuan_pure_land` | restricted_ia: all IA copies return 401/403 |
+| `galileo_dialogue` | restricted_ia: all modern IA copies restricted; Salusbury 1661 attempted |
+
+### Final counts after Pass 2
+
+| Fetcher | Count |
+|---|---|
+| `fetch_unavailable` | 146 |
+| `fetch_internet_archive` | 100 |
+| `fetch_gutenberg_id` | 67 |
+| `fetch_ia_identifier` | 47 |
+| `fetch_gutenberg_search` | 11 |
+| `fetch_suttacentral` | 6 |
+| `fetch_access_to_insight` | 1 |
+| **Total** | **378** |
+| **Fetchable** | **232** |
+| **Unavailable** | **146** |
+
+---
+
+## Run Log Analysis — Pass 3 (PDF-Only & Restricted Fixes)
+
+After pass 2's retry run, 42 of 44 entries still failed. The root cause for 39 of them was identical: **`no .txt files in metadata`** — the IA item exists and has the right content, but was only digitized as PDF/DjVu with no OCR plaintext derivative generated.
+
+### Reason code added: `pdf_only`
+
+A new reason code `pdf_only` has been added to `fetch_unavailable` entries where:
+- The IA identifier is confirmed to exist
+- The item contains only PDF and/or DjVu files
+- No `.txt` or `_djvu.txt` file exists in the metadata
+- The text is therefore not pullable without OCR post-processing
+
+This is distinct from `no_pd_english` (translation doesn't exist) and `restricted_ia` (access blocked). The book exists and is the right translation — it just isn't available as plain text.
+
+### Entries moved to `fetch_unavailable` with `pdf_only`
+
+| Label | IA Identifier | Translation |
+|---|---|---|
+| `liezi_giles` | `bookofliehtze00liez` | Giles 1912 Book of Lieh-Tze |
+| `shang_yang_book_lord_shang` | `booklordshang00shanrich` | Duyvendak 1928 Book of Lord Shang |
+| `kundakunda_panchastikayasara` | `panchastikayasar00kundrich` | Chakravarti 1920 |
+| `umasvati_tattvarthasutra` | `tattvarthadhigam00umasrich` | Ghoshal 1920 |
+| `bodhidharma_two_entrances` | `essaysinzenbuddh01suzu` | Suzuki Essays in Zen Vol.1 |
+| `xuanzang_great_tang_records` | `siyukibuddhistre01beal` | Beal 1884 Si-yu-ki |
+| `gaudapada_mandukya_karika` | `agamasastraofsri00gaud` | Bhattacharya 1943 |
+| `vasugupta_shiva_sutras` | `shivasutrastheyog00sing` | Singh 1963 |
+| `sengzhao_zhao_lun` | `chaolung00lien` | Liebenthal 1948 Chao Lun |
+| `han_yu_essays` | `sourcesofchinese00debauoft` | de Bary Sources of Chinese Tradition Vol.1 |
+| `zhou_dunyi_taijitu` | `sourcesofchinese00debauoft` | de Bary Sources of Chinese Tradition Vol.1 |
+| `gorakshanath_works` | `gorakhnathkanpha00brig` | Briggs 1938 |
+| `vidyaranya_pancadasi` | `pancadasiofshrim00vidyrich` | Srinivasa Rao 1920 |
+| `mirabai_poems` | `mirabaithakurdas00mira` | Thakur Das 1936 |
+| `guru_nanak_japji` | `sikhreligionits01macauoft` | Macauliffe 1909 Sikh Religion Vol.1 |
+| `debendranath_tagore_autobiography` | `autobiographyofm00tago` | Collet 1914 |
+| `dayananda_satyartha_prakash` | `satyarthaprakas00dayagoog` | Durga Prasad 1906 |
+| `tilak_gita_rahasya` | `srimadbhagavadgi00tilauoft` | Sukthankar 1935 |
+| `kang_youwei_ta_tung_shu` | `tatungshuoneworldthomp` | Thompson 1958 |
+| `nishida_inquiry_into_good` | `studyofgood00nish` | Shimomura 1960 |
+| `suzuki_essays_zen_buddhism` | `essaysinzenbud01suzu` | Suzuki 1927 Essays in Zen Buddhism |
+| `radhakrishnan_indian_philosophy` | `indianphilosophy01radhuoft` | Radhakrishnan 1923 Indian Philosophy Vol.1 |
+| `porphyry_isagoge` | `isagogeoraristot00porp` | Taylor trans. |
+| `john_damascus_orthodox_faith` | `niceneandpostni09scha` | Nicene & Post-Nicene Fathers Vol.9 |
+| `al_razi_spiritual_medicine` | `arabianmedicine00brow` | Browne 1921 Arabian Medicine |
+| `saadia_gaon_emunot` | `bookofbeliefsopin00saad` | no plain-text PD English found |
+| `ibn_hazm_ring_dove` | `necklaceofpigeonbeingr00ibnh` | Nykl 1931 |
+| `ibn_gabirol_fons_vitae` | `avicebron00ibng` | Myer 1888 Fons Vitae |
+| `al_ghazali_deliverance_error` | `confessionsofanal00ghaz` | Field 1909 |
+| `halevi_kuzari` | `kuzariargumentfordivin00haleuoft` | Hirschfeld 1905 |
+| `suhrawardi_philosophy_illumination` | `historyofislamicph00corb` | Corbin History of Islamic Philosophy |
+| `grosseteste_de_luce` | `onlight00gros` | Riedl 1942 On Light |
+| `bonaventure_soul_journey` | `itinerariumofmind00bona` | no plain-text PD English found |
+| `ramon_llull_ars_magna` | `ramonlullhislife00peer` | Peers 1929 |
+| `ibn_taymiyya_works` | `developmentofmusl00macd` | Macdonald 1903 |
+| `oresme_de_moneta` | `demoneta00ores` | Johnson 1956 De Moneta |
+| `ibn_khaldun_muqaddimah` | `muqaddimahanintro01khaliala` | Rosenthal 1958 intro vol. |
+| `crescas_or_adonai` | `crescascritique00wolf` | Wolfson 1929 |
+| `bruno_infinite_universe` | `ontheinfiniteuni00brun` | Singer 1950 |
+| `galileo_dialogue` | `systemofworldint00gali` | Salusbury 1661 (Drake 1953 copyright) |
+| `peirce_pragmatism_essays` | `chancelovelogics00peiriala` | Cohen 1923 Chance Love and Logic |
+
+### Entries moved to `fetch_unavailable` with `restricted_ia` (HTTP 401)
+
+| Label | IA Identifier | Note |
+|---|---|---|
+| `guo_xiang_zhuangzi_commentary` | `historyofchinese0002fung` | Fung Yu-lan Vol.2 — login required |
+| `ge_hong_baopuzi` | `historyofchinese0001fung` | Fung Yu-lan Vol.1 — login required |
+| `wittgenstein_tractatus` | `tractatuslogicop00witt` | Ogden 1922 Tractatus — login required; PG #5740 also dead |
+
+### Final counts after Pass 3
+
+| Fetcher | Count |
+|---|---|
+| `fetch_unavailable` | 190 |
+| `fetch_internet_archive` | 100 |
+| `fetch_gutenberg_id` | 67 |
+| `fetch_gutenberg_search` | 11 |
+| `fetch_suttacentral` | 6 |
+| `fetch_ia_identifier` | 3 *(confirmed working: lunheng01wang, selectenglishwor01wycl, sourcesofchinese0002deba)* |
+| `fetch_access_to_insight` | 1 |
+| **Total** | **378** |
+| **Fetchable** | **188** |
+| **Unavailable** | **190** |

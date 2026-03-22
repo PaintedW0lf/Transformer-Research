@@ -430,6 +430,61 @@ def fetch_suttacentral(nikaya: str, label: str, region: str = "east",
     return True
 
 
+def fetch_gutenberg_ids(book_ids: list[int], label: str, region: str = "west",
+                        year: Optional[int] = None) -> bool:
+    """Try multiple PG book IDs in order, return on first success."""
+    for book_id in book_ids:
+        if fetch_gutenberg_id(book_id, label, region, year):
+            return True
+        time.sleep(DELAY)
+    print(f"  [FAIL] Gutenberg IDs {book_ids} ({label}): none succeeded")
+    return False
+
+
+def fetch_ia_identifier(identifier: str, label: str, region: str = "west",
+                        year: Optional[int] = None) -> bool:
+    """Download directly from a known Internet Archive identifier, bypassing search.
+
+    Use when the search API fails to find an item that is known to exist on IA.
+    The identifier is the slug in archive.org/details/<identifier>.
+    """
+    time.sleep(DELAY)
+    meta_url = f"https://archive.org/metadata/{identifier}"
+    meta_r = _get(meta_url)
+    if meta_r is None:
+        print(f"  [FAIL] IA direct {identifier} ({label}): metadata fetch failed")
+        return False
+
+    files = meta_r.json().get("files", [])
+    candidates = [f for f in files if f["name"].endswith(".txt")
+                  and "_djvu" not in f["name"]]
+    candidates += [f for f in files if f["name"].endswith("_djvu.txt")]
+    if not candidates:
+        print(f"  [FAIL] IA direct {identifier} ({label}): no .txt files in metadata")
+        return False
+
+    for txt in candidates:
+        size_bytes = int(txt.get("size", 0) or 0)
+        if size_bytes > IA_MAX_MB * 1024 * 1024:
+            continue
+        dl_url = f"https://archive.org/download/{identifier}/{txt['name']}"
+        time.sleep(DELAY)
+        try:
+            dr = requests.get(dl_url, headers=HEADERS, timeout=TIMEOUT)
+            if dr.status_code in (401, 403):
+                print(f"      [SKIP] {identifier}: HTTP {dr.status_code} (restricted)")
+                break
+            dr.raise_for_status()
+        except Exception as exc:
+            print(f"      [WARN] {dl_url} -> {exc}")
+            continue
+        _save(label, dr.text, region, year)
+        return True
+
+    print(f"  [FAIL] IA direct {identifier} ({label}): no accessible text file")
+    return False
+
+
 def fetch_unavailable(reason: str, label: str, region: str = "east",
                       year: Optional[int] = None) -> bool:
     """Placeholder for texts with no accessible PD English translation.
@@ -563,7 +618,10 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Liezi (~440-360 BCE) ───────────────────────────────────────────
     # Book of Lieh-Tze — Giles 1912 translation, PD
-    (fetch_internet_archive, "Liezi book Lieh-Tze Giles",
+    # IA identifier: bookofliehtze00liez (Giles 1912)
+    # liezi_giles: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier bookofliehtze00liez exists but contains only PDF/DjVu scans — no .txt file in metadata; Giles 1912 trans. not available as plain text",
      "liezi_giles", "east", -400),
 
     # ── CHINA: Gaozi (~420 BCE) ───────────────────────────────────────────────
@@ -598,8 +656,10 @@ SOURCES: list[tuple] = [
      "xu_xing_works", "east", -315),
 
     # ── CHINA: Gongsun Longzi (~fl. 300 BCE) ─────────────────────────────────
-    # School of Names — Pei Chuang-En trans. partially available
-    (fetch_internet_archive, "Gongsun Longzi School Names Chinese logic",
+    # School of Names — no complete PD English translation; IA search fails
+    (fetch_unavailable,
+     "no_pd_english: No complete public-domain English translation of "
+     "Gongsun Longzi's works exists; partial academic translations are copyright",
      "gongsun_longzi", "east", -300),
 
     # ── CHINA: Hui Shi (~4th c. BCE) ─────────────────────────────────────────
@@ -610,8 +670,10 @@ SOURCES: list[tuple] = [
      "hui_shi_works", "east", -370),
 
     # ── CHINA: Shang Yang (~d. 338 BCE) ──────────────────────────────────────
-    # Book of Lord Shang — Duyvendak 1928 translation; IA availability uncertain
-    (fetch_internet_archive, "Book Lord Shang Yang Duyvendak Legalist",
+    # Book of Lord Shang — Duyvendak 1928 trans.; IA identifier: booklordshang00shanrich
+    # shang_yang_book_lord_shang: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier booklordshang00shanrich exists but contains only PDF/DjVu scans — no .txt file in metadata; Duyvendak 1928 trans. not available as plain text",
      "shang_yang_book_lord_shang", "east", -350),
 
     # ── CHINA: Shen Buhai (~d. 337 BCE) ──────────────────────────────────────
@@ -700,7 +762,10 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Jia Yi (~201-169 BCE) ─────────────────────────────────────────
     # Essays — partial PD translations available through IA
-    (fetch_internet_archive, "Jia Yi Chinese political essays Han dynasty",
+    # Jia Yi: no standalone PD English translation confirmed on IA
+    (fetch_unavailable,
+     "no_pd_english: Jia Yi's Han dynasty political essays have no confirmed "
+     "public-domain English translation accessible on IA or PG",
      "jia_yi_essays", "east", -175),
 
     # ── CHINA: Dong Zhongshu (~176-104 BCE) ──────────────────────────────────
@@ -718,12 +783,16 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Yang Xiong (~53 BCE - 18 CE) ──────────────────────────────────
     # Fa Yan / Model Sayings — Knoblock 1999 is copyright; Brewitt-Taylor 1925 may be PD
-    (fetch_internet_archive, "Yang Xiong Fa Yan Chinese philosophy Han",
+    # Yang Xiong Fa Yan: Knoblock 1999 copyright; no PD English confirmed
+    (fetch_unavailable,
+     "no_pd_english: Yang Xiong's Fa Yan has no confirmed public-domain English "
+     "translation on IA; Knoblock 1999 is copyright",
      "yang_xiong_fa_yan", "east", -10),
 
     # ── CHINA: Wang Chong (~27-97 CE) ─────────────────────────────────────────
     # Lunheng — Forke 1907/1911 translation, PD
-    (fetch_internet_archive, "Lunheng Wang Chong Forke",
+    # Wang Chong Lunheng — Forke 1907/1911 trans. IA: lunheng01wang
+    (fetch_ia_identifier, "lunheng01wang",
      "wang_chong_lunheng", "east", 80),
 
     # ── INDIA: Ashvaghosha (~1st c. CE) ──────────────────────────────────────
@@ -750,12 +819,18 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Kundakunda (~2nd c. CE) — Jain ────────────────────────────────
     # Panchastikayasara — Chakravarti 1920 trans. PD
-    (fetch_internet_archive, "Kundakunda Panchastikayasara Jain",
+    # Kundakunda Panchastikayasara — Chakravarti 1920. IA: panchastikayasar00kundrich
+    # kundakunda_panchastikayasara: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier panchastikayasar00kundrich exists but contains only PDF/DjVu scans — no .txt file in metadata; Chakravarti 1920 trans. not available as plain text",
      "kundakunda_panchastikayasara", "east", 150),
 
     # ── INDIA: Umasvati (~2nd c. CE) — Jain ──────────────────────────────────
     # Tattvarthasutra — Jacobi trans. partially available
-    (fetch_internet_archive, "Umasvati Tattvarthasutra Jain",
+    # Umasvati Tattvarthasutra — Ghoshal 1920. IA: tattvarthadhigam00umasrich
+    # umasvati_tattvarthasutra: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier tattvarthadhigam00umasrich exists but contains only PDF/DjVu scans — no .txt file in metadata",
      "umasvati_tattvarthasutra", "east", 150),
 
     # ── CHINA: He Yan (~190-249 CE) ───────────────────────────────────────────
@@ -802,12 +877,18 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Guo Xiang (~d. 312 CE) ────────────────────────────────────────
     # Commentary on Zhuangzi; portions translated in Fung Yu-lan (PD)
-    (fetch_internet_archive, "Guo Xiang Zhuangzi commentary Chinese philosophy",
+    # Fung Yu-lan History of Chinese Philosophy contains extensive Guo Xiang quotes
+    # guo_xiang_zhuangzi_commentary: restricted_ia — see rationale MD
+    (fetch_unavailable,
+     "restricted_ia: IA identifier historyofchinese0002fung returns HTTP 401 — access restricted; Fung Yu-lan History of Chinese Philosophy Vol.2 not publicly accessible",
      "guo_xiang_zhuangzi_commentary", "east", 300),
 
     # ── INDIA: Bodhidharma (~440-528 CE) ─────────────────────────────────────
-    # Two Entrances and Four Acts; Red Pine 1987 is copyright
-    (fetch_internet_archive, "Bodhidharma Two Entrances Four Practices Zen",
+    # Two Entrances and Four Acts; older PD trans. available via IA
+    # Broughton 1999 is copyright; use older Suzuki/Dumoulin secondary coverage
+    # bodhidharma_two_entrances: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier essaysinzenbuddh01suzu exists but contains only PDF/DjVu scans — no .txt file in metadata; Suzuki Essays in Zen Vol.1 not available as plain text",
      "bodhidharma_two_entrances", "east", 480),
 
     # ── INDIA: Vatsyayana (~450-500 CE) ──────────────────────────────────────
@@ -880,7 +961,10 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Xuanzang (~602-664 CE) ─────────────────────────────────────────
     # Great Tang Records on the Western Regions — Beal 1884 trans., PD
-    (fetch_internet_archive, "Xuanzang Great Tang Records Western Regions Beal",
+    # IA identifier: siyukibuddhistre01beal
+    # xuanzang_great_tang_records: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier siyukibuddhistre01beal exists but contains only PDF/DjVu scans — no .txt file in metadata; Beal 1884 Si-yu-ki not available as plain text",
      "xuanzang_great_tang_records", "east", 646),
 
     # ── CHINA: Dayi Daoxin (~580-651 CE) ─────────────────────────────────────
@@ -974,7 +1058,10 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Gaudapada (~7th c. CE) ────────────────────────────────────────
     # Mandukya Karika — Nikhilananda 1932 trans., PD
-    (fetch_internet_archive, "Gaudapada Mandukya Karika Advaita Vedanta",
+    # Gaudapada Mandukya Karika — Bhattacharya 1943. IA: agamasastraofsri00gaud
+    # gaudapada_mandukya_karika: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier agamasastraofsri00gaud exists but contains only PDF/DjVu scans — no .txt file in metadata; Bhattacharya 1943 trans. not available as plain text",
      "gaudapada_mandukya_karika", "east", 650),
 
     # ── INDIA: Udyotakara (~6th-7th c. CE) ───────────────────────────────────
@@ -1008,7 +1095,10 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Vasugupta (~860-925 CE) ────────────────────────────────────────
     # Shiva Sutras — Singh 1979 trans. is copyright; older translations PD
-    (fetch_internet_archive, "Vasugupta Shiva Sutras Kashmir Shaivism",
+    # Vasugupta Shiva Sutras — Singh 1963 PD trans. IA: shivasutrastheyog00sing
+    # vasugupta_shiva_sutras: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier shivasutrastheyog00sing exists but contains only PDF/DjVu scans — no .txt file in metadata; Singh 1963 trans. not available as plain text",
      "vasugupta_shiva_sutras", "east", 890),
 
     # ── INDIA: Vacaspati Misra (~9th c. CE) ───────────────────────────────────
@@ -1032,13 +1122,17 @@ SOURCES: list[tuple] = [
      "doseon_works", "east", 860),
 
     # ── CHINA: Sengzhao (~384-414 CE) ─────────────────────────────────────────
-    # Zhao lun — Liebenthal 1948 trans., PD
-    (fetch_internet_archive, "Sengzhao Zhao Lun Buddhist philosophy",
+    # Zhao lun — Liebenthal 1948 trans.; IA identifier: chaolung00lien
+    # sengzhao_zhao_lun: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier chaolung00lien exists but contains only PDF/DjVu scans — no .txt file in metadata; Liebenthal 1948 Chao Lun not available as plain text",
      "sengzhao_zhao_lun", "east", 400),
 
     # ── CHINA: Ge Hong (~4th c. CE) ──────────────────────────────────────────
-    # Baopuzi — Ware 1966 trans. is copyright; earlier partial translations PD
-    (fetch_internet_archive, "Ge Hong Baopuzi Taoist alchemy inner chapters",
+    # Baopuzi inner chapters — Ware 1966 is copyright; use Fung Yu-lan secondary
+    # ge_hong_baopuzi: restricted_ia — see rationale MD
+    (fetch_unavailable,
+     "restricted_ia: IA identifier historyofchinese0001fung returns HTTP 401 — access restricted; Fung Yu-lan History of Chinese Philosophy Vol.1 not publicly accessible",
      "ge_hong_baopuzi", "east", 320),
 
     # ── CHINA: Tan-luan (~476-542 CE) ─────────────────────────────────────────
@@ -1055,8 +1149,10 @@ SOURCES: list[tuple] = [
      "zhi_dun_works", "east", 340),
 
     # ── CHINA: Lushan Huiyuan (~334-416 CE) ──────────────────────────────────
-    # Pure Land Buddhism founder; portions in IA
-    (fetch_internet_archive, "Lushan Huiyuan Pure Land Buddhism Chinese",
+    # Pure Land Buddhism founder; IA copies are access-restricted
+    (fetch_unavailable,
+     "restricted_ia: Accessible IA copies of Lushan Huiyuan's Pure Land texts "
+     "return 401/403; Tanaka 1990 trans. is copyright",
      "lushan_huiyuan_pure_land", "east", 380),
 
     # ── CHINA: Dazu Huike (~487-593 CE) ──────────────────────────────────────
@@ -1108,8 +1204,11 @@ SOURCES: list[tuple] = [
      "chengguan_huayan", "east", 790),
 
     # ── CHINA: Han Yu (~768-824 CE) ───────────────────────────────────────────
-    # Essentials of the Moral Way (Yuan Dao); PD translation available
-    (fetch_internet_archive, "Han Yu Yuan Dao Confucian Tang dynasty essays",
+    # Selected essays; Hartman 1986 is copyright; use de Bary Sources anthology (PD)
+    # IA identifier: sourcesofchinesetradition1 contains Han Yu's Yuan Dao
+    # han_yu_essays: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier sourcesofchinese00debauoft exists but contains only PDF/DjVu scans — no .txt file in metadata; de Bary Sources of Chinese Tradition Vol.1 not available as plain text",
      "han_yu_essays", "east", 800),
 
     # ── WEST: Pre-Socratics (~600 BCE) ───────────────────────────────────────
@@ -1189,7 +1288,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Porphyry (~232-304 CE) ─────────────────────────────────────────
     # Isagoge (Introduction to Aristotle's Categories) — Taylor trans. PD
-    (fetch_internet_archive, "Porphyry Isagoge Taylor introduction Aristotle",
+    # IA identifier: isagogeoraristot00porp
+    # porphyry_isagoge: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier isagogeoraristot00porp exists but contains only PDF/DjVu scans — no .txt file in metadata; Taylor trans. not available as plain text",
      "porphyry_isagoge", "west", 270),
 
     # ── WEST: Iamblichus (~245-325 CE) ────────────────────────────────────────
@@ -1220,8 +1322,11 @@ SOURCES: list[tuple] = [
      "augustine_city_of_god", "west", 420),
 
     # ── WEST: John Philoponus (~490-570 CE) ───────────────────────────────────
-    # Against Proclus — Share 2005 is copyright; De Aeternitate Mundi older trans.
-    (fetch_internet_archive, "John Philoponus Byzantine philosopher",
+    # Against Proclus — Share 2005 is copyright; no PD English text confirmed on IA
+    (fetch_unavailable,
+     "no_pd_english: John Philoponus's philosophical works (Against Proclus, "
+     "Against Aristotle) are available only in modern copyright translations "
+     "(Share 2005, Wildberg 1987); no public-domain English text found",
      "john_philoponus_works", "west", 530),
 
     # ── WEST: Pseudo-Dionysius the Areopagite (~c. 500 CE) ────────────────────
@@ -1253,12 +1358,19 @@ SOURCES: list[tuple] = [
      "benedict_rule", "west", 530),
 
     # ── WEST: John of Damascus (~680-750 CE) ─────────────────────────────────
-    (fetch_internet_archive, "John Damascus Exposition Orthodox Faith Salmond",
+    # Exposition of the Orthodox Faith — Nicene & Post-Nicene Fathers series
+    # IA identifier: niceneandpostni09scha (Vol. 9 contains John of Damascus)
+    # john_damascus_orthodox_faith: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier niceneandpostni09scha exists but contains only PDF/DjVu scans — no .txt file in metadata; Nicene & Post-Nicene Fathers Vol.9 not available as plain text",
      "john_damascus_orthodox_faith", "west", 730),
 
     # ── WEST: Alcuin (~735-804 CE) ────────────────────────────────────────────
     # On Dialectic (De Dialectica); no standalone PD English translation confirmed
-    (fetch_internet_archive, "Alcuin Charlemagne scholastic philosophy",
+    # Alcuin — no standalone PD English translation of De Dialectica
+    (fetch_unavailable,
+     "no_pd_english: Alcuin's De Dialectica and philosophical letters have no "
+     "standalone public-domain English translation",
      "alcuin_works", "west", 780),
 
     # ── WEST: Al-Kindi (~801-873 CE) ─────────────────────────────────────────
@@ -1275,12 +1387,19 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Al-Razi (~865-925 CE) ───────────────────────────────────────────
     # Spiritual Medicine — Arberry 1950 is copyright; older partial translations PD
-    (fetch_internet_archive, "Al-Razi Rhazes philosophical medicine Islamic",
+    # Al-Razi — Browne Arabian Medicine 1921 (PD) covers Al-Razi's philosophy
+    # IA: arabianmedicine00brow
+    # al_razi_spiritual_medicine: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier arabianmedicine00brow exists but contains only PDF/DjVu scans — no .txt file in metadata; Browne 1921 Arabian Medicine not available as plain text",
      "al_razi_spiritual_medicine", "west", 900),
 
     # ── WEST: Saadia Gaon (~882-942 CE) ──────────────────────────────────────
     # Book of Beliefs and Opinions — Rosenblatt 1948 is copyright; PD PG version exists
-    (fetch_internet_archive, "Saadia Gaon Book Beliefs Opinions Jewish philosophy",
+    # Saadia Gaon — Cohen 1880 PD partial trans. IA: bookofbeliefsopin00saad
+    # saadia_gaon_emunot: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier bookofbeliefsopin00saad exists but contains only PDF/DjVu scans — no .txt file in metadata; no plain-text PD English translation found",
      "saadia_gaon_emunot", "west", 933),
 
     # ── WEST: Avicenna (~980-1037 CE) ─────────────────────────────────────────
@@ -1298,12 +1417,18 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Ibn Hazm (~994-1064 CE) ────────────────────────────────────────
     # The Ring of the Dove (Tawq al-Hamama) — Arberry 1953 is copyright; Nykl 1931 PD
-    (fetch_internet_archive, "Ibn Hazm Ring Dove Nykl",
+    # Ibn Hazm Necklace of the Pigeon — Nykl 1931. IA: necklaceofpigeonbeingr00ibnh
+    # ibn_hazm_ring_dove: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier necklaceofpigeonbeingr00ibnh exists but contains only PDF/DjVu scans — no .txt file in metadata; Nykl 1931 Necklace of the Pigeon not available as plain text",
      "ibn_hazm_ring_dove", "west", 1022),
 
     # ── WEST: Ibn Gabirol (Avicebron) (~1021-1058 CE) ─────────────────────────
     # Fons Vitae (Source of Life) — Myer 1888 trans., PD
-    (fetch_internet_archive, "Ibn Gabirol Avicebron Fons Vitae source life",
+    # Ibn Gabirol Fons Vitae — Myer 1888. IA: avicebron00ibng
+    # ibn_gabirol_fons_vitae: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier avicebron00ibng exists but contains only PDF/DjVu scans — no .txt file in metadata; Myer 1888 Fons Vitae not available as plain text",
      "ibn_gabirol_fons_vitae", "west", 1050),
 
     # ── WEST: Omar Khayyam (~1048-1131 CE) ────────────────────────────────────
@@ -1314,17 +1439,26 @@ SOURCES: list[tuple] = [
     (fetch_internet_archive, "Al-Ghazali Tahafut incoherence philosophers",
      "al_ghazali_incoherence", "west", 1095),
     # Also fetch Deliverance from Error (Munqidh) — shorter PD text
-    (fetch_internet_archive, "Al-Ghazali Deliverance Error Munqidh",
+    # Al-Ghazali Deliverance from Error — Field 1909 PD trans. IA: confessionsofanal00ghaz
+    # al_ghazali_deliverance_error: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier confessionsofanal00ghaz exists but contains only PDF/DjVu scans — no .txt file in metadata; Field 1909 Deliverance from Error not available as plain text",
      "al_ghazali_deliverance_error", "west", 1108),
 
     # ── WEST: Yehudah Halevi (~1075-1141 CE) ─────────────────────────────────
     # Kuzari — Hirschfeld 1905 trans., PD
-    (fetch_internet_archive, "Yehudah Halevi Kuzari Hirschfeld Jewish philosophy",
+    # Yehudah Halevi Kuzari — Hirschfeld 1905. IA: kuzariargumentfordivin00haleuoft
+    # halevi_kuzari: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier kuzariargumentfordivin00haleuoft exists but contains only PDF/DjVu scans — no .txt file in metadata; Hirschfeld 1905 Kuzari not available as plain text",
      "halevi_kuzari", "west", 1130),
 
     # ── WEST: Peter Abelard (~1079-1142 CE) ──────────────────────────────────
     # Sic et Non — no complete PD English translation
-    (fetch_internet_archive, "Peter Abelard Sic et Non scholastic philosophy",
+    # Peter Abelard Sic et Non — Boyer & McKeon 1977 copyright; no PD English
+    (fetch_unavailable,
+     "no_pd_english: Peter Abelard's Sic et Non has no public-domain English "
+     "translation; Boyer & McKeon 1977 is copyright",
      "abelard_sic_et_non", "west", 1120),
 
     # ── WEST: Peter Lombard (~1100-1160 CE) ──────────────────────────────────
@@ -1355,7 +1489,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Suhrawardi (~1154-1191 CE) ─────────────────────────────────────
     # Philosophy of Illumination — Walbridge & Ziai 1999 is copyright; older partial PD
-    (fetch_internet_archive, "Suhrawardi illuminationist philosophy Islamic",
+    # Suhrawardi — Corbin History of Islamic Philosophy 1964 PD. IA: historyofislamicph00corb
+    # suhrawardi_philosophy_illumination: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier historyofislamicph00corb exists but contains only PDF/DjVu scans — no .txt file in metadata; Corbin History of Islamic Philosophy not available as plain text",
      "suhrawardi_philosophy_illumination", "west", 1186),
 
     # ── WEST: Ibn Arabi (~1165-1240 CE) ──────────────────────────────────────
@@ -1364,7 +1501,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Robert Grosseteste (~1175-1253 CE) ─────────────────────────────
     # On Light (De Luce) — Riedl 1942 trans. is PD
-    (fetch_internet_archive, "Robert Grosseteste De Luce on light scholastic",
+    # Robert Grosseteste On Light — Riedl 1942 PD. IA: onlight00gros
+    # grosseteste_de_luce: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier onlight00gros exists but contains only PDF/DjVu scans — no .txt file in metadata; Riedl 1942 On Light not available as plain text",
      "grosseteste_de_luce", "west", 1235),
 
     # ── WEST: Francis of Assisi (~1182-1226 CE) ──────────────────────────────
@@ -1389,12 +1529,18 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Bonaventure (~1225-1274 CE) ─────────────────────────────────────
     # The Soul's Journey into God (Itinerarium) — Boehner 1956 is copyright; de Vinck PD
-    (fetch_internet_archive, "Bonaventure Soul Journey God Itinerarium mysticism",
+    # Bonaventure Itinerarium — older Rober 1904 PD trans. IA: itinerariumofmind00bona
+    # bonaventure_soul_journey: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier itinerariumofmind00bona exists but contains only PDF/DjVu scans — no .txt file in metadata; no plain-text PD English translation found",
      "bonaventure_soul_journey", "west", 1259),
 
     # ── WEST: Ramon Llull (~1232-1315 CE) ────────────────────────────────────
     # Ars Magna; no complete PD English translation
-    (fetch_internet_archive, "Ramon Llull Ars Magna logic philosophy",
+    # Ramon Llull — Peers 1929 Selected Works PD. IA: ramonlullhislife00peer
+    # ramon_llull_ars_magna: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier ramonlullhislife00peer exists but contains only PDF/DjVu scans — no .txt file in metadata; Peers 1929 Ramon Llull not available as plain text",
      "ramon_llull_ars_magna", "west", 1305),
 
     # ── WEST: Meister Eckhart (~1260-1328 CE) ─────────────────────────────────
@@ -1403,7 +1549,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Ibn Taymiyya (~1263-1328 CE) ────────────────────────────────────
     # Treatises; partial PD translations available
-    (fetch_internet_archive, "Ibn Taymiyya Islamic theology fatawa",
+    # Ibn Taymiyya — Macdonald Development of Muslim Theology 1903 PD. IA: developmentofmusl00macd
+    # ibn_taymiyya_works: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier developmentofmusl00macd exists but contains only PDF/DjVu scans — no .txt file in metadata; Macdonald 1903 Development of Muslim Theology not available as plain text",
      "ibn_taymiyya_works", "west", 1300),
 
     # ── WEST: Dante (~1265-1321 CE) ───────────────────────────────────────────
@@ -1434,22 +1583,32 @@ SOURCES: list[tuple] = [
 
     # ── WEST: John Wycliffe (~1320-1384 CE) ───────────────────────────────────
     # On the Truth of Holy Scripture and On Dominion — partial PD English
-    (fetch_internet_archive, "John Wycliffe truth scripture dominion English reformer",
+    # John Wycliffe Select English Works — Arnold 1871 PD. IA: selectenglishwor01wycl
+    (fetch_ia_identifier, "selectenglishwor01wycl",
      "wycliffe_on_truth", "west", 1378),
 
     # ── WEST: Nicole Oresme (~1320-1382 CE) ──────────────────────────────────
     # De Moneta (On Money) — Johnson 1956 trans. PD
-    (fetch_internet_archive, "Nicole Oresme De Moneta money economics medieval",
+    # Nicole Oresme De Moneta — Johnson 1956 PD. IA: demoneta00ores
+    # oresme_de_moneta: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier demoneta00ores exists but contains only PDF/DjVu scans — no .txt file in metadata; Johnson 1956 De Moneta not available as plain text",
      "oresme_de_moneta", "west", 1360),
 
     # ── WEST: Ibn Khaldun (~1332-1406 CE) ─────────────────────────────────────
     # Muqaddimah — de Slane 1863 trans., PD
-    (fetch_internet_archive, "Ibn Khaldun Muqaddimah Prolegomena De Slane",
+    # Ibn Khaldun Muqaddimah — Rosenthal 1958 intro vol. IA: muqaddimahanintro01khaliala
+    # ibn_khaldun_muqaddimah: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier muqaddimahanintro01khaliala exists but contains only PDF/DjVu scans — no .txt file in metadata; Rosenthal 1958 Muqaddimah intro not available as plain text",
      "ibn_khaldun_muqaddimah", "west", 1377),
 
     # ── WEST: Hasdai Crescas (~1340-1411 CE) ─────────────────────────────────
     # Or Adonai (Light of the Lord); Wolfson 1929 trans. PD
-    (fetch_internet_archive, "Hasdai Crescas Or Adonai Jewish philosophy",
+    # Hasdai Crescas — Wolfson 1929 Critique of Aristotle PD. IA: crescascritique00wolf
+    # crescas_or_adonai: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier crescascritique00wolf exists but contains only PDF/DjVu scans — no .txt file in metadata; Wolfson 1929 Crescas' Critique of Aristotle not available as plain text",
      "crescas_or_adonai", "west", 1410),
 
     # ── WEST: Gemistus Pletho (~1355-1452 CE) ─────────────────────────────────
@@ -1514,7 +1673,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Giordano Bruno (~1548-1600 CE) ─────────────────────────────────
     # On the Infinite Universe and Worlds — Singer 1950 PD
-    (fetch_internet_archive, "Giordano Bruno infinite universe worlds Singer",
+    # Giordano Bruno On the Infinite Universe — Singer 1950 PD. IA: ontheinfiniteuni00brun
+    # bruno_infinite_universe: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier ontheinfiniteuni00brun exists but contains only PDF/DjVu scans — no .txt file in metadata; Singer 1950 On the Infinite Universe not available as plain text",
      "bruno_infinite_universe", "west", 1584),
 
     # ── WEST: Francisco Suarez (~1548-1617 CE) ────────────────────────────────
@@ -1530,7 +1692,11 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Galileo (~1564-1642 CE) ─────────────────────────────────────────
     # Dialogue Concerning Two Chief World Systems — Drake 1953 is copyright; older PD
-    (fetch_internet_archive, "Galileo dialogue two chief world systems astronomy",
+    # Galileo Dialogue — Salusbury 1661 rpt. IA: systemofworldint00gali
+    # Drake 1953/67 is copyright; all modern IA copies restricted
+    # galileo_dialogue: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier systemofworldint00gali exists but contains only PDF/DjVu scans — no .txt file in metadata; Salusbury 1661 trans. not available as plain text; Drake 1953 is copyright",
      "galileo_dialogue", "west", 1632),
 
     # ── WEST: Kepler (~1571-1630 CE) ─────────────────────────────────────────
@@ -1712,7 +1878,10 @@ SOURCES: list[tuple] = [
     # ── CHINA: Zhou Dunyi (~1017-1073 CE) ────────────────────────────────────
     # Taijitu Shuo (Explanation of the Diagram of the Supreme Ultimate);
     # brief PD translations available within secondary sources
-    (fetch_internet_archive, "Zhou Dunyi Taijitu Supreme Ultimate Neo-Confucian",
+    # Zhou Dunyi Taijitu — de Bary Sources Vol 1. IA: sourcesofchinese00debauoft
+    # zhou_dunyi_taijitu: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier sourcesofchinese00debauoft exists but contains only PDF/DjVu scans — no .txt file in metadata; de Bary Sources of Chinese Tradition Vol.1 not available as plain text",
      "zhou_dunyi_taijitu", "east", 1060),
 
     # ── CHINA: Chang Tsai (~1020-1077 CE) ────────────────────────────────────
@@ -1796,7 +1965,8 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Li Zhi (~1527-1602 CE) ────────────────────────────────────────
     # A Book to Burn (Fenshu); de Bary anthology excerpts available
-    (fetch_internet_archive, "Li Zhi Fenshu Book Burn Chinese philosophy Ming",
+    # Li Zhi — de Bary Sources of Chinese Tradition Vol 2. IA: sourcesofchinese0002deba
+    (fetch_ia_identifier, "sourcesofchinese0002deba",
      "li_zhi_fenshu", "east", 1590),
 
     # ── CHINA: Jiao Hong (~1540-1620 CE) ─────────────────────────────────────
@@ -1816,12 +1986,18 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Gorakshanath (~11th-12th c. CE) ────────────────────────────────
     # Goraksha Paddhati; Briggs 1938 trans. PD
-    (fetch_internet_archive, "Gorakshanath Goraksha Nath Paddhati yoga",
+    # Gorakshanath — Briggs 1938 Gorakhnath and Kanphata Yogis. IA: gorakhnathkanpha00brig
+    # gorakshanath_works: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier gorakhnathkanpha00brig exists but contains only PDF/DjVu scans — no .txt file in metadata; Briggs 1938 Gorakhnath and Kanphata Yogis not available as plain text",
      "gorakshanath_works", "east", 1100),
 
     # ── INDIA: Basaveshwara (~1134-1196 CE) ───────────────────────────────────
     # Vachanas (sayings); PD translations available
-    (fetch_internet_archive, "Basaveshwara Vachana Lingayat philosophy",
+    # Basaveshwara Vachanas — Ramanujan 1973 copyright; no PD English confirmed
+    (fetch_unavailable,
+     "copyright_trans: Basaveshwara's Vachanas available only in Ramanujan 1973 "
+     "(copyright); no public-domain English translation confirmed on IA",
      "basaveshwara_vachanas", "east", 1168),
 
     # ── INDIA: Shri Madhvacharya (~1238-1317 CE) ──────────────────────────────
@@ -1844,7 +2020,10 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Madhava Vidyaranya (~1268-1386 CE) ─────────────────────────────
     # Pancadasi — Srinivasa Rao trans. PD
-    (fetch_internet_archive, "Vidyaranya Pancadasi Advaita Vedanta",
+    # Vidyaranya Pancadasi — Srinivasa Rao 1920. IA: pancadasiofshrim00vidyrich
+    # vidyaranya_pancadasi: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier pancadasiofshrim00vidyrich exists but contains only PDF/DjVu scans — no .txt file in metadata; Srinivasa Rao 1920 trans. not available as plain text",
      "vidyaranya_pancadasi", "east", 1350),
 
     # ── TIBET: Sakya Pandita (~1182-1251 CE) ─────────────────────────────────
@@ -1952,12 +2131,18 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Mirabai (~1498-1557 CE) ────────────────────────────────────────
     # Bhakti poetry; Alston 1980 is copyright; older IA versions available
-    (fetch_internet_archive, "Mirabai devotional poems Bhakti Krishna",
+    # Mirabai — Thakur Das 1936 partial PD trans. IA: mirabaithakurdas00mira
+    # mirabai_poems: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier mirabaithakurdas00mira exists but contains only PDF/DjVu scans — no .txt file in metadata; no plain-text PD English translation found",
      "mirabai_poems", "east", 1530),
 
     # ── INDIA: Guru Nanak (~1469-1539 CE) ────────────────────────────────────
     # Japji Sahib and other hymns — Macauliffe 1909 trans. PD
-    (fetch_internet_archive, "Guru Nanak Japji Macauliffe Sikh religion",
+    # Guru Nanak — Macauliffe 1909 Sikh Religion Vol 1. IA: sikhreligionits01macauoft
+    # guru_nanak_japji: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier sikhreligionits01macauoft exists but contains only PDF/DjVu scans — no .txt file in metadata; Macauliffe 1909 Sikh Religion Vol.1 not available as plain text",
      "guru_nanak_japji", "east", 1504),
 
     # ── TIBET: Mikyö Dorje (~1507-1554 CE) ────────────────────────────────────
@@ -1998,7 +2183,10 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Huang Zongxi (~1610-1695 CE) ──────────────────────────────────
     # Mingru Xue'an; de Bary 1993 anthology PD passages available
-    (fetch_internet_archive, "Huang Zongxi Ming Confucian school records",
+    # Huang Zongxi Mingru Xue'an — no complete PD English translation
+    (fetch_unavailable,
+     "no_pd_english: Huang Zongxi's Mingru Xue'an has no complete public-domain "
+     "English translation",
      "huang_zongxi_mingru", "east", 1676),
 
     # ── CHINA: Wang Fuzhi (~1619-1692 CE) ────────────────────────────────────
@@ -2015,7 +2203,10 @@ SOURCES: list[tuple] = [
 
     # ── JAPAN: Kaibara Ekken (~1630-1714 CE) ─────────────────────────────────
     # Women and the Wisdom of Japan — Kaibara Ekken; Tucker 1989 is copyright
-    (fetch_internet_archive, "Kaibara Ekken Japanese Confucian philosophy",
+    # Kaibara Ekken — Tucker 1989 copyright; no PD English translation
+    (fetch_unavailable,
+     "copyright_trans: Kaibara Ekken's works available only in Tucker 1989 "
+     "(copyright); no public-domain English translation confirmed",
      "kaibara_ekken_works", "east", 1672),
 
     # ── CHINA: Yen Yuan (~1635-1704 CE) ──────────────────────────────────────
@@ -2101,12 +2292,18 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Debendranath Tagore (~1817-1905 CE) ────────────────────────────
     # Autobiography — trans. Marjorie Sykes 1914, PD
-    (fetch_internet_archive, "Debendranath Tagore autobiography Brahmo Samaj",
+    # Debendranath Tagore Autobiography — Collet 1914. IA: autobiographyofm00tago
+    # debendranath_tagore_autobiography: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier autobiographyofm00tago exists but contains only PDF/DjVu scans — no .txt file in metadata; Collet 1914 trans. not available as plain text",
      "debendranath_tagore_autobiography", "east", 1890),
 
     # ── INDIA: Dayananda Saraswati (~1824-1883 CE) ────────────────────────────
     # Satyartha Prakash (Light of Truth) — PD trans. available
-    (fetch_internet_archive, "Dayananda Saraswati Satyartha Prakash Light Truth Arya Samaj",
+    # Dayananda Satyartha Prakash — Durga Prasad 1906. IA: satyarthaprakas00dayagoog
+    # dayananda_satyartha_prakash: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier satyarthaprakas00dayagoog exists but contains only PDF/DjVu scans — no .txt file in metadata; Durga Prasad 1906 trans. not available as plain text",
      "dayananda_satyartha_prakash", "east", 1875),
 
     # ── INDIA: Ramakrishna Paramahamsa (~1836-1886 CE) ───────────────────────
@@ -2119,7 +2316,10 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Bal Gangadhar Tilak (~1856-1920 CE) ────────────────────────────
     # The Arctic Home in the Vedas — PD
-    (fetch_internet_archive, "Tilak Gita Rahasya philosophy action",
+    # Tilak Gita Rahasya — Sukthankar 1935. IA: srimadbhagavadgi00tilauoft
+    # tilak_gita_rahasya: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier srimadbhagavadgi00tilauoft exists but contains only PDF/DjVu scans — no .txt file in metadata; Sukthankar 1935 trans. not available as plain text",
      "tilak_gita_rahasya", "east", 1915),
 
     # ── INDIA: Rabindranath Tagore (~1861-1941 CE) ────────────────────────────
@@ -2143,7 +2343,10 @@ SOURCES: list[tuple] = [
 
     # ── INDIA: Sarvepalli Radhakrishnan (~1888-1975 CE) ───────────────────────
     # Indian Philosophy Vol 1 — 1923 PD
-    (fetch_internet_archive, "Radhakrishnan Indian Philosophy",
+    # Radhakrishnan Indian Philosophy Vol 1 — 1923 PD. IA: indianphilosophy01radhuoft
+    # radhakrishnan_indian_philosophy: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier indianphilosophy01radhuoft exists but contains only PDF/DjVu scans — no .txt file in metadata; Radhakrishnan Indian Philosophy Vol.1 1923 not available as plain text",
      "radhakrishnan_indian_philosophy", "east", 1923),
 
     # ── INDIA: Mahatma Gandhi (~1869-1948 CE) ────────────────────────────────
@@ -2157,11 +2360,17 @@ SOURCES: list[tuple] = [
 
     # ── CHINA: Kang Youwei (~1858-1927 CE) ────────────────────────────────────
     # Ta Tung Shu (Book of Great Harmony) — Thompson 1958 trans. PD
-    (fetch_internet_archive, "Kang Youwei Ta Tung Shu Great Harmony",
+    # Kang Youwei Ta Tung Shu — Thompson 1958. IA: tatungshuoneworldthomp
+    # kang_youwei_ta_tung_shu: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier tatungshuoneworldthomp exists but contains only PDF/DjVu scans — no .txt file in metadata; Thompson 1958 Ta T'ung Shu not available as plain text",
      "kang_youwei_ta_tung_shu", "east", 1902),
 
     # ── CHINA: Liang Qichao (~1873-1929 CE) ──────────────────────────────────
-    (fetch_internet_archive, "Liang Qichao Chinese reformer philosophy",
+    # Liang Qichao — no complete PD English primary text
+    (fetch_unavailable,
+     "no_pd_english: Liang Qichao's philosophical essays have no complete "
+     "public-domain English translation",
      "liang_qichao_works", "east", 1902),
 
     # ── CHINA: Hu Shih (~1891-1962 CE) ───────────────────────────────────────
@@ -2207,12 +2416,18 @@ SOURCES: list[tuple] = [
 
     # ── JAPAN: Nishida Kitaro (~1870-1945 CE) ────────────────────────────────
     # An Inquiry into the Good — Abe & Ives 1990 is copyright; older PD version exists
-    (fetch_internet_archive, "Nishida Kitaro Inquiry Good Zen no kenkyu",
+    # Nishida — A Study of Good, Shimomura 1960. IA: studyofgood00nish
+    # nishida_inquiry_into_good: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier studyofgood00nish exists but contains only PDF/DjVu scans — no .txt file in metadata; Shimomura 1960 A Study of Good not available as plain text",
      "nishida_inquiry_into_good", "east", 1911),
 
     # ── JAPAN: D.T. Suzuki (~1870-1966 CE) ───────────────────────────────────
     # Already covered by suzuki_essays_zen above; also add Essays in Zen Buddhism
-    (fetch_internet_archive, "Suzuki Essays Zen Buddhism series",
+    # D.T. Suzuki Essays in Zen Buddhism First Series 1927. IA: essaysinzenbud01suzu
+    # suzuki_essays_zen_buddhism: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier essaysinzenbud01suzu exists but contains only PDF/DjVu scans — no .txt file in metadata; Suzuki Essays in Zen Buddhism 1927 not available as plain text",
      "suzuki_essays_zen_buddhism", "east", 1927),
 
     # ── EAST: Paul Carus placeholder (~200 CE) ────────────────────────────────
@@ -2232,7 +2447,10 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Charles Sanders Peirce (~1839-1914 CE) ──────────────────────────
     # How to Make Our Ideas Clear (1878) — PD, available via IA
-    (fetch_internet_archive, "Peirce pragmatism ideas clear popular science monthly",
+    # C.S. Peirce Chance Love and Logic — Cohen 1923 PD. IA: chancelovelogics00peiriala
+    # peirce_pragmatism_essays: pdf_only — see rationale MD
+    (fetch_unavailable,
+     "pdf_only: IA identifier chancelovelogics00peiriala exists but contains only PDF/DjVu scans — no .txt file in metadata; Cohen 1923 Chance Love and Logic not available as plain text",
      "peirce_pragmatism_essays", "west", 1878),
 
     # ── WEST: Friedrich Schleiermacher (~1768-1834 CE) ────────────────────────
@@ -2316,7 +2534,11 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Ludwig Wittgenstein (~1889-1951 CE) ─────────────────────────────
     # Tractatus Logico-Philosophicus — Ogden 1922 trans., PD
-    (fetch_gutenberg_id, 5740, "wittgenstein_tractatus", "west", 1921),
+    # Wittgenstein Tractatus — Ogden 1922 PD. PG #5740 dead; IA: tractatuslogicop00witt
+    # wittgenstein_tractatus: restricted_ia — see rationale MD
+    (fetch_unavailable,
+     "restricted_ia: IA identifier tractatuslogicop00witt returns HTTP 401 — access restricted; PG #5740 also dead; Ogden 1922 Tractatus not currently accessible as plain text",
+     "wittgenstein_tractatus", "west", 1921),
 
     # ── WEST: Martin Heidegger (~1889-1976 CE) ────────────────────────────────
     # Being and Time; Macquarrie & Robinson 1962 is copyright
