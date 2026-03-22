@@ -530,45 +530,47 @@ SOURCES: list[tuple] = [
     (fetch_gutenberg_id, 2034, "upanishads_muller_sbe15", "east", -800),
 
     # ── INDIA: Pali Canon (~480 BCE) ──────────────────────────────────────
-    # Rhys Davids — Dialogues of the Buddha (PG #38399)
-    (fetch_gutenberg_id, 38399, "pali_dialogues_rhys_davids", "east", -480),
-    # Rhys Davids — Buddhist Suttas (Sacred Books of the East vol. 11)
-    (fetch_internet_archive, "Buddhist Suttas Rhys Davids",
-     "pali_rhys_davids_pg", "east", -480),
-    # Thanissaro Bhikkhu — Access to Insight (open license)
-    (fetch_access_to_insight,
-     "https://www.accesstoinsight.org/tipitaka/",
-     "pali_thanissaro_ati", "east", -480),
-    # SuttaCentral — Sujato translation (CC0)
+    # SuttaCentral — Sujato translation (CC0) — one source per nikaya
     (fetch_suttacentral, "dn",  "pali_dn_sujato",  "east", -480),
     (fetch_suttacentral, "mn",  "pali_mn_sujato",  "east", -480),
     (fetch_suttacentral, "sn",  "pali_sn_sujato",  "east", -480),
     (fetch_suttacentral, "an",  "pali_an_sujato",  "east", -480),
     (fetch_suttacentral, "dhp", "pali_dhp_sujato", "east", -480),
     (fetch_suttacentral, "kn",  "pali_kn_sujato",  "east", -480),
+    # Thanissaro Bhikkhu — Access to Insight (different translation, open license)
+    (fetch_access_to_insight,
+     "https://www.accesstoinsight.org/tipitaka/",
+     "pali_thanissaro_ati", "east", -480),
+
+    # ── INDIA: Bhagavad Gita (~400–200 BCE) ──────────────────────────────
+    # Edwin Arnold trans. "The Song Celestial" (1885) — PG #2388
+    # Authority: Radhakrishnan & Moore 1957, pp. 101–163; Scharfstein 1998, ch. 3
+    (fetch_gutenberg_id, 2388, "bhagavad_gita_arnold", "east", -300),
 
     # ── CHINA: Analects (~479 BCE) ────────────────────────────────────────
+    # Authority: Fung Yu-lan 1952, vol. I ch. 4; Scharfstein 1998, ch. 6
     (fetch_gutenberg_id, 3330, "analects_legge", "east", -479),
-    (fetch_internet_archive, "Analects Confucius Soothill",
-     "analects_soothill", "east", -479),
 
     # ── CHINA: Mencius (~372 BCE) ─────────────────────────────────────────
+    # Authority: Fung Yu-lan 1952, vol. I ch. 7; Scharfstein 1998, ch. 6
     (fetch_gutenberg_id, 38406, "mencius_legge", "east", -372),
-    (fetch_internet_archive, "Mencius Jennings",
-     "mencius_jennings", "east", -372),
 
     # ── CHINA: Tao Te Ching (~400 BCE) ───────────────────────────────────
+    # Authority: Fung Yu-lan 1952, vol. I ch. 8; Scharfstein 1998, ch. 7
     (fetch_gutenberg_id, 216, "tao_te_ching_legge", "east", -400),
-    # Paul Carus open edition (Open Court, 1898)
-    (fetch_internet_archive, "Canon Reason Virtue Carus Lao Tze",
-     "tao_te_ching_carus", "east", -400),
 
     # ── CHINA: Zhuangzi (~350 BCE) ────────────────────────────────────────
+    # Authority: Fung Yu-lan 1952, vol. I ch. 10; Scharfstein 1998, ch. 7
     (fetch_gutenberg_id, 29724, "zhuangzi_legge", "east", -350),
-    (fetch_internet_archive, "Chuang Tzu Giles 1889",
-     "zhuangzi_giles", "east", -350),
+
+    # ── CHINA: Xunzi (~313–238 BCE) ──────────────────────────────────────
+    # H.H. Dubs trans. "Works of Hsuntze" (1928, PD) — IA identifier in.ernet.dli.2015.103953
+    # Authority: Fung Yu-lan 1952, vol. I ch. 12
+    (fetch_internet_archive, "Works Hsuntze",
+     "xunzi_dubs", "east", -300),
 
     # ── CHINA: Mozi (~470 BCE) ────────────────────────────────────────────
+    # Authority: Fung Yu-lan 1952, vol. I ch. 5
     (fetch_internet_archive, "Works Motse Yi-Pao Mei",
      "mozi_mei", "east", -470),
 
@@ -581,6 +583,7 @@ SOURCES: list[tuple] = [
 
     # ── WEST: Plato (~428 BCE) ────────────────────────────────────────────
     # Known Gutenberg IDs (Jowett translations)
+    # Project Gutenberg individual dialogues (Jowett) — one source: Gutenberg only
     (fetch_gutenberg_id, 1497, "plato_republic_jowett",    "west", -428),
     (fetch_gutenberg_id, 1658, "plato_phaedo_jowett",      "west", -428),
     (fetch_gutenberg_id, 1600, "plato_symposium_jowett",   "west", -428),
@@ -588,8 +591,6 @@ SOURCES: list[tuple] = [
     (fetch_gutenberg_id, 1672, "plato_gorgias_jowett",     "west", -428),
     (fetch_gutenberg_id, 1735, "plato_theaetetus_jowett",  "west", -428),
     (fetch_gutenberg_id, 1572, "plato_timaeus_jowett",     "west", -428),
-    (fetch_internet_archive, "Plato dialogues Jowett",
-     "plato_ia_jowett", "west", -428),
 
     # ── WEST: Aristotle (~384 BCE) ────────────────────────────────────────
     # Known Gutenberg IDs for Aristotle
@@ -605,11 +606,10 @@ SOURCES: list[tuple] = [
      "aristotle_de_anima", "west", -384),
 
     # ── PERSIA: Avesta (~1200 BCE, Gathas) ───────────────────────────────
-    # Darmesteter — Sacred Books of the East Vol 4 (Vendidad) + Vol 23 (Yasts + Gathas)
+    # Darmesteter — SBE Vol 4 (Vendidad); Mills — SBE Vol 31 (Gathas/Yasnas)
+    # One source per translator; dropped Vol 23 (same Darmesteter translator as Vol 4)
     (fetch_internet_archive, "Zend-Avesta Darmesteter Vendidad",
      "avesta_darmesteter_vol4", "west", -1200),
-    (fetch_internet_archive, "Zend Avesta Darmesteter sacred",
-     "avesta_darmesteter_vol23", "west", -1200),
     (fetch_internet_archive, "Avesta Mills Zend",
      "avesta_mills", "west", -1200),
 
@@ -677,7 +677,12 @@ SOURCES: list[tuple] = [
 
     # ── 400–500 CE ────────────────────────────────────────────────────────────
     # EAST
+    # Patanjali — Yoga Sutras (~400 CE) — Johnston 1912 / Vivekananda trans.
+    # Authority: Radhakrishnan & Moore 1957, pp. 453–485 ("Yoga system of Patanjali")
+    (fetch_internet_archive, "Yoga Sutras Patanjali",
+     "yoga_sutras_patanjali", "east", 400),
     # Buddhaghosa — Visuddhimagga (~430 CE)
+    # Authority: Radhakrishnan & Moore 1957, p. 285; Deutsch & Bontekoe 1997, ch. 7
     (fetch_internet_archive, "Visuddhimagga path purification",
      "visuddhimagga_buddhaghosa", "east", 430),
     # WEST
@@ -722,8 +727,12 @@ SOURCES: list[tuple] = [
 
     # ── 800–900 CE ────────────────────────────────────────────────────────────
     # EAST
+    # Shankara — Vivekachudamani ("Crest-Jewel of Wisdom") (~788 CE) — Johnston 1925 trans., PD
+    # Authority: Radhakrishnan & Moore 1957, pp. 506–517; Scharfstein 1998, ch. 3
+    (fetch_internet_archive, "Crest Jewel Wisdom Shankara Johnston",
+     "shankara_vivekachudamani", "east", 788),
     # Tibetan Book of the Dead (~8th–9th c. CE) — Evans-Wentz 1927 translation, public domain
-    # Kukai's major works only available in Hakeda 1972 (copyright); replacing with Bardo Thodol
+    # Authority: Deutsch & Bontekoe 1997, ch. 9
     (fetch_internet_archive, "Tibetan Book Dead Evans-Wentz",
      "tibetan_book_of_dead", "east", 820),
     # WEST
@@ -762,10 +771,10 @@ SOURCES: list[tuple] = [
 
     # ── 1100–1200 CE ──────────────────────────────────────────────────────────
     # EAST
-    # Four Books / Zhu Xi Neo-Confucian texts (~1175 CE)
-    # Zhu Xi's own translations are copyright; use Legge's Four Books (PD) which Zhu Xi compiled
-    (fetch_internet_archive, "Four books Confucius Mencius Legge",
-     "zhu_xi_reflections", "east", 1175),
+    # I Ching / Yi Jing — Legge translation (SBE Vol 16, 1882), PD
+    # Zhu Xi's Neo-Confucian school centred on commentary of I Ching; unique text not yet covered
+    (fetch_internet_archive, "I Ching Legge",
+     "i_ching_legge", "east", 1175),
     # WEST
     # Averroes — Incoherence of the Incoherence (~1180 CE)
     (fetch_internet_archive, "Averroes Tahafut incoherence",
