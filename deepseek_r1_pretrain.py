@@ -33,7 +33,7 @@ def build_deepseek_r1_from_scratch(
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     config = AutoConfig.from_pretrained(model_id)
     config.vocab_size = len(tokenizer)
-    # Fix rope_scaling integer fields that must be floats
+    # Keep rope_scaling numeric fields as float for compatibility.
     if hasattr(config, "rope_scaling") and isinstance(config.rope_scaling, dict):
         for key in ("factor", "beta_fast", "beta_slow"):
             if key in config.rope_scaling:
@@ -68,6 +68,12 @@ def build_deepseek_r1_from_scratch(
 
 
 if __name__ == "__main__":
+    # Streaming is strongly preferred for a 7B model — avoids OOM on tokenization
+    model, dataset, collator = build_deepseek_r1_from_scratch(
+        data_dir="data",
+        use_streaming=True,
+        block_size=4096,
+        shuffle_buffer=50000,
     # Train on Eastern philosophical texts
     print("\n=== Training on Eastern texts ===")
     east_texts = load_texts_from_data_dir("data/east")
@@ -77,25 +83,20 @@ if __name__ == "__main__":
         dataset_east,
         collator_east,
         output_dir="./outputs/deepseek_r1_east",
-        per_device_train_batch_size=4,  # DeepSeek-R1 is larger, use smaller batch
-        gradient_accumulation_steps=8,  # Effective batch size: 4*8*2 GPUs = 64
-        learning_rate=3e-4,
-        max_steps=1000,
-    )
-    trainer_east.train()
-
-    # Train on Western philosophical texts
-    print("\n=== Training on Western texts ===")
-    west_texts = load_texts_from_data_dir("data/west")
-    model_west, dataset_west, collator_west = build_deepseek_r1_from_scratch(west_texts)
-    trainer_west = build_trainer(
-        model_west,
-        dataset_west,
-        collator_west,
-        output_dir="./outputs/deepseek_r1_west",
         per_device_train_batch_size=4,
         gradient_accumulation_steps=8,
         learning_rate=3e-4,
         max_steps=1000,
     )
-    trainer_west.train()
+
+    trainer = build_trainer(
+        model,
+        dataset,
+        collator,
+        output_dir="./outputs/deepseek_r1_scratch",
+        per_device_train_batch_size=4,   # 7B model — keep batches small
+        gradient_accumulation_steps=8,   # Effective batch: 4 * 8 * 2 GPUs = 64
+        learning_rate=3e-4,
+        max_steps=1000,
+    )
+    trainer.train()
