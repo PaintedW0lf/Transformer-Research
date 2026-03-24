@@ -60,14 +60,61 @@ DEFAULT_CONFIG = {
     "n_layer": 12,
     "n_head": 12,
     "n_embd": 768,
-    "max_steps": 10000,
+    # max_steps is now computed dynamically per model; this value is used
+    # only when --max-steps is passed explicitly on the command line.
+    "max_steps": None,
     "learning_rate": 5e-4,
     "per_device_train_batch_size": 8,
     "gradient_accumulation_steps": 4,
-    "save_steps": 500,
+    # save_steps / logging_steps scale with max_steps dynamically too
+    "save_steps": None,
     "logging_steps": 50,
+    # Dynamic-step tuning knobs
+    "steps_per_text": 200,   # base steps contributed by each text file
+    "min_steps": 500,        # never train for fewer than this many steps
+    "max_steps_cap": 20000,  # never train for more than this many steps
 }
 
+
+# ---------------------------------------------------------------------------
+# Dynamic step computation
+# ---------------------------------------------------------------------------
+
+def compute_max_steps(
+    num_texts: int,
+    steps_per_text: int = DEFAULT_CONFIG["steps_per_text"],
+    min_steps: int = DEFAULT_CONFIG["min_steps"],
+    max_steps_cap: int = DEFAULT_CONFIG["max_steps_cap"],
+    override: int | None = None,
+) -> int:
+    """Return training steps scaled to corpus size.
+
+    If *override* is provided (via --max-steps CLI flag) that value is
+    returned as-is, allowing manual control when needed.
+
+    Formula:
+        steps = clamp(num_texts * steps_per_text, min_steps, max_steps_cap)
+
+    Examples (defaults):
+        28 texts  ->  5 600 steps  (~50 min on RTX 6000 Ada)
+        50 texts  -> 10 000 steps  (~90 min)
+        75 texts  -> 15 000 steps  (~140 min)
+        119 texts -> 20 000 steps  (capped)
+    """
+    if override is not None:
+        return override
+    steps = num_texts * steps_per_text
+    return max(min_steps, min(steps, max_steps_cap))
+
+
+def compute_save_steps(max_steps: int) -> int:
+    """Save a checkpoint roughly every 10 % of training."""
+    return max(100, max_steps // 10)
+
+
+# ---------------------------------------------------------------------------
+# Data helpers
+# ---------------------------------------------------------------------------
 
 def get_period_directories(region: str, up_to_period: str, data_base_dir: str = "data") -> List[Path]:
     """Get list of directories to include for cumulative training up to given period.
@@ -125,12 +172,17 @@ def load_cumulative_texts(region: str, up_to_period: str, data_base_dir: str = "
     return texts
 
 
+# ---------------------------------------------------------------------------
+# Training
+# ---------------------------------------------------------------------------
+
 def train_period_model(
     region: str,
     period: str,
     output_base_dir: str,
     config: dict,
     data_base_dir: str = "data",
+    max_steps_override: int | None = None,
 ) -> Path:
     """Train a model for a given region and time period.
 
@@ -138,8 +190,9 @@ def train_period_model(
         region: 'east' or 'west'
         period: Time period (e.g., '300')
         output_base_dir: Base output directory
-        config: Training configuration dict
+        config: Training configuration dict (max_steps may be None for dynamic)
         data_base_dir: Base data directory
+        max_steps_override: If set, use this fixed step count instead of dynamic
 
     Returns:
         Path to trained model checkpoint
@@ -152,6 +205,20 @@ def train_period_model(
     texts = load_cumulative_texts(region, period, data_base_dir)
     if not texts:
         raise ValueError(f"No texts loaded for {region} region up to period {period}")
+
+    # ── Dynamic step computation ──────────────────────────────────────────
+    max_steps = compute_max_steps(
+        num_texts=len(texts),
+        steps_per_text=config.get("steps_per_text", DEFAULT_CONFIG["steps_per_text"]),
+        min_steps=config.get("min_steps", DEFAULT_CONFIG["min_steps"]),
+        max_steps_cap=config.get("max_steps_cap", DEFAULT_CONFIG["max_steps_cap"]),
+        override=max_steps_override,
+    )
+    save_steps = compute_save_steps(max_steps)
+    logger.info(
+        f"Corpus size: {len(texts)} texts  →  "
+        f"max_steps={max_steps}  save_steps={save_steps}"
+    )
 
     # Build model, dataset, collator
     start_time = time.time()
@@ -181,8 +248,8 @@ def train_period_model(
         per_device_train_batch_size=config["per_device_train_batch_size"],
         gradient_accumulation_steps=config["gradient_accumulation_steps"],
         learning_rate=config["learning_rate"],
-        max_steps=config["max_steps"],
-        save_steps=config["save_steps"],
+        max_steps=max_steps,
+        save_steps=save_steps,
         logging_steps=config["logging_steps"],
     )
 
@@ -202,6 +269,10 @@ def train_period_model(
 
     return best_checkpoint
 
+
+# ---------------------------------------------------------------------------
+# Evaluation helpers (unchanged)
+# ---------------------------------------------------------------------------
 
 def run_batch_chat_test(
     model_checkpoint: Path,
@@ -339,6 +410,10 @@ def save_training_manifest(
     logger.info(f"Training manifest updated: {manifest_path}")
 
 
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
 def main():
     parser = argparse.ArgumentParser(
         description="Progressive philosophical training pipeline"
@@ -372,8 +447,32 @@ def main():
     parser.add_argument(
         "--max-steps",
         type=int,
-        default=DEFAULT_CONFIG["max_steps"],
-        help="Training steps per model",
+        default=None,
+        help=(
+            "Fixed training steps per model. "
+            "If omitted, steps are computed dynamically from corpus size "
+            f"({DEFAULT_CONFIG['steps_per_text']} steps/text, "
+            f"min={DEFAULT_CONFIG['min_steps']}, "
+            f"cap={DEFAULT_CONFIG['max_steps_cap']})."
+        ),
+    )
+    parser.add_argument(
+        "--steps-per-text",
+        type=int,
+        default=DEFAULT_CONFIG["steps_per_text"],
+        help="Steps contributed by each text file when using dynamic scheduling (default: 200)",
+    )
+    parser.add_argument(
+        "--min-steps",
+        type=int,
+        default=DEFAULT_CONFIG["min_steps"],
+        help="Minimum steps regardless of corpus size (default: 500)",
+    )
+    parser.add_argument(
+        "--max-steps-cap",
+        type=int,
+        default=DEFAULT_CONFIG["max_steps_cap"],
+        help="Maximum steps cap regardless of corpus size (default: 20000)",
     )
     parser.add_argument(
         "--learning-rate",
@@ -395,10 +494,13 @@ def main():
 
     args = parser.parse_args()
 
-    # Update config
+    # Build config — max_steps stays None here; train_period_model resolves it
+    # per model using the dynamic formula (or the CLI override if provided).
     config = DEFAULT_CONFIG.copy()
-    config["max_steps"] = args.max_steps
     config["learning_rate"] = args.learning_rate
+    config["steps_per_text"] = args.steps_per_text
+    config["min_steps"] = args.min_steps
+    config["max_steps_cap"] = args.max_steps_cap
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -421,10 +523,18 @@ def main():
 
     periods_to_train = args.periods[start_idx:]
 
-    logger.info(f"Starting progressive training pipeline")
+    logger.info("Starting progressive training pipeline")
     logger.info(f"Periods: {periods_to_train}")
     logger.info(f"Regions: {args.regions}")
     logger.info(f"Output directory: {output_dir}")
+    if args.max_steps is not None:
+        logger.info(f"Step mode: FIXED ({args.max_steps} steps per model)")
+    else:
+        logger.info(
+            f"Step mode: DYNAMIC "
+            f"({args.steps_per_text} steps/text, "
+            f"min={args.min_steps}, cap={args.max_steps_cap})"
+        )
     logger.info(f"Config: {config}")
 
     # Main training loop
@@ -444,6 +554,7 @@ def main():
                     output_base_dir=str(output_dir),
                     config=config,
                     data_base_dir=str(data_dir),
+                    max_steps_override=args.max_steps,  # None = use dynamic
                 )
                 checkpoints[region] = checkpoint
             except Exception as e:
