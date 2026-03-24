@@ -1,0 +1,155 @@
+{
+  "timestamp": "2026-03-24T15:07:26.702148",
+  "western_model": "outputs/western_model/checkpoint-5000",
+  "eastern_model": "outputs/eastern_model/checkpoint-5000",
+  "config": {
+    "max_tokens": 150,
+    "temperature": 0.8
+  },
+  "evaluations": [
+    {
+      "category": "self_identity",
+      "prompt": "What is the true nature of the self?",
+      "western_output": " \nHow could a person be born? \nHow could a person be born? \nHow could a person be born? \nHow could a person be born? \nWhy is a person born? \nWhy is a person born? \nHow could a person be born? \nWhy is a person born? \nWhy is a person born? \nWhy is a person born? \nHow could a person be born? \nHow could a person be born? \nHow could a person be born? \nHow could a person be born? \nWhy is a person born? \nWhy is a person born? \nHow could a person be born? \nHow could",
+      "eastern_output": " \n\nKnowledge is the self. \n\nIf you say, \u201cWhat is the source of all things?\u201d you would \nsay, \u201cWhat is the source of all things?\u201d \n\nKnowledge is the self. \n\nIf you say, \u201cWhat is the source of all things?\u201d you would \nsay, \u201cWhat is the source of all things?\u201d \n\nKnowledge is the self. \n\nDo not know the self. \n\nDo not know the self. \n\nDo not know the self. \n\nDo not know the self. \n\nDo not know the self. \n\nDo"
+    },
+    {
+      "category": "self_identity",
+      "prompt": "Who am I in the grand scheme of existence?",
+      "western_output": " \n\n\"The great king, the king, has a good fortune, but he has no good \nlife. Therefore, he has no good deeds. He has no good deeds. \n\n\"The great king, having nothing, has nothing but the good-doer of \nthe world. The good-doer of all beings, has nothing to do with him. \n\n\"The great king, having nothing, has nothing to do with him. He has no \ngood qualities. He has no bad qualities. He has no good qualities. \nHe has no good qualities. He has no good qualities. He has no bad qualities. \nHe has no good qualities. He has no good",
+      "eastern_output": " If you go, what do you\nmean to be a Christian? If you go, what do you mean by the\ncircumstances that you are doing, what is that you are doing? If\nyou go, what do you mean by the law of nature? If you go, what do you\nmean by the law of nature? If you do, what is that to say? If you\ndo, what is that to say? If I do, what is that to say? If you say, what is\nthat to say? If I do, what is that to say? If I do, what is that to say?\nIf I do, what is that to say? If I do, what is"
+    },
+    {
+      "category": "self_identity",
+      "prompt": "What defines a person's identity?",
+      "western_output": "\u201d \n\u201cThere is nothing other than the self\u201d. \n\u201cThat\u2019s what I call \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d \n\u201cThat\u2019s what I called \u2018self\u2019.\u201d ",
+      "eastern_output": "\u201d \n\u201cI\u2019m not right.\u201d \n\u201cI am right.\u201d \n\u201cI am right.\u201d \n\u201cI am wrong.\u201d \n\u201cI am right.\u201d \n\u201cI am wrong.\u201d \n\u201cI am right.\u201d \n\u201cI am wrong.\u201d \n\u201cI am wrong.\u201d \n\u201cI am right.\u201d \n\u201cI am right.\u201d \n\u201cI am wrong.\u201d \n\u201cI am right.\u201d \n\u201cI am wrong.\u201d \n\u201cI"
+    },
+    {
+      "category": "purpose_meaning",
+      "prompt": "What is the meaning of life?",
+      "western_output": "\u201d \n\u201cIt\u2019s like this, sir.\u201d \n\u201cBut when someone has a bad reputation, he\u2019s called a mendicant. \nWhat\u2019s the meaning of life?\u201d \n\u201cIt\u2019s when someone has a bad reputation, he\u2019s called a mendicant. \nWhat\u2019s the meaning of life?\u201d \n\u201cIt\u2019s when someone has a bad reputation, he\u2019s called a mendicant. \nWhat\u2019s the meaning of life?\u201d \n\u201cIt\u2019s like this, sir.\u201d \n\u201cIt\u2019",
+      "eastern_output": " \n\u2018Realized Ones are the origin of suffering\u2019: this is the practice that leads to the cessation of suffering. \nThat\u2019s how there is an escape from suffering. \nThe Realized One has rightly explained the meaning of the teaching in this way: \n\u2018This is suffering\u2019 \u2026 \n\u2018This is the origin of suffering\u2019 \u2026 \n\u2018This is the cessation of suffering\u2019 \u2026 \n\u2018This is the practice that leads to the cessation of suffering.\u2019 \nThat\u2019s how there is an escape from suffering. \nSatisfied, the mendicants approved what the Buddha said. \n\nMiddle Discourses 101"
+    },
+    {
+      "category": "purpose_meaning",
+      "prompt": "Why do we exist?",
+      "western_output": " How do we exist? If we conceive of the \ninherent in the case of the existence of the cause, it is only the \nexistence of the effect, and we have a cause for our existence. \n\nThe next is the import of the thesis of the philosophers, \n\nThe second proof is that they have no cause, and that \n\nwhich is the cause of their being a cause cannot be known. \n\nThe second proof is that it is a cause of the effect. The \nargument is that the effect is not an effect; for it is a cause. \n\nI say: \n\nThe fifth proof is that the cause is an effect, and that the \n",
+      "eastern_output": " \nThey have no end, \nno end. \nThey have no end, \nno end. \nThey\u2019re not free of rebirth, \nthey\u2019re free of rebirth, \nand haven\u2019t come to an end. \nSo they have no end, \nthey\u2019re not free of rebirth, \nand have no end. \nThere is no end, \nno end, \nthey\u2019ve come to an end. \nAnd how does a man live? \nIt\u2019s no end, \nthey\u2019re not free of rebirth, \nnor have they rebirth, \nnor are they bound to rebirth"
+    },
+    {
+      "category": "purpose_meaning",
+      "prompt": "What gives life purpose?",
+      "western_output": "\u201d \n\u201cIt\u2019s possible that someone who has the ability to develop this task can be easily \naware of this.\u201d \n\u201cIt\u2019s possible that someone who has the ability to develop this task can be easily heard of.\u201d \n\u201cIt\u2019s possible that someone who has the ability to develop this task can be easily heard of.\u201d \n\u201cIt\u2019s possible that someone who has the ability to develop this work can be easily heard of.\u201d \n\u201cIt\u2019s possible that someone who has the ability to achieve this practice can be fully heard of.\u201d \n\u201cIt\u2019s possible that",
+      "eastern_output": " \nIt\u2019s when someone is purified by wisdom, \nand the teaching is not given up.\u201d \n\nLinked Discourses 3.10 \n1. The Teaching of the Gods \nWith Venerable \u0100nanda \nWith Cunda the Greater Edena, \n\u201cThis one time, sir, I was staying near S\u0101vatth\u012b in Jeta\u2019s Grove, An\u0101thapi\u1e47\u1e0dika\u2019s monastery. \nNow at that time Venerable \u0100nanda was sitting in the land of the Mallas of the Magadhanans together with a large Sa\u1e45gha of mendicants. "
+    },
+    {
+      "category": "ethics_morality",
+      "prompt": "What makes an action morally right?",
+      "western_output": " \nIt\u2019s just like saying that \nwhen a person has a wrong livelihood, \nhe becomes a man. \nIf a person has a wrong livelihood, \nhe becomes a person. \nIf he has a wrong livelihood, \nhe becomes a person. \nIf a person has a wrong livelihood, \nhe becomes a person. \nIf he has a right livelihood, \nhe becomes a person. \nIf he has a right livelihood, \nhe becomes a person. \nIf he has a wrong livelihood, \nhe is a person. \nIf he has a right livelihood, \nhe becomes a person. \nIf he has a right livelihood,",
+      "eastern_output": "\u201d \n\nThe Buddha said this: \n\u201cAll things are impermanent, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut off, \nthe mind is not to be cut"
+    },
+    {
+      "category": "ethics_morality",
+      "prompt": "How should one live a good life?",
+      "western_output": "\u201d \n\u201cSo then, mendicants, the perfected one, the fully awakened Buddha has become fully awakened Buddha, accomplished in the Sa\u1e45gha of the thirty-three. \nWhat three? \nWhen you\u2019re practicing the same teaching and training, you\u2019re practicing the same teaching and training.\u201d \n\u201cExcellent, worthy Gotama! Excellent! \nAs if he were righting the overturned, or revealing the path to the dark, or lighting a lamp in the dark so people with clear eyes can see what\u2019s there, the worthy Gotama has achieved with his own insight the teaching.\u201d \n\u201cYes, worthy Gotama! \n",
+      "eastern_output": "\u201d \n\u201cHow do you think, householder? \nIf you don\u2019t get caught up in the Sa\u1e45gha, a bad, unskillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skillful, and skillful qualities that are skill"
+    },
+    {
+      "category": "ethics_morality",
+      "prompt": "What is the foundation of ethics?",
+      "western_output": " \nHow does a mendicant meditate on a meditation that is not liable to the cessation of suffering? \nIt\u2019s when a mendicant meditates on a meditation that is not liable to the cessation of suffering. \nWhen a mendicant meditates on a meditation that is not liable to the cessation of suffering. \nWhen a mendicant meditates on a meditation that is not liable to the cessation of suffering. \nWhen a mendicant meditates on a meditation that is not liable to the cessation of suffering. \nWhen a mendicant meditates on a meditation that is not liable to the cessation of suffering. \nWhen a mendicant meditates on a meditation that",
+      "eastern_output": " \nIt\u2019s when a mendicant meditates spreading a heart full of rapture. \nAnd how is a mendicant a perfected one, a fully awakened Buddha? \nIt\u2019s when a mendicant meditates spreading a heart full of rapture. \nAnd how is a mendicant a perfected one, a fully awakened Buddha? \nIt\u2019s when a mendicant meditates spreading a heart full of rapture. \nAnd how is a mendicant a perfected one, a fully awakened Buddha? \nIt\u2019s when a mendicant meditates spreading a heart full of rapture. \nAnd how is a mendicant a perfected one"
+    },
+    {
+      "category": "reality_existence",
+      "prompt": "What is the nature of reality?",
+      "western_output": " \n\nHow do you say, \u201cI have no wisdom\u201d? \n\nWhen you say, \u201cI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom, \nI have no wisdom,",
+      "eastern_output": "\u201d \n\nNumbered Discourses 3.16 \n9. A Warrior \nAt one time the Buddha was staying near S\u0101vatth\u012b in Jeta\u2019s Grove, An\u0101thapi\u1e47\u1e0dika\u2019s monastery. \nNow at that time the Buddha was educating, encouraging, firing up, and inspiring the mendicants with a Dhamma talk, and inspiring the mendicants with a Dhamma talk, and inspiring the mendicants with a Dhamma talk, and inspiring the mendicants with a Dhamma talk, and inspiring the mendicants with a Dhamma talk, and inspiring the mendicants with a Dhamma talk,"
+    },
+    {
+      "category": "reality_existence",
+      "prompt": "Is the physical world the ultimate reality?",
+      "western_output": " \n\nThis entire universe is the universe. \n\nIt is the ultimate world, the ultimate reality. \n\nIt is the ultimate world, the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the ultimate world. \n\nIt is the",
+      "eastern_output": "\u201d \n\u201cCertainly, sir.\u201d \n\u201cHow can I describe the physical world as defined by the mind?\u201d \n\u201cThe physical world is empty, sir.\u201d \n\u201cWhat do you describe the physical world as defined by the mind?\u201d \n\u201cThe physical world is empty, sir.\u201d \n\u201cWhat do you describe the physical world as defined by the mind?\u201d \n\u201cThe physical world is empty, sir.\u201d \n\u201cWhat do you describe the physical world as defined by the mind?\u201d \n\u201cThe physical world is empty, sir.\u201d \n\u201cWhat do"
+    },
+    {
+      "category": "reality_existence",
+      "prompt": "What is the relationship between mind and matter?",
+      "western_output": " \n\n\"The mind that is without the mind is also without the mind is without the mind is without \nthe mind. But one should meditate on the mind. \n\n\"When you have realized the mind, the mind is without the mind is without the mind. \n\n\"But the mind that is without the mind is without the mind. \n\n\"In the same way, there are no minds, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no thoughts, no",
+      "eastern_output": "\u201d \n\u201cIt\u2019s when someone doesn\u2019t want to be mindful.\u201d \n\u201cWhat is the relationship between mind and matter?\u201d \n\u201cIt\u2019s when someone doesn\u2019t want to be mindful.\u201d \n\u201cWhat is the relationship between mind and matter?\u201d \n\u201cIt\u2019s when someone doesn\u2019t want to be mindful.\u201d \n\u201cWhat is the relationship between mind and mind?\u201d \n\u201cIt\u2019s when someone doesn\u2019t want to be mindful.\u201d \n\u201cWhat is the relation between mind and mind?\u201d \n\u201c"
+    },
+    {
+      "category": "knowledge_truth",
+      "prompt": "What is true knowledge?",
+      "western_output": " \nAnd what is the true knowledge? \nIt\u2019s when someone teaches the teaching, and there is no other path to the teaching. \nWhen they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from the defilements they\u2019re freed from",
+      "eastern_output": " \n\nThey\u2019re practicing the skillful and knower of sentient beings.\u201d \n\nLinked Discourses 11.14 \n2. The Six Kinds \nA Trainee \nAt S\u0101vatth\u012b. \nThen the Buddha robed up in the morning and, taking his bowl and robe, entered S\u0101vatth\u012b for alms. \nThen the Buddha robed up in the morning and, taking his bowl and robe, entered S\u0101vatth\u012b for alms. \nThen, late at night, several hundred carts were being broken, \nand many of them were all swept away. \nThen the Buddha robed up in the morning"
+    },
+    {
+      "category": "knowledge_truth",
+      "prompt": "How can we know what is real?",
+      "western_output": " The truth is not to be proved by us, but \nthat we have a beginning. We can only know that we have a beginning. \nTherefore we are going to ask the question \u2018I am\u2019. If we do not know \nthis, we must do not know that it is real. The reason why we know \nthis is that we know that we have a beginning. That is why we \nunderstand that we are going to know that we are going to know that we \nare going to know that we have a beginning. But we must know that \nwe are going to know that we have a beginning. The reason why we \nknow that we have a beginning, that we",
+      "eastern_output": " How can we know what is real? \n\nTo know what is real, and to know what is real is to know what is real. \n\nTo know what is real is to know what is real. \n\nTo know what is real is not to know what is real. \n\nTo know what is real is to know what is real is not real. \n\nTo know what is unreal is to know what is unreal is to know what is real. \n\nTo know what is unreal is to know what is real. \n\nTo know what is real is to know what is real is to know what is unreal. \n\nTo know what is real is to know what is real"
+    },
+    {
+      "category": "knowledge_truth",
+      "prompt": "What is the nature of truth?",
+      "western_output": "\u201d \n\u201cWhat is the origin of truth?\u201d \n\u201cThe origin of truth,\u201d \n\u201cThe origin of truth,\u201d \n\u201cthe origin of truth,\u201d \n\u201cThe origin of truth,\u201d \n\u201cthe origin of truth,\u201d \n\u201cthe origin of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\u201cthe cessation of truth,\u201d \n\ufffd",
+      "eastern_output": "\u201d \n\u201cThat\u2019s how you should not be negligent. \nFor it is not the nature of truth. \nBut as the noble ones declare the path, \nfor the good do not see, \nso the noble ones declare the path. \nFor the good do not see, \nso the noble ones declare the path.\u201d \n\nLinked Discourses 2.7 \n1. A Reed \nStanding to one side, the Buddha said to the Buddha, \n\u201cMendicants!\u201d \n\u201cVenerable sir,\u201d they replied. \nThe Buddha said this: \n\u201cMendicants,"
+    },
+    {
+      "category": "death_immortality",
+      "prompt": "What happens after death?",
+      "western_output": "\u201d \n\u201cThis is a way to escape what I do.\u201d \n\u201cThis is a way to escape what you do.\u201d \n\u201cA sensible person would extend to the future, future, future, future, and future. \nBut those who live in the future, future, future, and future. \nBut those who live in the future, future, and future. \nIf they don\u2019t get angry, they\u2019re a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one, a bad one",
+      "eastern_output": " \nIt\u2019s when someone kills living creatures, steals, commits sexual misconduct, and is reborn in a good place, a heavenly realm, or a heavenly realm.\u201d \nThe Buddha said this: \n\u201cIn the case of someone who kills living creatures, steals, commits sexual misconduct, and is reborn in a good place, a heavenly realm. \nThat\u2019s why the three individuals are reborn in a good place, a heavenly realm.\u201d \nThe Buddha said this: \n\u201cIn the case of someone who kills living creatures, steals, commits sexual misconduct, and is reborn in a good place, a heavenly realm.\u201d \nThe Buddha said this: \n\ufffd"
+    },
+    {
+      "category": "death_immortality",
+      "prompt": "Is death the end of existence?",
+      "western_output": " \nWhat is the cause? \nWhat is the cause? \n\nMaharshi: \n\u2018There is no cessation, no cessation, no cessation, the cessation, the cessation, and the cessation of suffering.\u2019 \nWhat are the four elements? \nBecause of which there is no disappearance. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \nThere is no grasping in the world. \n",
+      "eastern_output": "\u2019 \n\nSo long as life grows and grows, \n\nthe life of self-control ceases. \n\nBut when rebirth ceases, \n\nthe pain of self-control ceases. \n\n5. The Noble Truths of Transformation \n\n8. The Perfected Ones \n\n9. The Perfected Ones \n\n10. The Perfected Ones \n\n11. The Perfected Ones \n\n12. The Perfected Ones \n\n12. The Perfected Ones \n\n13. The Perfected Ones \n\n14. The Perfected Ones \n\n15. The Perfected Ones \n\n15. The Perfected Ones \n\n16. The"
+    },
+    {
+      "category": "death_immortality",
+      "prompt": "How should we face mortality?",
+      "western_output": " \n\nIf we return to an angel, we shall go into an angel, \nand the angels shall ascend to the angels, \n\nAnd the angels shall ascend to the angel. \n\nIf we turn to the angel, the angels will ascend to \ntheir angel, and the angels will ascend to their angels. \n\nThen, when the angels are united to the angels, \nthey will ascend to their angel, and the angels will ascend \nto their angel, until they shall ascend to their angel, \nwhen the angels are the angels, and they shall ascend to their \nangel, until they have become a creature, and the angels \nwill ascend to their angel. \n",
+      "eastern_output": " For if the soul which has the body\nof the body, was not now made flesh, and is not now made flesh,\nit would not be the soul which has the body of the soul, which is\nthe soul of the soul, but the soul of the soul; and it is impossible\nthat the soul should ever be immortal, and yet the soul which has the\nbody of the soul would not have been immortal. And if, indeed, we\nshould say that the soul is immortal, and has been made flesh, we\nshould say that the soul is immortal, and has become immortal.\nFor, as we have said, we have said before, that death, which is\nfolly incorruptible, may"
+    },
+    {
+      "category": "nature_universe",
+      "prompt": "What is the relationship between humans and nature?",
+      "western_output": "\u201d \n\u201cYou are ethical and ethical.\u201d \n\u201cHow do you think, \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Gotama is a fully awakened Buddha.\u2019 \n\u2018The ascetic Got",
+      "eastern_output": "\u201d \n\u201cIt\u2019s the harmony of the heart with the heart with the heart.\u201d \n\u201cGood, good, \nand bad, \nso the heart is the harmony of the heart with the heart.\u201d \n\u201cGood, good, \nand bad, \nso the heart is the harmony of the heart with the heart.\u201d \n\u201cGood, good, \nand bad, \nso the heart is the harmony of the heart with the heart.\u201d \n\u201cGood, good, \nand bad, \nso the heart is the harmony of the heart with the heart.\u201d \n\u201cGood,"
+    },
+    {
+      "category": "nature_universe",
+      "prompt": "What is the cosmic order of the universe?",
+      "western_output": " \n\nM. (To Vijnakirti, Vijnaktika) is a great ocean of \nsensuous existence. There is no more or less, there is a more \ndistant and a more or less, and there is no more or less of \nthe three. It is like a tree on the bank of the river Ganges. It \nis like a tree on the bank of the river Ganges. \n\nThe Ocean of Vulture Peak. \n\n\"The Ocean of Vulture Peak is like a fish on the bank of the river Ganges. \nThe waves of the river Ganges are like a river on the bank of the river Ganges.",
+      "eastern_output": "\u201d \n\nNirvana, Mahamati, is not a permanent thing. Mahamati, the \nultimate truth of the universe is not a reality. But it is not a reality, \nbut the reality of the universe is the reality of all things. \n\nThe Lanka, Mahamati, is a reality not a reality, but is \na reality not a reality. It is not a reality, but is the reality of all \nthings. If it is a reality, it is not a reality. If it is a reality, it \nis not a reality; but it is not a reality. If it is a reality, it is not \na reality. If it"
+    },
+    {
+      "category": "nature_universe",
+      "prompt": "Are humans separate from or connected to the cosmos?",
+      "western_output": "\u201d \n\u201cIn this context, the mind has become immersed in sam\u0101dhi like this\u2014purified, bright, flawless, rid of corruptions, pliable, workable, steady, and imperturbable\u2014they project and extend it toward knowledge of the world.\u201d \nWhen they had spoken, they knew that \nthey had spoken, \n\u201cThis is the origin of suffering, the path that leads to the cessation of suffering, the path that leads to the cessation of suffering, the path that leads to the cessation of suffering, the path that leads to the cessation of suffering. \nThe Realized One has rightly understood this: \u2018This is the origin of suffering, the",
+      "eastern_output": "\u201d \n\u201cThere are, mendicants, these three individuals that are unified and unified. \nWhat two? \nThe cosmos of sentient beings. \nThey are unified and unified. \nWhat two? \nThe cosmos of sentient beings. \nThey are unified and unified. \nThere are, mendicants, these two individuals that are unified and unified. \nWhat two? \nThe cosmos of sentient beings. \nThey are unified and unified. \nThere are, mendicants, these three individuals that are unified and unified. \nWhat two? \nThe cosmos of sentient beings. \nThey are unified and unified. \nThere are, mendicants"
+    },
+    {
+      "category": "enlightenment_liberation",
+      "prompt": "How can one achieve enlightenment?",
+      "western_output": "\u201d \n\u201cIt\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nFor it\u2019s not like the Buddha. \n\nIt\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo it\u2019s like the Buddha. \n\nSo",
+      "eastern_output": " \n\nOne who has realized the aspiration for enlightenment is the \nenlightenment of the way. \n\nThe realization of enlightenment is not only the enlightenment \nof the way. \n\nWhen enlightenment is realized, there is no more than the \nenlightenment of the way. If realization is realized, there is no \nmore than the enlightenment of the way. The enlightenment \nof the way is not necessarily the enlightenment of the way. This is the \nenlightenment of the way. This is the realization of the way. \n\nThe entire spectrum of this meditation is not the awakening of \nthe way. The enlightenment of the way is not the realization of the way. "
+    },
+    {
+      "category": "enlightenment_liberation",
+      "prompt": "What is liberation from suffering?",
+      "western_output": " \nBy this you should train a teaching.\u201d \n\nLinked Discourses 3.3 \n3. The Appeal \n4. The Appeal \n1. The Appeal \n4. The Appeal \nAt S\u0101vatth\u012b. \nAt S\u0101vatth\u012b. \nThere the Buddha was staying near S\u0101vatth\u012b in Jeta\u2019s Grove, An\u0101thapi\u1e47\u1e0dika\u2019s monastery. \nThere the Buddha addressed the mendicants: \n\u201cWhat is a mistake? \nIt\u2019s when a mendicant is a strong man, a strong man, a strong man, a strong man,",
+      "eastern_output": "\u201d \n\u201cIt\u2019s the attainment of the noble ones who live in the noble ones who live in the noble ones. \nBut the noble ones who live in the noble ones have not born in the noble ones.\u201d \n\u201cBut why is that?\u201d \n\u201cIt\u2019s the attainment of the noble ones who live in the noble ones. \nBut the noble ones who live in the noble ones have not born in the noble ones.\u201d \n\u201cBut why is that?\u201d \n\u201cIt\u2019s the attainment of the noble ones who live in the noble ones.\u201d \n\u201cBut why is that?\u201d"
+    },
+    {
+      "category": "enlightenment_liberation",
+      "prompt": "What is the ultimate goal of spiritual practice?",
+      "western_output": "\u201d \n\u201cIt\u2019s good to be reborn in the monastic code of the people. \nBut it\u2019s good to be reborn in the monastic code.\u201d \n\u201cIt\u2019s good to be reborn in the monastic code, \nand the spiritual practice that leads to the final end of the spiritual practice. \nFor this reason, there are some ascetics and brahmins who have been reborn in the monastic code. \nSo, there are some ascetics and brahmins who have been reborn in the monastic code. \nThe monastic code is that they\u2019ve been reborn in the monastic code. \nThere are some",
+      "eastern_output": " \nWhen it is developed in ethics, immersion, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, immersion, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, immersion, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, ethics, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, ethics, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, ethics, and wisdom, this is the ultimate goal of spiritual practice. \nWhen it is developed in ethics, ethics, and"
+    }
+  ]
+}
