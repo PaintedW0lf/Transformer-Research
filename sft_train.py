@@ -143,7 +143,6 @@ def train_sft(
 
     final_path = Path(output_dir) / "final"
     model.save_pretrained(final_path)
-    tokenizer.save_pretrained(final_path)
     print(f"SFT training complete! Final model saved to {final_path}")
 
 
