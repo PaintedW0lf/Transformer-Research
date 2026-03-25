@@ -11,8 +11,12 @@ __pycache__/
 .venv/
 venv/
 .env/
-.pytest_cache/
+
 # Training outputs
+outputs/
+
+# Local data
+data/
 
 # OS
 .DS_Store
