@@ -60,19 +60,16 @@ DEFAULT_CONFIG = {
     "n_layer": 12,
     "n_head": 12,
     "n_embd": 768,
-    # max_steps is now computed dynamically per model; this value is used
-    # only when --max-steps is passed explicitly on the command line.
     "max_steps": None,
     "learning_rate": 5e-4,
     "per_device_train_batch_size": 8,
     "gradient_accumulation_steps": 4,
-    # save_steps / logging_steps scale with max_steps dynamically too
     "save_steps": None,
     "logging_steps": 50,
     # Dynamic-step tuning knobs
-    "steps_per_text": 200,   # base steps contributed by each text file
-    "min_steps": 500,        # never train for fewer than this many steps
-    "max_steps_cap": 20000,  # never train for more than this many steps
+    "steps_per_text": 20,    # down from 200 — prevents overfitting on small corpora
+    "min_steps": 300,        # down from 500
+    "max_steps_cap": 5000,   # down from 20000
 }
 
 
