@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List
 
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, IterableDataset
 from transformers import Trainer, TrainingArguments
 
 
@@ -42,6 +43,85 @@ class SimpleLMDataCollator:
         }
 
 
+class StreamingLMDataset(IterableDataset):
+    """Memory-efficient streaming dataset for large corpora.
+    
+    Reads text files on-the-fly instead of loading everything into memory.
+    Supports optional buffer shuffling for better randomization.
+    """
+    
+    def __init__(
+        self,
+        data_dir: str | Path,
+        tokenizer,
+        eos_id: int,
+        block_size: int = 1024,
+        shuffle_buffer: int = 10000,
+        subdir: str = None,
+    ):
+        if shuffle_buffer < 1:
+            raise ValueError(f"shuffle_buffer must be positive, got {shuffle_buffer}")
+        if block_size < 1:
+            raise ValueError(f"block_size must be positive, got {block_size}")
+        
+        self.data_dir = Path(data_dir)
+        if subdir:
+            self.data_dir = self.data_dir / subdir
+        self.tokenizer = tokenizer
+        self.eos_id = eos_id
+        self.block_size = block_size
+        self.shuffle_buffer = shuffle_buffer
+        
+        if not self.data_dir.exists() or not self.data_dir.is_dir():
+            raise FileNotFoundError(f"Expected a data directory at: {self.data_dir}")
+
+    def _encode_text(self, text: str) -> List[int]:
+        """Tokenize text without forcing tokenizer-specific kwargs."""
+        try:
+            return self.tokenizer.encode(text, add_special_tokens=False)
+        except TypeError:
+            return self.tokenizer.encode(text)
+    
+    def __iter__(self):
+        worker_info = torch.utils.data.get_worker_info()
+        
+        # Get list of files (sorted for reproducibility)
+        txt_files = sorted(self.data_dir.rglob("*.txt"))
+        if not txt_files:
+            raise FileNotFoundError("No .txt files found in data directory.")
+        
+        # If in a worker process, split files across workers
+        if worker_info is not None:
+            txt_files = txt_files[worker_info.id :: worker_info.num_workers]
+        
+        # Shuffle file order for variety
+        txt_files = list(txt_files)
+        random.shuffle(txt_files)
+        
+        buffer: List[torch.Tensor] = []
+        
+        for file_path in txt_files:
+            text = file_path.read_text(encoding="utf-8")
+            ids = self._encode_text(text) + [self.eos_id]
+            
+            # Yield blocks from this file
+            for i in range(0, len(ids) - self.block_size + 1, self.block_size):
+                block = torch.tensor(ids[i:i + self.block_size], dtype=torch.long)
+                
+                if len(buffer) < self.shuffle_buffer:
+                    buffer.append(block)
+                else:
+                    # Randomly replace from buffer to maintain ~shuffle_buffer size
+                    idx = random.randint(0, self.shuffle_buffer - 1)
+                    yield buffer[idx]
+                    buffer[idx] = block
+        
+        # Drain remaining buffer (shuffled)
+        random.shuffle(buffer)
+        for block in buffer:
+            yield block
+
+
 def make_blocks(token_ids: List[int], block_size: int) -> List[List[int]]:
     blocks = []
     for i in range(0, len(token_ids) - block_size + 1, block_size):
@@ -54,21 +134,48 @@ def build_trainer(
     dataset: Dataset,
     collator: SimpleLMDataCollator,
     output_dir: str,
-    per_device_train_batch_size: int = 1,
+    per_device_train_batch_size: int = 8,
+    gradient_accumulation_steps: int = 4,
     learning_rate: float = 5e-4,
-    max_steps: int = 100,
+    max_steps: int = 100000,
+    save_steps: int = 1000,
+    logging_steps: int = 10,
+    save_total_limit: int = 3,
 ) -> Trainer:
+    """Build trainer optimized for RTX 6000 Ada GPUs.
+    Default settings:
+    - bf16: Better numerical stability than fp16 on Ada architecture
+    - batch_size=8 * gradient_accumulation=4 = effective batch size of 32 per GPU
+    - With 2 GPUs: total effective batch size of 64
+    - Uses ~45GB VRAM per GPU (safe for 49GB available)
+    """
     args = TrainingArguments(
         output_dir=output_dir,
         per_device_train_batch_size=per_device_train_batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
         learning_rate=learning_rate,
         max_steps=max_steps,
-        logging_steps=10,
-        save_steps=50,
-        warmup_steps=10,
+        logging_steps=logging_steps,
+        save_steps=save_steps,
+        save_strategy="steps",
+        save_total_limit=save_total_limit,
+        warmup_steps=100,
         weight_decay=0.1,
-        fp16=torch.cuda.is_available(),
+        # Use bfloat16 for Ada architecture (better than fp16)
+        bf16=torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+        bf16_full_eval=torch.cuda.is_available() and torch.cuda.is_bf16_supported(),
+        # Multi-GPU optimization
+        ddp_find_unused_parameters=False,
+        dataloader_num_workers=4,
+        dataloader_pin_memory=True,
+        # Gradient clipping for stability
+        max_grad_norm=1.0,
+        # Logging
         report_to=[],
+        logging_first_step=True,
+        # Memory optimization
+        gradient_checkpointing=False,  # Enable if running out of memory
+        optim="adamw_torch_fused",  # Faster optimizer for Ada GPUs
     )
     return Trainer(
         model=model,
