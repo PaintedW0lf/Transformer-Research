@@ -363,6 +363,9 @@ def run_evaluate_bias(
 
         if result.returncode != 0:
             logger.error(f"Bias evaluation failed: {result.stderr}")
+            raise RuntimeError(
+                f"Bias evaluation failed for period {period} with exit code {result.returncode}"
+            )
         else:
             logger.info(f"Bias evaluation completed")
     except subprocess.TimeoutExpired:
@@ -371,6 +374,14 @@ def run_evaluate_bias(
         logger.error(f"Error running bias evaluation: {e}")
 
     return output_dir
+
+
+def resolve_latest_checkpoint(period_dir: Path) -> Path:
+    """Return the most recent checkpoint directory for a period output folder."""
+    checkpoints = sorted(period_dir.glob("checkpoint-*"))
+    if not checkpoints:
+        raise RuntimeError(f"No checkpoints found in {period_dir}")
+    return checkpoints[-1]
 
 
 def save_training_manifest(
@@ -555,6 +566,21 @@ def main():
             except Exception as e:
                 logger.error(f"Training failed for {region} period {period}: {e}")
                 continue
+
+        # Always resolve to the latest checkpoint on disk after training so
+        # evaluation runs against the most recent saved model state.
+        resolved_checkpoints = {}
+        for region in args.regions:
+            period_dir = output_dir / f"progressive_{region}" / f"period_{period}"
+            try:
+                resolved_checkpoints[region] = resolve_latest_checkpoint(period_dir)
+            except Exception as e:
+                logger.warning(
+                    f"Could not resolve latest checkpoint for {region} period {period}: {e}"
+                )
+
+        if resolved_checkpoints:
+            checkpoints = resolved_checkpoints
 
         if not checkpoints:
             logger.error(f"No models trained for period {period}, skipping evaluation")
