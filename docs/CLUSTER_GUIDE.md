@@ -1,98 +1,155 @@
-# LLMTraining - Cluster Quick Reference
+# LLMTraining - Cluster Guide
 
-## Connect to Cluster
+## What This Does
+Trains GPT-2 models from scratch on philosophical texts to compare Western vs Eastern bias. The model learns language patterns from the training data and can generate text reflecting those patterns.
+
+---
+
+## Quick Start
+
+### 1. Copy Project to Cluster
 ```bash
-ssh your_username@Cmps03.ok.ubc.ca
+# From local machine
+scp -r LLMTraining vanshi05@Cmps03.ok.ubc.ca:~/
 ```
 
-## Setup (Run Once)
+### 2. Setup (Run Once)
 ```bash
-# Copy files to cluster
-scp -r LLMTraining your_username@Cmps03.ok.ubc.ca:~/
-
-# SSH into cluster
-ssh your_username@Cmps03.ok.ubc.ca
-
-# Run setup
+ssh vanshi05@Cmps03.ok.ubc.ca
 cd ~/LLMTraining
-chmod +x scripts/cluster_setup.sh
-./scripts/cluster_setup.sh
+chmod +x *.sh
+./cluster_setup.sh
 ```
 
-## Prepare Data
+### 3. Download Training Data
 ```bash
-# Upload your text files
-scp your_text_files/* your_username@Cmps03.ok.ubc.ca:~/LLMTraining/data/western/
-scp your_text_files/* your_username@Cmps03.ok.ubc.ca:~/LLMTraining/data/eastern/
+./cluster_download_data.sh
 ```
+Downloads from Project Gutenberg:
+- **Western**: Bible, Plato's Republic, Aristotle's Politics
+- **Eastern**: Bhagavad Gita, Tao Te Ching, Upanishads
 
-## Train Single Model
+### 4. Train Models (Use tmux!)
 ```bash
-cd ~/LLMTraining
+# Start tmux session (persists if disconnected)
+tmux new -s train
+
+# Activate environment
 source .venv/bin/activate
 
-# Basic training (loads all into memory)
-python gpt2_pretrain.py --data-dir data/western --max-steps 500
+# Train Western model
+python gpt2_pretrain.py --data-dir data/western --streaming --max-steps 500 --output-dir outputs/western_model
 
-# Streaming mode (for large datasets)
-python gpt2_pretrain.py --data-dir data/western --streaming --max-steps 500
+# Open new tmux window: Ctrl+B, C
+# Train Eastern model
+python gpt2_pretrain.py --data-dir data/eastern --streaming --max-steps 500 --output-dir outputs/eastern_model
 
-# With custom output directory
-python gpt2_pretrain.py --data-dir data/western --output-dir outputs/western --max-steps 1000
+# Detach: Ctrl+B, D (training continues)
+# Reattach: tmux attach -t train
 ```
 
-## Train Both Models (Western vs Eastern)
+### 5. Download Trained Models
 ```bash
-cd ~/LLMTraining
-source .venv/bin/activate
-
-# Train Western
-python gpt2_pretrain.py --data-dir data/western --output-dir outputs/western --max-steps 500
-
-# Train Eastern
-python gpt2_pretrain.py --data-dir data/eastern --output-dir outputs/eastern --max-steps 500
+# From local machine
+scp -r vanshi05@Cmps03.ok.ubc.ca:~/LLMTraining/outputs ./LLMTraining/
 ```
 
-## Command Line Options
+---
+
+## Training Flow
+
+```
+Text Files (.txt)
+      ↓
+   Tokenize (tiktoken GPT-2 encoding)
+      ↓
+   Create blocks of 1024 tokens
+      ↓
+   Feed to GPT-2 model (124M params)
+      ↓
+   Predict next token, compute loss
+      ↓
+   Backpropagate, update weights
+      ↓
+   Save checkpoints & final model
+```
+
+---
+
+## Output Files Explained
+
+| File | Description |
+|------|-------------|
+| `model.safetensors` | **Trained weights** (~500MB) - the "learned knowledge" |
+| `config.json` | Model architecture (layers, heads, dimensions) |
+| `trainer_state.json` | Training history (loss per step) |
+| `runs/` | TensorBoard logs for visualization |
+
+---
+
+## Command Reference
+
+### Training Options
+```bash
+python gpt2_pretrain.py \
+    --data-dir data/western \    # Source text directory
+    --streaming \                 # Memory-efficient mode (required for large data)
+    --max-steps 500 \            # Training iterations
+    --output-dir outputs/model   # Where to save
+```
+
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--data-dir` | data | Directory with .txt files |
 | `--output-dir` | outputs/gpt2_scratch | Output directory |
+| `--streaming` | off | Use for large datasets |
+| `--max-steps` | 100000 | Training steps |
 | `--block-size` | 1024 | Sequence length |
-| `--max-steps` | 100 | Training steps |
-| `--learning-rate` | 5e-4 | Learning rate |
-| `--streaming` | False | Use streaming mode |
-| `--shuffle-buffer` | 10000 | Buffer size for streaming |
-| `--n-layer` | 12 | Number of layers |
-| `--n-head` | 12 | Number of heads |
-| `--n-embd` | 768 | Embedding dimension |
 
-## GPU Training (Recommended)
+### Helper Scripts
 ```bash
-# Check GPU
-nvidia-smi
-
-# Run with GPU (automatically detected)
-python gpt2_pretrain.py --data-dir data/western --max-steps 500
+./cluster_setup.sh           # Initial setup
+./cluster_download_data.sh   # Download texts
+./cluster_train.sh western   # Train one model
+./cluster_train_both.sh      # Train both models
 ```
 
-## Training Tips
-- For GPT-2 base: ~125M params, needs ~2GB VRAM
-- For GPT-2 large: ~760M params, needs ~10-15GB VRAM
-- Use `--streaming` for datasets > 1GB
-- Start with `--max-steps 100` to test
+### tmux Shortcuts
+| Keys | Action |
+|------|--------|
+| `Ctrl+B, C` | New window |
+| `Ctrl+B, N/P` | Next/Previous window |
+| `Ctrl+B, D` | Detach (keeps running) |
+| `tmux attach -t train` | Reattach |
 
-## Monitor Training
-```bash
-# Check GPU usage
-watch -n 1 nvidia-smi
+---
 
-# Check output
-tail -f outputs/gpt2_scratch/trainer_state.json
+## Understanding Training Output
+
 ```
-
-## Download Results
-```bash
-# Download trained models
-scp -r your_username@Cmps03.ok.ubc.ca:~/LLMTraining/outputs ./
+{'loss': 5.5, 'grad_norm': 1.0, 'learning_rate': 5e-4, 'epoch': 0.5}
 ```
+- **loss**: Prediction error (lower = better, ~4-5 is reasonable for small data)
+- **grad_norm**: Gradient magnitude (1-2 is healthy)
+- **learning_rate**: Decays over training
+- **epoch**: How many times through the data
+
+---
+
+## Next Steps After Training
+
+1. **Generate text** to compare models
+2. **Analyze bias** in generated outputs
+3. **Fine-tune** with more data or steps
+4. **Visualize** with TensorBoard: `tensorboard --logdir outputs/`
+
+---
+
+## Troubleshooting
+
+| Error | Fix |
+|-------|-----|
+| `No .txt files found` | Run `./cluster_download_data.sh` |
+| `no_cuda` error | Update lm_utils.py from repo |
+| `pkg_resources` missing | `pip install setuptools` |
+| Training slow | Check GPU: `nvidia-smi` |

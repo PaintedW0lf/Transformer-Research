@@ -1,49 +1,31 @@
 #!/bin/bash
-# Training script for LLMTraining on cluster
-# Run from ~/LLMTraining directory
+# Train a single model on cluster
+# Usage: ./cluster_train.sh [western|eastern] [max_steps]
 
 set -e
-
 source .venv/bin/activate
 
-echo "=== LLMTraining - Training Script ==="
+DATA_TYPE=${1:-western}  # western or eastern
+MAX_STEPS=${2:-500}
 
-# Check data exists
-if [ ! -d "data/western" ] || [ -z "$(ls -A data/western)" ]; then
-    echo "ERROR: No files in data/western/"
+echo "=== Training ${DATA_TYPE} model ==="
+
+# Verify data exists
+if [ ! -d "data/${DATA_TYPE}" ] || [ -z "$(ls -A data/${DATA_TYPE}/*.txt 2>/dev/null)" ]; then
+    echo "ERROR: No .txt files in data/${DATA_TYPE}/"
+    echo "Run ./cluster_download_data.sh first"
     exit 1
 fi
 
-if [ ! -d "data/eastern" ] || [ -z "$(ls -A data/eastern)" ]; then
-    echo "ERROR: No files in data/eastern/"
-    exit 1
-fi
-
-echo "Found training data:"
-echo "  Western: $(ls data/western/*.txt 2>/dev/null | wc -l) files"
-echo "  Eastern: $(ls data/eastern/*.txt 2>/dev/null | wc -l) files"
-
-# Check GPU availability
-if command -v nvidia-smi &> /dev/null; then
-    echo ""
-    echo "GPU Info:"
-    nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv
-fi
-
-echo ""
-echo "Starting training..."
+echo "Data files: $(ls data/${DATA_TYPE}/*.txt | wc -l)"
+echo "Max steps: ${MAX_STEPS}"
 echo ""
 
-# Set training parameters
-export DATA_DIR="data/western"
-export MODEL_TYPE="gpt2"
-export BLOCK_SIZE=1024
-export MAX_STEPS=1000
-export LEARNING_RATE=5e-4
-
-# Run training (uncomment trainer.train() in the script first!)
-python gpt2_pretrain.py
+python gpt2_pretrain.py \
+    --data-dir data/${DATA_TYPE} \
+    --streaming \
+    --max-steps ${MAX_STEPS} \
+    --output-dir outputs/${DATA_TYPE}_model
 
 echo ""
-echo "=== Training Complete! ==="
-echo "Check outputs/ for checkpoints"
+echo "=== Done! Model saved to outputs/${DATA_TYPE}_model/ ==="
