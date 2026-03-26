@@ -162,6 +162,18 @@ def build_trainer(
     _cuda = torch.cuda.is_available()
     _bf16 = _cuda and torch.cuda.is_bf16_supported()
 
+    # Only enable TensorBoard reporting when backend is available.
+    report_to = []
+    try:
+        import tensorboard  # noqa: F401
+        report_to = ["tensorboard"]
+    except Exception:
+        try:
+            import tensorboardX  # noqa: F401
+            report_to = ["tensorboard"]
+        except Exception:
+            report_to = []
+
     args = TrainingArguments(
         output_dir=output_dir,
         per_device_train_batch_size=per_device_train_batch_size,
@@ -186,7 +198,7 @@ def build_trainer(
         # Stability
         max_grad_norm=1.0,
         # Logging
-        report_to=["tensorboard"],
+        report_to=report_to,
         run_name="llm_training",
         logging_first_step=True,
         # Memory

@@ -612,6 +612,11 @@ def main():
                     period,
                     str(output_dir),
                 )
+        elif not args.skip_evaluation:
+            logger.warning(
+                f"Skipping evaluations for period {period}: both east and west checkpoints are required. "
+                f"Available checkpoints: {sorted(checkpoints.keys())}"
+            )
 
     logger.info(f"\n{'='*60}")
     logger.info("Progressive training pipeline completed!")
