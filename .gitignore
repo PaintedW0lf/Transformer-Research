@@ -14,8 +14,5 @@ venv/
 .pytest_cache/
 # Training outputs
 
-# Local data
-data/
-
 # OS
 .DS_Store
