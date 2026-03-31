@@ -1,0 +1,356 @@
+"""Vocabulary bubble visualizer for bias evaluation outputs.
+
+Produces three charts from the JSON written by evaluate_bias.py:
+
+  vocab_bubbles_western.png  — Western model core vocabulary (blue)
+  vocab_bubbles_eastern.png  — Eastern model core vocabulary (red)
+  vocab_bubbles_combined.png — Both models merged; bubble colour shows which
+                               model favours the word (blue=western, red=eastern,
+                               purple=shared equally)
+
+Circle size always reflects word frequency.
+Pronouns, prepositions, and common stop words are excluded.
+"""
+
+import json
+import math
+import re
+import argparse
+from collections import Counter
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import numpy as np
+
+# ---------------------------------------------------------------------------
+# Filter lists
+# ---------------------------------------------------------------------------
+
+PRONOUNS = {
+    "i", "me", "my", "myself",
+    "we", "our", "ours", "ourselves",
+    "you", "your", "yours", "yourself", "yourselves",
+    "he", "him", "his", "himself",
+    "she", "her", "hers", "herself",
+    "it", "its", "itself",
+    "they", "them", "their", "theirs", "themselves",
+    "who", "whom", "whose", "which", "what",
+    "this", "that", "these", "those",
+}
+
+PREPOSITIONS = {
+    "a", "about", "above", "across", "after", "against", "along", "among",
+    "around", "as", "at", "before", "behind", "below", "beneath", "beside",
+    "between", "beyond", "by", "despite", "down", "during", "except",
+    "for", "from", "in", "including", "inside", "into", "near", "of",
+    "off", "on", "onto", "out", "outside", "over", "per", "since",
+    "through", "throughout", "to", "toward", "towards", "under", "until",
+    "unto", "up", "upon", "via", "with", "within", "without",
+}
+
+AUXILIARY_AND_STOPWORDS = {
+    "am", "an", "and", "any", "are", "also", "be", "been", "being",
+    "both", "but", "can", "cannot", "could", "did", "do", "does",
+    "done", "don", "each", "either", "else", "even", "every",
+    "few", "get", "got", "had", "has", "have", "here", "how",
+    "if", "is", "just", "may", "might", "more", "most", "must",
+    "neither", "no", "nor", "not", "now", "or", "other", "rather",
+    "really", "s", "shall", "should", "so", "some", "such", "t",
+    "than", "the", "then", "there", "though", "thus", "too",
+    "was", "were", "when", "where", "whether", "while", "will",
+    "would", "very", "yet", "one", "two", "three", "all", "none",
+    "hence", "therefore", "however", "although", "because",
+}
+
+FILTER = PRONOUNS | PREPOSITIONS | AUXILIARY_AND_STOPWORDS
+
+# Colour anchors
+_BLUE   = np.array([0x25 / 255, 0x63 / 255, 0xEB / 255])   # western
+_PURPLE = np.array([0x7C / 255, 0x3A / 255, 0xED / 255])   # shared
+_RED    = np.array([0xDC / 255, 0x26 / 255, 0x26 / 255])   # eastern
+
+BG_COLOUR = "#0F172A"
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def tokenize(text: str) -> list[str]:
+    return [w for w in re.findall(r"[a-z]+", text.lower()) if len(w) > 1]
+
+
+def raw_counts(texts: list[str]) -> Counter:
+    """Full word count across all texts, excluding filter words."""
+    counter: Counter = Counter()
+    for t in texts:
+        counter.update(w for w in tokenize(t) if w not in FILTER)
+    return counter
+
+
+def top_counts(counter: Counter, top_n: int) -> Counter:
+    return Counter(dict(counter.most_common(top_n)))
+
+
+def _blend(frac: float) -> tuple:
+    """Map frac in [0, 1] → colour.  0 = eastern (red), 1 = western (blue)."""
+    if frac >= 0.5:
+        t = (frac - 0.5) * 2.0
+        rgb = _PURPLE * (1 - t) + _BLUE * t
+    else:
+        t = frac * 2.0
+        rgb = _RED * (1 - t) + _PURPLE * t
+    return tuple(float(c) for c in rgb)
+
+
+# ---------------------------------------------------------------------------
+# Circle packing
+# ---------------------------------------------------------------------------
+
+def _overlaps(nx: float, ny: float, nr: float,
+              positions: list, radii: list, gap: float = 0.05) -> bool:
+    for (px, py), pr in zip(positions, radii):
+        if math.hypot(nx - px, ny - py) < nr + pr + gap:
+            return True
+    return False
+
+
+def pack_circles(radii: list[float], seed: int = 42) -> list[tuple[float, float]]:
+    """Greedy packing — largest circles first, orbiting toward the centre."""
+    rng = np.random.default_rng(seed)
+    positions: list = []
+    placed: list = []
+
+    for r in radii:
+        if not positions:
+            positions.append((0.0, 0.0))
+            placed.append(r)
+            continue
+
+        best: tuple | None = None
+        best_dist = math.inf
+
+        for _ in range(600):
+            ref_idx = rng.integers(len(positions))
+            cx, cy = positions[ref_idx]
+            cr = placed[ref_idx]
+            angle = rng.uniform(0, 2 * math.pi)
+            dist = cr + r + 0.05
+            nx = cx + dist * math.cos(angle)
+            ny = cy + dist * math.sin(angle)
+
+            if not _overlaps(nx, ny, r, positions, placed):
+                d = math.hypot(nx, ny)
+                if d < best_dist:
+                    best_dist = d
+                    best = (nx, ny)
+                if d < r * 0.5:
+                    break
+
+        if best is None:
+            best = (max(p[0] for p in positions) + r * 2.5 + 0.1, 0.0)
+
+        positions.append(best)
+        placed.append(r)
+
+    return positions
+
+
+# ---------------------------------------------------------------------------
+# Drawing
+# ---------------------------------------------------------------------------
+
+def _scale_radii(freqs: np.ndarray,
+                 max_r: float = 2.0,
+                 min_r: float = 0.18) -> np.ndarray:
+    f_min, f_max = freqs.min(), freqs.max()
+    if f_max == f_min:
+        return np.full(len(freqs), (max_r + min_r) / 2)
+    return min_r + (freqs - f_min) / (f_max - f_min) * (max_r - min_r)
+
+
+def _render_bubbles(ax: plt.Axes,
+                    words: list[str],
+                    radii: np.ndarray,
+                    colours: list,
+                    title: str,
+                    title_colour: str = "white",
+                    max_r: float = 2.0) -> None:
+    """Place circles on *ax* — words/radii/colours already sorted largest-first."""
+    positions = pack_circles(radii.tolist())
+
+    for (x, y), r, word, colour in zip(positions, radii, words, colours):
+        ax.add_patch(plt.Circle((x, y), r, color=colour, alpha=0.60, linewidth=0))
+        fs = max(5, min(14, r * 7))
+        ax.text(x, y, word, ha="center", va="center",
+                fontsize=fs, fontweight="bold", color="white", clip_on=True)
+
+    xs = [p[0] for p in positions]
+    ys = [p[1] for p in positions]
+    pad = max_r * 1.3
+    ax.set_xlim(min(xs) - pad, max(xs) + pad)
+    ax.set_ylim(min(ys) - pad, max(ys) + pad)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_facecolor(BG_COLOUR)
+    ax.set_title(title, fontsize=15, fontweight="bold", color=title_colour, pad=10)
+
+
+def draw_single_model(ax: plt.Axes,
+                      counts: Counter,
+                      colour: str,
+                      title: str) -> None:
+    words = list(counts.keys())
+    freqs = np.array([counts[w] for w in words], dtype=float)
+    radii = _scale_radii(freqs)
+    order = np.argsort(-radii)
+    words  = [words[i] for i in order]
+    radii  = radii[order]
+    colours = [colour] * len(words)
+    _render_bubbles(ax, words, radii, colours, title)
+
+
+def draw_combined(ax: plt.Axes,
+                  west_raw: Counter,
+                  east_raw: Counter,
+                  top_n: int) -> None:
+    """Single chart: union of both models' vocab, colour encodes model dominance."""
+    all_words = set(west_raw.keys()) | set(east_raw.keys())
+
+    # Build (total_freq, west_frac) per word
+    word_data: dict[str, tuple[int, float]] = {}
+    for w in all_words:
+        wf = west_raw.get(w, 0)
+        ef = east_raw.get(w, 0)
+        total = wf + ef
+        word_data[w] = (total, wf / total)
+
+    # Keep top-n by combined frequency
+    sorted_words = sorted(word_data, key=lambda w: word_data[w][0], reverse=True)[:top_n]
+
+    words   = sorted_words
+    freqs   = np.array([word_data[w][0] for w in words], dtype=float)
+    fracs   = [word_data[w][1] for w in words]   # 1=western, 0=eastern
+    radii   = _scale_radii(freqs)
+
+    # Sort largest first
+    order   = np.argsort(-radii)
+    words   = [words[i] for i in order]
+    radii   = radii[order]
+    fracs   = [fracs[i] for i in order]
+    colours = [_blend(f) for f in fracs]
+
+    # Legend patches
+    legend = [
+        mpatches.Patch(color=tuple(_BLUE),   label="Western dominant"),
+        mpatches.Patch(color=tuple(_PURPLE), label="Shared equally"),
+        mpatches.Patch(color=tuple(_RED),    label="Eastern dominant"),
+    ]
+
+    _render_bubbles(ax, words, radii, colours,
+                    "Combined Vocabulary — colour shows model dominance")
+
+    ax.legend(handles=legend, loc="lower right",
+              framealpha=0.3, labelcolor="white",
+              facecolor=BG_COLOUR, edgecolor="none", fontsize=10)
+
+
+# ---------------------------------------------------------------------------
+# Orchestration
+# ---------------------------------------------------------------------------
+
+def load_latest_results(output_dir: str) -> dict:
+    files = sorted(Path(output_dir).glob("bias_evaluation_*.json"))
+    if not files:
+        raise FileNotFoundError(f"No bias_evaluation_*.json found in {output_dir}")
+    path = files[-1]
+    print(f"Loading: {path}")
+    with open(path) as f:
+        return json.load(f)
+
+
+def _save(fig: plt.Figure, path: Path) -> None:
+    fig.savefig(path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"Saved:  {path}")
+
+
+def build_charts(results: dict, save_dir: str, top_n: int = 60) -> None:
+    evaluations = results.get("evaluations", [])
+    if not evaluations:
+        raise ValueError("No evaluations found in the results file.")
+
+    western_texts = [e["western_output"] for e in evaluations if "western_output" in e]
+    eastern_texts = [e["eastern_output"] for e in evaluations if "eastern_output" in e]
+
+    west_raw = raw_counts(western_texts)
+    east_raw = raw_counts(eastern_texts)
+
+    west_top = top_counts(west_raw, top_n)
+    east_top = top_counts(east_raw, top_n)
+
+    Path(save_dir).mkdir(parents=True, exist_ok=True)
+    subtitle = f"(size = frequency · top {top_n} words · pronouns & prepositions removed)"
+
+    # --- Western chart ---
+    fig, ax = plt.subplots(figsize=(14, 12))
+    fig.patch.set_facecolor(BG_COLOUR)
+    draw_single_model(ax, west_top, "#2563EB", "Western Model — Core Vocabulary")
+    fig.suptitle(subtitle, fontsize=11, color="#94A3B8", y=0.02)
+    _save(fig, Path(save_dir) / "vocab_bubbles_western.png")
+
+    # --- Eastern chart ---
+    fig, ax = plt.subplots(figsize=(14, 12))
+    fig.patch.set_facecolor(BG_COLOUR)
+    draw_single_model(ax, east_top, "#DC2626", "Eastern Model — Core Vocabulary")
+    fig.suptitle(subtitle, fontsize=11, color="#94A3B8", y=0.02)
+    _save(fig, Path(save_dir) / "vocab_bubbles_eastern.png")
+
+    # --- Combined chart ---
+    fig, ax = plt.subplots(figsize=(16, 14))
+    fig.patch.set_facecolor(BG_COLOUR)
+    draw_combined(ax, west_raw, east_raw, top_n)
+    fig.suptitle(subtitle, fontsize=11, color="#94A3B8", y=0.02)
+    _save(fig, Path(save_dir) / "vocab_bubbles_combined.png")
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Render vocabulary bubble charts from evaluate_bias.py output"
+    )
+    parser.add_argument(
+        "--results-dir", default="outputs/bias_evaluation",
+        help="Directory with bias_evaluation_*.json files (default: outputs/bias_evaluation)",
+    )
+    parser.add_argument(
+        "--results-file", default=None,
+        help="Specific JSON file; overrides --results-dir",
+    )
+    parser.add_argument(
+        "--output-dir", default="outputs/vocab_bubbles",
+        help="Where to save PNGs (default: outputs/vocab_bubbles)",
+    )
+    parser.add_argument(
+        "--top-n", type=int, default=60,
+        help="Top N words to display per chart (default: 60)",
+    )
+    args = parser.parse_args()
+
+    if args.results_file:
+        with open(args.results_file) as f:
+            results = json.load(f)
+    else:
+        results = load_latest_results(args.results_dir)
+
+    build_charts(results, args.output_dir, args.top_n)
+
+
+if __name__ == "__main__":
+    main()
