@@ -54,9 +54,9 @@ def build_gpt2_from_scratch(
             if text_blocks:
                 blocks.extend(text_blocks)
                 continue
-            if len(ids) < block_size:
-                padded = ids + [eos_id] * (block_size - len(ids))
-                blocks.append(padded)
+            # if len(ids) < block_size:
+            #     padded = ids + [eos_id] * (block_size - len(ids))
+            #     blocks.append(padded)
         dataset = LMDataset(blocks)
 
     config = GPT2Config(

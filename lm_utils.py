@@ -11,7 +11,6 @@ import torch
 from torch.utils.data import Dataset, IterableDataset
 from transformers import Trainer, TrainingArguments
 
-
 @dataclass
 class LMExample:
     input_ids: List[int]
@@ -33,21 +32,19 @@ class SimpleLMDataCollator:
         self.pad_id = pad_id
 
     def __call__(self, features) -> dict:
-        # Handle both LMExample objects (from LMDataset) and raw tensors (from StreamingLMDataset)
         if isinstance(features[0], torch.Tensor):
-            # StreamingLMDataset yields tensors directly
             input_tensor = torch.stack(features)
         elif isinstance(features[0], LMExample):
-            # LMDataset yields LMExample objects
             max_len = max(len(f.input_ids) for f in features)
             input_ids = [f.input_ids + [self.pad_id] * (max_len - len(f.input_ids)) for f in features]
             input_tensor = torch.tensor(input_ids, dtype=torch.long)
         else:
             raise TypeError(f"Unexpected feature type: {type(features[0])}")
-
+        labels = input_tensor.clone()
+        labels[labels == self.pad_id] = -100
         return {
             "input_ids": input_tensor,
-            "labels": input_tensor.clone(),
+            "labels": labels,
             "attention_mask": (input_tensor != self.pad_id).long(),
         }
 
@@ -120,7 +117,6 @@ class StreamingLMDataset(IterableDataset):
                 if len(buffer) < self.shuffle_buffer:
                     buffer.append(block)
                 else:
-                    # Randomly replace from buffer to maintain ~shuffle_buffer size
                     idx = random.randint(0, self.shuffle_buffer - 1)
                     yield buffer[idx]
                     buffer[idx] = block
