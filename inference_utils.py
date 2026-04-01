@@ -79,8 +79,10 @@ def generate_with_history(
     full_prompt = f"{history}Human: {prompt}\nAssistant:" if history else f"Human: {prompt}\nAssistant:"
     
     response = generate(
-        model, encoding, full_prompt, 
-        max_new_tokens, temperature, top_p, device
+        model, encoding, full_prompt,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
     )
     
     reply = response.split("Human:")[0].strip()
