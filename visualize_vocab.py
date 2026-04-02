@@ -26,6 +26,13 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 # ---------------------------------------------------------------------------
+# Hardcoded paths
+# ---------------------------------------------------------------------------
+
+RESULTS_DIR = "/home/marora15/outputs_full/progressive_evaluations"
+OUTPUT_DIR  = "/home/marora15/outputs_full/progressive_evaluations/vocab_bubbles"
+
+# ---------------------------------------------------------------------------
 # Filter lists
 # ---------------------------------------------------------------------------
 
@@ -68,9 +75,9 @@ AUXILIARY_AND_STOPWORDS = {
 FILTER = PRONOUNS | PREPOSITIONS | AUXILIARY_AND_STOPWORDS
 
 # Colour anchors
-_BLUE   = np.array([0x25 / 255, 0x63 / 255, 0xEB / 255])   # western
-_PURPLE = np.array([0x7C / 255, 0x3A / 255, 0xED / 255])   # shared
-_RED    = np.array([0xDC / 255, 0x26 / 255, 0x26 / 255])   # eastern
+_BLUE   = np.array([0x25 / 255, 0x63 / 255, 0xEB / 255])
+_PURPLE = np.array([0x7C / 255, 0x3A / 255, 0xED / 255])
+_RED    = np.array([0xDC / 255, 0x26 / 255, 0x26 / 255])
 
 BG_COLOUR = "#0F172A"
 
@@ -84,7 +91,6 @@ def tokenize(text: str) -> list[str]:
 
 
 def raw_counts(texts: list[str]) -> Counter:
-    """Full word count across all texts, excluding filter words."""
     counter: Counter = Counter()
     for t in texts:
         counter.update(w for w in tokenize(t) if w not in FILTER)
@@ -92,7 +98,6 @@ def raw_counts(texts: list[str]) -> Counter:
 
 
 def raw_bigrams(texts: list[str]) -> Counter:
-    """Count consecutive word pairs where both words survive the filter."""
     counter: Counter = Counter()
     for t in texts:
         tokens = tokenize(t)
@@ -110,7 +115,6 @@ def top_counts(counter: Counter, top_n: int) -> Counter:
 
 
 def _blend(frac: float) -> tuple:
-    """Map frac in [0, 1] → colour.  0 = eastern (red), 1 = western (blue)."""
     if frac >= 0.5:
         t = (frac - 0.5) * 2.0
         rgb = _PURPLE * (1 - t) + _BLUE * t
@@ -124,8 +128,7 @@ def _blend(frac: float) -> tuple:
 # Circle packing
 # ---------------------------------------------------------------------------
 
-def _overlaps(nx: float, ny: float, nr: float,
-              positions: list, radii: list, gap: float = 0.05) -> bool:
+def _overlaps(nx, ny, nr, positions, radii, gap=0.05):
     for (px, py), pr in zip(positions, radii):
         if math.hypot(nx - px, ny - py) < nr + pr + gap:
             return True
@@ -133,7 +136,6 @@ def _overlaps(nx: float, ny: float, nr: float,
 
 
 def pack_circles(radii: list[float], seed: int = 42) -> list[tuple[float, float]]:
-    """Greedy packing — largest circles first, orbiting toward the centre."""
     rng = np.random.default_rng(seed)
     positions: list = []
     placed: list = []
@@ -144,7 +146,7 @@ def pack_circles(radii: list[float], seed: int = 42) -> list[tuple[float, float]
             placed.append(r)
             continue
 
-        best: tuple | None = None
+        best = None
         best_dist = math.inf
 
         for _ in range(600):
@@ -177,24 +179,15 @@ def pack_circles(radii: list[float], seed: int = 42) -> list[tuple[float, float]
 # Drawing
 # ---------------------------------------------------------------------------
 
-def _scale_radii(freqs: np.ndarray,
-                 max_r: float = 2.0,
-                 min_r: float = 0.18) -> np.ndarray:
+def _scale_radii(freqs: np.ndarray, max_r=2.0, min_r=0.18) -> np.ndarray:
     f_min, f_max = freqs.min(), freqs.max()
     if f_max == f_min:
         return np.full(len(freqs), (max_r + min_r) / 2)
     return min_r + (freqs - f_min) / (f_max - f_min) * (max_r - min_r)
 
 
-def _render_bubbles(ax: plt.Axes,
-                    words: list[str],
-                    radii: np.ndarray,
-                    colours: list,
-                    title: str,
-                    title_colour: str = "white",
-                    max_r: float = 2.0,
-                    font_scale: float = 7.0) -> None:
-    """Place circles on *ax* — words/radii/colours already sorted largest-first."""
+def _render_bubbles(ax, words, radii, colours, title,
+                    title_colour="white", max_r=2.0, font_scale=7.0):
     positions = pack_circles(radii.tolist())
 
     for (x, y), r, word, colour in zip(positions, radii, words, colours):
@@ -215,60 +208,44 @@ def _render_bubbles(ax: plt.Axes,
     ax.set_title(title, fontsize=15, fontweight="bold", color=title_colour, pad=10)
 
 
-def draw_single_model(ax: plt.Axes,
-                      counts: Counter,
-                      colour: str,
-                      title: str) -> None:
+def draw_single_model(ax, counts, colour, title):
     words = list(counts.keys())
     freqs = np.array([counts[w] for w in words], dtype=float)
     radii = _scale_radii(freqs)
     order = np.argsort(-radii)
-    words  = [words[i] for i in order]
-    radii  = radii[order]
+    words   = [words[i] for i in order]
+    radii   = radii[order]
     colours = [colour] * len(words)
     _render_bubbles(ax, words, radii, colours, title)
 
 
-def draw_combined(ax: plt.Axes,
-                  west_raw: Counter,
-                  east_raw: Counter,
-                  top_n: int) -> None:
-    """Single chart: union of both models' vocab, colour encodes model dominance."""
+def draw_combined(ax, west_raw, east_raw, top_n):
     all_words = set(west_raw.keys()) | set(east_raw.keys())
-
-    # Build (total_freq, west_frac) per word
-    word_data: dict[str, tuple[int, float]] = {}
+    word_data = {}
     for w in all_words:
         wf = west_raw.get(w, 0)
         ef = east_raw.get(w, 0)
         total = wf + ef
         word_data[w] = (total, wf / total)
 
-    # Keep top-n by combined frequency
     sorted_words = sorted(word_data, key=lambda w: word_data[w][0], reverse=True)[:top_n]
-
     words   = sorted_words
     freqs   = np.array([word_data[w][0] for w in words], dtype=float)
-    fracs   = [word_data[w][1] for w in words]   # 1=western, 0=eastern
+    fracs   = [word_data[w][1] for w in words]
     radii   = _scale_radii(freqs)
-
-    # Sort largest first
     order   = np.argsort(-radii)
     words   = [words[i] for i in order]
     radii   = radii[order]
     fracs   = [fracs[i] for i in order]
     colours = [_blend(f) for f in fracs]
 
-    # Legend patches
     legend = [
         mpatches.Patch(color=tuple(_BLUE),   label="Western dominant"),
         mpatches.Patch(color=tuple(_PURPLE), label="Shared equally"),
         mpatches.Patch(color=tuple(_RED),    label="Eastern dominant"),
     ]
-
     _render_bubbles(ax, words, radii, colours,
                     "Combined Vocabulary — colour shows model dominance")
-
     ax.legend(handles=legend, loc="lower right",
               framealpha=0.3, labelcolor="white",
               facecolor=BG_COLOUR, edgecolor="none", fontsize=10)
@@ -278,37 +255,26 @@ def draw_combined(ax: plt.Axes,
 # Bigram charts
 # ---------------------------------------------------------------------------
 
-def _prep_bigram_display(bigram_counter: Counter, top_n: int):
-    """Return (labels, freqs) sorted largest-first, labels use newline separator."""
-    top = bigram_counter.most_common(top_n)
+def _prep_bigram_display(bigram_counter, top_n):
+    top    = bigram_counter.most_common(top_n)
     labels = [f"{a}\n{b}" for (a, b), _ in top]
     freqs  = np.array([f for _, f in top], dtype=float)
     return labels, freqs
 
 
-def draw_single_bigrams(ax: plt.Axes,
-                        bigram_counter: Counter,
-                        colour: str,
-                        title: str,
-                        top_n: int) -> None:
+def draw_single_bigrams(ax, bigram_counter, colour, title, top_n):
     labels, freqs = _prep_bigram_display(bigram_counter, top_n)
     radii   = _scale_radii(freqs, max_r=2.4, min_r=0.3)
     order   = np.argsort(-radii)
     labels  = [labels[i] for i in order]
     radii   = radii[order]
     colours = [colour] * len(labels)
-    _render_bubbles(ax, labels, radii, colours, title,
-                    max_r=2.4, font_scale=5.5)
+    _render_bubbles(ax, labels, radii, colours, title, max_r=2.4, font_scale=5.5)
 
 
-def draw_combined_bigrams(ax: plt.Axes,
-                          west_bigrams: Counter,
-                          east_bigrams: Counter,
-                          top_n: int) -> None:
-    """Combined bigram chart; colour encodes model dominance."""
+def draw_combined_bigrams(ax, west_bigrams, east_bigrams, top_n):
     all_bigrams = set(west_bigrams.keys()) | set(east_bigrams.keys())
-
-    bigram_data: dict = {}
+    bigram_data = {}
     for bg in all_bigrams:
         wf = west_bigrams.get(bg, 0)
         ef = east_bigrams.get(bg, 0)
@@ -316,12 +282,10 @@ def draw_combined_bigrams(ax: plt.Axes,
         bigram_data[bg] = (total, wf / total)
 
     sorted_bgs = sorted(bigram_data, key=lambda b: bigram_data[b][0], reverse=True)[:top_n]
-
     labels  = [f"{a}\n{b}" for a, b in sorted_bgs]
     freqs   = np.array([bigram_data[bg][0] for bg in sorted_bgs], dtype=float)
     fracs   = [bigram_data[bg][1] for bg in sorted_bgs]
     radii   = _scale_radii(freqs, max_r=2.4, min_r=0.3)
-
     order   = np.argsort(-radii)
     labels  = [labels[i] for i in order]
     radii   = radii[order]
@@ -332,11 +296,9 @@ def draw_combined_bigrams(ax: plt.Axes,
         mpatches.Patch(color=tuple(_PURPLE), label="Shared equally"),
         mpatches.Patch(color=tuple(_RED),    label="Eastern dominant"),
     ]
-
     _render_bubbles(ax, labels, radii, colours,
                     "Combined Bigrams — colour shows model dominance",
                     max_r=2.4, font_scale=5.5)
-
     ax.legend(handles=legend, loc="lower right",
               framealpha=0.3, labelcolor="white",
               facecolor=BG_COLOUR, edgecolor="none", fontsize=10)
@@ -356,14 +318,13 @@ def load_latest_results(output_dir: str) -> dict:
         return json.load(f)
 
 
-def _save(fig: plt.Figure, path: Path) -> None:
+def _save(fig, path):
     fig.savefig(path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
     plt.close(fig)
     print(f"Saved:  {path}")
 
 
-def build_charts(results: dict, save_dir: str,
-                 top_n: int = 60, top_n_bigrams: int = 40) -> None:
+def build_charts(results, save_dir, top_n=60, top_n_bigrams=40):
     evaluations = results.get("evaluations", [])
     if not evaluations:
         raise ValueError("No evaluations found in the results file.")
@@ -375,36 +336,31 @@ def build_charts(results: dict, save_dir: str,
     east_raw     = raw_counts(eastern_texts)
     west_top     = top_counts(west_raw, top_n)
     east_top     = top_counts(east_raw, top_n)
-
     west_bigrams = raw_bigrams(western_texts)
     east_bigrams = raw_bigrams(eastern_texts)
 
     Path(save_dir).mkdir(parents=True, exist_ok=True)
-    word_sub    = f"(size = frequency · top {top_n} words · pronouns & prepositions removed)"
-    bigram_sub  = f"(size = frequency · top {top_n_bigrams} bigrams · both words must be content words)"
+    word_sub   = f"(size = frequency · top {top_n} words · pronouns & prepositions removed)"
+    bigram_sub = f"(size = frequency · top {top_n_bigrams} bigrams · both words must be content words)"
 
-    # --- Unigram: Western ---
     fig, ax = plt.subplots(figsize=(14, 12))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_single_model(ax, west_top, "#2563EB", "Western Model — Core Vocabulary")
     fig.suptitle(word_sub, fontsize=11, color="#94A3B8", y=0.02)
     _save(fig, Path(save_dir) / "vocab_bubbles_western.png")
 
-    # --- Unigram: Eastern ---
     fig, ax = plt.subplots(figsize=(14, 12))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_single_model(ax, east_top, "#DC2626", "Eastern Model — Core Vocabulary")
     fig.suptitle(word_sub, fontsize=11, color="#94A3B8", y=0.02)
     _save(fig, Path(save_dir) / "vocab_bubbles_eastern.png")
 
-    # --- Unigram: Combined ---
     fig, ax = plt.subplots(figsize=(16, 14))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_combined(ax, west_raw, east_raw, top_n)
     fig.suptitle(word_sub, fontsize=11, color="#94A3B8", y=0.02)
     _save(fig, Path(save_dir) / "vocab_bubbles_combined.png")
 
-    # --- Bigram: Western ---
     fig, ax = plt.subplots(figsize=(14, 12))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_single_bigrams(ax, west_bigrams, "#2563EB",
@@ -412,7 +368,6 @@ def build_charts(results: dict, save_dir: str,
     fig.suptitle(bigram_sub, fontsize=11, color="#94A3B8", y=0.02)
     _save(fig, Path(save_dir) / "bigram_bubbles_western.png")
 
-    # --- Bigram: Eastern ---
     fig, ax = plt.subplots(figsize=(14, 12))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_single_bigrams(ax, east_bigrams, "#DC2626",
@@ -420,7 +375,6 @@ def build_charts(results: dict, save_dir: str,
     fig.suptitle(bigram_sub, fontsize=11, color="#94A3B8", y=0.02)
     _save(fig, Path(save_dir) / "bigram_bubbles_eastern.png")
 
-    # --- Bigram: Combined ---
     fig, ax = plt.subplots(figsize=(16, 14))
     fig.patch.set_facecolor(BG_COLOUR)
     draw_combined_bigrams(ax, west_bigrams, east_bigrams, top_n_bigrams)
@@ -429,43 +383,9 @@ def build_charts(results: dict, save_dir: str,
 
 
 # ---------------------------------------------------------------------------
-# CLI
+# Main
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Render vocabulary bubble charts from evaluate_bias.py output"
-    )
-    parser.add_argument(
-        "--results-dir", default="outputs/bias_evaluation",
-        help="Directory with bias_evaluation_*.json files (default: outputs/bias_evaluation)",
-    )
-    parser.add_argument(
-        "--results-file", default=None,
-        help="Specific JSON file; overrides --results-dir",
-    )
-    parser.add_argument(
-        "--output-dir", default="outputs/vocab_bubbles",
-        help="Where to save PNGs (default: outputs/vocab_bubbles)",
-    )
-    parser.add_argument(
-        "--top-n", type=int, default=60,
-        help="Top N words to display per unigram chart (default: 60)",
-    )
-    parser.add_argument(
-        "--top-n-bigrams", type=int, default=40,
-        help="Top N bigrams to display per bigram chart (default: 40)",
-    )
-    args = parser.parse_args()
-
-    if args.results_file:
-        with open(args.results_file) as f:
-            results = json.load(f)
-    else:
-        results = load_latest_results(args.results_dir)
-
-    build_charts(results, args.output_dir, args.top_n, args.top_n_bigrams)
-
-
 if __name__ == "__main__":
-    main()
+    results = load_latest_results(RESULTS_DIR)
+    build_charts(results, OUTPUT_DIR)
