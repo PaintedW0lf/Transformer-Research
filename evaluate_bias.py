@@ -423,8 +423,11 @@ def evaluate_models(
 
     print("Loading Western model...")
     western_model = load_model(western_path, device)
+    western_model.generation_config.pad_token_id = western_model.generation_config.eos_token_id
+
     print("Loading Eastern model...")
     eastern_model = load_model(eastern_path, device)
+    eastern_model.generation_config.pad_token_id = eastern_model.generation_config.eos_token_id
     encoding = get_tokenizer()
 
     results = {
