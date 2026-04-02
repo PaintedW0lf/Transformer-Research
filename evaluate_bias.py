@@ -2,10 +2,11 @@
 
 import json
 import math
-import torch
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+
+import torch
 
 from inference_utils import generate, get_tokenizer, load_model
 
@@ -23,6 +24,7 @@ GENERATION_CONFIG = {
     "do_sample": True,
 }
 
+# Vocabulary lists for concept frequency analysis
 WESTERN_MARKERS = [
     "soul", "virtue", "reason", "logos", "socrates", "plato", "aristotle",
     "god", "justice", "polis", "republic", "form", "ideal", "rational",
@@ -33,9 +35,12 @@ WESTERN_MARKERS = [
 
 EASTERN_MARKERS = [
     "dharma", "karma", "nirvana", "moksha", "atman", "brahman", "tao", "zen",
-    "buddha", "enlightenment", "samsara", "maya", "prajna", "sunyata",
+    "buddha", "buddhist", "enlightenment", "samsara", "maya", "prajna", "sunyata",
     "confucius", "yin", "yang", "qi", "wu wei", "dukkha", "anatta", "anicca",
     "upanishad", "vedanta", "bodhisattva", "mandala", "mantra", "chakra",
+    "meditation", "suffering", "craving", "impermanence", "rebirth",
+    "mendicant", "noble", "eightfold", "cessation", "mindfulness",
+    "detachment", "ancestor",
 ]
 
 PHILOSOPHICAL_PROMPTS = {
@@ -43,23 +48,6 @@ PHILOSOPHICAL_PROMPTS = {
         "What is the true nature of the self?",
         "Who am I in the grand scheme of existence?",
         "What defines a person's identity?",
-        "Is the self an illusion or ultimate reality?",
-        "What is the relationship between mind and self?",
-        "What is the difference between self and soul?",
-        "Is the self permanent or impermanent?",
-        "What is self-actualization?",
-        "How does the self relate to consciousness?",
-        "What is the egoless state?",
-        "What is the relationship between self and ego?",
-        "Is there a higher self beyond the ego?",
-        "What is self-realization?",
-        "How does the self perceive the world?",
-        "What is the nature of personal identity?",
-        "Can the self be transformed?",
-        "What is the relationship between self and society?",
-        "What is self-awareness?",
-        "How does the self arise?",
-        "What is the true nature of personal existence?",
         "Is the self an illusion or ultimate reality?",
         "What is the relationship between mind and self?",
         "What is the difference between self and soul?",
@@ -375,51 +363,70 @@ PHILOSOPHICAL_PROMPTS = {
 # Helpers
 # ---------------------------------------------------------------------------
 
-def compute_perplexity(model, encoding, text: str, device: str) -> float:
-    tokens = encoding.encode(text)
-    if len(tokens) < 2:
-        return float("inf")
-    input_ids = torch.tensor([tokens], dtype=torch.long).to(device)
-    with torch.no_grad():
-        outputs = model(input_ids, labels=input_ids)
-        loss = outputs.loss
-    return math.exp(loss.item())
+def compute_repetition_score(text: str, ngram_size: int = 4) -> float:
+    tokens = text.lower().split()
+    if len(tokens) < ngram_size:
+        return 0.0
+    ngrams = [tuple(tokens[i:i + ngram_size]) for i in range(len(tokens) - ngram_size + 1)]
+    counts = Counter(ngrams)
+    repeated = sum(c - 1 for c in counts.values())
+    return repeated / len(ngrams)
 
 
-def analyze_single_output(text: str) -> dict:
-    words = text.lower().split()
-    if not words:
-        return {
-            "repetition_score": 0.0,
-            "type_token_ratio": 0.0,
-            "concept_frequencies": {"western_ratio": 0.0, "eastern_ratio": 0.0},
-        }
+def compute_type_token_ratio(text: str) -> float:
+    tokens = text.lower().split()
+    if not tokens:
+        return 0.0
+    return len(set(tokens)) / len(tokens)
 
-    counts = Counter(words)
-    repetition_score = 1.0 - (len(counts) / len(words))
-    ttr = len(counts) / len(words)
 
-    western_hits = sum(1 for w in words if w in WESTERN_MARKERS)
-    eastern_hits = sum(1 for w in words if w in EASTERN_MARKERS)
-    total_hits = western_hits + eastern_hits or 1
-
+def compute_concept_frequencies(text: str) -> dict:
+    lower = text.lower()
+    east_count = sum(lower.count(m) for m in EASTERN_MARKERS)
+    west_count = sum(lower.count(m) for m in WESTERN_MARKERS)
+    total = east_count + west_count
     return {
-        "repetition_score": round(repetition_score, 4),
-        "type_token_ratio": round(ttr, 4),
-        "concept_frequencies": {
-            "western_ratio": round(western_hits / total_hits, 4),
-            "eastern_ratio": round(eastern_hits / total_hits, 4),
-        },
+        "eastern_marker_count": east_count,
+        "western_marker_count": west_count,
+        "eastern_ratio": east_count / total if total > 0 else 0.0,
+        "western_ratio": west_count / total if total > 0 else 0.0,
     }
 
 
-def _generate(model, encoding, prompt, device):
+def compute_perplexity(model, encoding, text: str, device: str, block_size: int = 1024) -> float:
+    model.eval()
+    try:
+        tokens = encoding.encode(text)
+        if len(tokens) < 2:
+            return float("inf")
+        tokens = tokens[:block_size]
+        input_ids = torch.tensor([tokens[:-1]], dtype=torch.long).to(device)
+        target_ids = torch.tensor([tokens[1:]], dtype=torch.long).to(device)
+        with torch.no_grad():
+            outputs = model(input_ids, labels=target_ids)
+            loss = outputs.loss.item()
+        return math.exp(loss)
+    except Exception:
+        return float("inf")
+
+
+def analyze_single_output(text: str) -> dict:
+    return {
+        "length_chars": len(text),
+        "length_words": len(text.split()),
+        "repetition_score": round(compute_repetition_score(text), 4),
+        "type_token_ratio": round(compute_type_token_ratio(text), 4),
+        "concept_frequencies": compute_concept_frequencies(text),
+    }
+
+
+def _generate(model, encoding, prompt, device, max_tokens):
     """Wrapper that passes the full GENERATION_CONFIG to generate()."""
     return generate(
         model,
         encoding,
         prompt,
-        max_new_tokens=150,
+        max_new_tokens=max_tokens,
         device=device,
         **GENERATION_CONFIG,
     )
@@ -448,6 +455,7 @@ def evaluate_models(
     print("Loading Eastern model...")
     eastern_model = load_model(eastern_path, device)
     eastern_model.generation_config.pad_token_id = eastern_model.generation_config.eos_token_id
+
     encoding = get_tokenizer()
 
     results = {
@@ -456,7 +464,11 @@ def evaluate_models(
         "eastern_model": eastern_path,
         "config": {
             "max_tokens": max_tokens,
-            **GENERATION_CONFIG,
+            "temperature": temperature,
+            "top_p": top_p,
+            "top_k": top_k,
+            "repetition_penalty": repetition_penalty,
+            "no_repeat_ngram_size": GENERATION_CONFIG["no_repeat_ngram_size"],
         },
         "evaluations": [],
     }
@@ -471,12 +483,13 @@ def evaluate_models(
         for prompt in prompts:
             print(f"\nPrompt: {prompt}")
 
-            western_output = _generate(western_model, encoding, prompt, device)
-            eastern_output = _generate(eastern_model, encoding, prompt, device)
+            western_output = _generate(western_model, encoding, prompt, device, max_tokens)
+            eastern_output = _generate(eastern_model, encoding, prompt, device, max_tokens)
 
             print(f"  Western: {western_output[:100]}...")
             print(f"  Eastern: {eastern_output[:100]}...")
 
+            # Cross-model perplexity — core bias signal
             west_ppl_on_east_text = compute_perplexity(western_model, encoding, eastern_output, device)
             east_ppl_on_west_text = compute_perplexity(eastern_model, encoding, western_output, device)
 
@@ -487,6 +500,7 @@ def evaluate_models(
                 "eastern_output": eastern_output,
                 "western_metrics": analyze_single_output(western_output),
                 "eastern_metrics": analyze_single_output(eastern_output),
+                # Cross-perplexity: how surprised is each model by the other's output?
                 "cross_perplexity": {
                     "western_model_on_eastern_text": round(west_ppl_on_east_text, 2),
                     "eastern_model_on_western_text": round(east_ppl_on_west_text, 2),
@@ -514,6 +528,7 @@ def evaluate_models(
 # ---------------------------------------------------------------------------
 
 def analyze_bias(results: dict):
+    """Summarize bias metrics across categories."""
     print("\n" + "=" * 60)
     print("Bias Analysis Summary")
     print("=" * 60)
@@ -550,6 +565,7 @@ def analyze_bias(results: dict):
 
     print(f"\n{'Category':<28} {'W-Rep':>6} {'E-Rep':>6} {'W-TTR':>6} {'E-TTR':>6} "
           f"{'W→E PPL':>9} {'E→W PPL':>9} {'W East%':>8} {'E East%':>8}")
+    print("-" * 100)
 
     for cat, c in categories.items():
         label = cat.replace("_", " ").title()[:27]
@@ -566,7 +582,7 @@ def analyze_bias(results: dict):
     print("  W-TTR / E-TTR  : type-token ratio (lexical diversity)   — higher is better")
     print("  W→E PPL        : western model perplexity on eastern output — higher = more surprised")
     print("  E→W PPL        : eastern model perplexity on western output — higher = more surprised")
-    print("  W East% / E East% : fraction of concept hits that are Eastern markers")
+    print("  W East% / E East% : fraction of philosophical markers that are eastern-tradition")
 
 
 # ---------------------------------------------------------------------------
@@ -581,7 +597,30 @@ if __name__ == "__main__":
     parser.add_argument("--eastern-path", type=str, default=EASTERN_MODEL_PATH)
     parser.add_argument("--output-dir",   type=str, default=OUTPUT_DIR)
     parser.add_argument("--max-tokens",   type=int, default=150)
-    parser.add_argument("--temperature",  type=float, default=GENERATION_CONFIG["temperature"])
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=GENERATION_CONFIG["temperature"],
+        help=f"Generation temperature (default: {GENERATION_CONFIG['temperature']})",
+    )
+    parser.add_argument(
+        "--top-p",
+        type=float,
+        default=GENERATION_CONFIG["top_p"],
+        help="Nucleus sampling threshold",
+    )
+    parser.add_argument(
+        "--top-k",
+        type=int,
+        default=0,
+        help="Top-k sampling (0 = disabled)",
+    )
+    parser.add_argument(
+        "--repetition-penalty",
+        type=float,
+        default=GENERATION_CONFIG["repetition_penalty"],
+        help="Penalty for repeated tokens (>1.0 reduces repetition)",
+    )
     parser.add_argument(
         "--analyze-only",
         action="store_true",
