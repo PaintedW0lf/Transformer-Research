@@ -16,10 +16,11 @@ OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
-    "temperature": 0.4,
-    "repetition_penalty": 1.3,
-    "no_repeat_ngram_size": 4,
+    "temperature": 0.7,           # raised slightly for more diversity
+    "repetition_penalty": 1.5,    # stronger penalty (was 1.3)
+    "no_repeat_ngram_size": 5,    # block 5-grams (was 4)
     "top_p": 0.9,
+    "top_k": 50,                  # add top-k to cut the long tail
     "do_sample": True,
 }
 
@@ -359,7 +360,6 @@ PHILOSOPHICAL_PROMPTS = {
 # ---------------------------------------------------------------------------
 
 def compute_perplexity(model, encoding, text: str, device: str) -> float:
-    """Compute perplexity of a model on the given text."""
     tokens = encoding.encode(text)
     if len(tokens) < 2:
         return float("inf")
@@ -371,7 +371,6 @@ def compute_perplexity(model, encoding, text: str, device: str) -> float:
 
 
 def analyze_single_output(text: str) -> dict:
-    """Compute repetition score, TTR, and concept frequencies."""
     words = text.lower().split()
     if not words:
         return {
@@ -398,6 +397,18 @@ def analyze_single_output(text: str) -> dict:
     }
 
 
+def _generate(model, encoding, prompt, device):
+    """Wrapper that passes the full GENERATION_CONFIG to generate()."""
+    return generate(
+        model,
+        encoding,
+        prompt,
+        max_new_tokens=150,
+        device=device,
+        **GENERATION_CONFIG,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Evaluation
 # ---------------------------------------------------------------------------
@@ -407,9 +418,8 @@ def evaluate_models(
     eastern_path: str,
     output_dir: str,
     max_tokens: int = 150,
-    temperature: float = 0.4,
+    temperature: float = GENERATION_CONFIG["temperature"],
 ):
-    """Run evaluation on both models with philosophical prompts."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Loading Western model...")
@@ -424,9 +434,7 @@ def evaluate_models(
         "eastern_model": eastern_path,
         "config": {
             "max_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": GENERATION_CONFIG["top_p"],
-            "repetition_penalty": GENERATION_CONFIG["repetition_penalty"],
+            **GENERATION_CONFIG,
         },
         "evaluations": [],
     }
@@ -441,22 +449,8 @@ def evaluate_models(
         for prompt in prompts:
             print(f"\nPrompt: {prompt}")
 
-            western_output = generate(
-                western_model,
-                encoding,
-                prompt,
-                max_new_tokens=max_tokens,
-                temperature=temperature,
-                device=device,
-            )
-            eastern_output = generate(
-                eastern_model,
-                encoding,
-                prompt,
-                max_new_tokens=max_tokens,
-                temperature=temperature,
-                device=device,
-            )
+            western_output = _generate(western_model, encoding, prompt, device)
+            eastern_output = _generate(eastern_model, encoding, prompt, device)
 
             print(f"  Western: {western_output[:100]}...")
             print(f"  Eastern: {eastern_output[:100]}...")
@@ -498,7 +492,6 @@ def evaluate_models(
 # ---------------------------------------------------------------------------
 
 def analyze_bias(results: dict):
-    """Summarize bias metrics across categories."""
     print("\n" + "=" * 60)
     print("Bias Analysis Summary")
     print("=" * 60)
@@ -566,7 +559,7 @@ if __name__ == "__main__":
     parser.add_argument("--eastern-path", type=str, default=EASTERN_MODEL_PATH)
     parser.add_argument("--output-dir",   type=str, default=OUTPUT_DIR)
     parser.add_argument("--max-tokens",   type=int, default=150)
-    parser.add_argument("--temperature",  type=float, default=0.4)
+    parser.add_argument("--temperature",  type=float, default=GENERATION_CONFIG["temperature"])
     parser.add_argument(
         "--analyze-only",
         action="store_true",
