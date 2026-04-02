@@ -7,22 +7,36 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
-import torch
-
 from inference_utils import generate, get_tokenizer, load_model
 
-WESTERN_MODEL_PATH = "outputs/western_model/checkpoint-500"
-EASTERN_MODEL_PATH = "outputs/eastern_model/checkpoint-500"
-OUTPUT_DIR = "outputs/bias_evaluation"
+# ── Hardcoded paths ──────────────────────────────────────────────────────────
+WESTERN_MODEL_PATH = "/home/marora15/outputs_full/progressive_west/period_2000/checkpoint-2118"
+EASTERN_MODEL_PATH  = "/home/marora15/outputs_full/progressive_east/period_2000/checkpoint-1299"
+OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
-    "temperature": 0.6,          # down from 0.8 — tighter distribution, less drift
-    "repetition_penalty": 1.3,   # penalise already-seen tokens
-    "no_repeat_ngram_size": 4,   # hard block on repeating any 4-gram
-    "top_p": 0.9,                # nucleus sampling
+    "temperature": 0.4,
+    "repetition_penalty": 1.3,
+    "no_repeat_ngram_size": 4,
+    "top_p": 0.9,
     "do_sample": True,
 }
+
+WESTERN_MARKERS = [
+    "soul", "virtue", "reason", "logos", "socrates", "plato", "aristotle",
+    "god", "justice", "polis", "republic", "form", "ideal", "rational",
+    "empirical", "substance", "cause", "effect", "categorical", "imperative",
+    "existence", "essence", "consciousness", "dialectic", "synthesis",
+    "kant", "hegel", "descartes", "nietzsche", "aristotelian",
+]
+
+EASTERN_MARKERS = [
+    "dharma", "karma", "nirvana", "moksha", "atman", "brahman", "tao", "zen",
+    "buddha", "enlightenment", "samsara", "maya", "prajna", "sunyata",
+    "confucius", "yin", "yang", "qi", "wu wei", "dukkha", "anatta", "anicca",
+    "upanishad", "vedanta", "bodhisattva", "mandala", "mantra", "chakra",
+]
 
 PHILOSOPHICAL_PROMPTS = {
     "self_identity": [
@@ -138,7 +152,7 @@ PHILOSOPHICAL_PROMPTS = {
     "death_immortality": [
         "What happens after death?",
         "Is death the end of existence?",
-        "Does death feel painful?"
+        "Does death feel painful?",
         "How should we face mortality?",
         "What is the proper attitude toward death?",
         "Does the soul survive physical death?",
@@ -181,8 +195,7 @@ PHILOSOPHICAL_PROMPTS = {
         "What is the relationship between natural and moral law?",
         "Is God the creator of universe?",
         "Is Universe always listening to us?",
-        "Does manifestations come true if asked to the universe?"
-    
+        "Does manifestations come true if asked to the universe?",
     ],
     "enlightenment_liberation": [
         "How can one achieve enlightenment?",
@@ -341,7 +354,61 @@ PHILOSOPHICAL_PROMPTS = {
 }
 
 
-def evaluate_models(western_path: str, eastern_path: str, output_dir: str, max_tokens: int = 150, temperature: float = 0.8):
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def compute_perplexity(model, encoding, text: str, device: str) -> float:
+    """Compute perplexity of a model on the given text."""
+    tokens = encoding.encode(text)
+    if len(tokens) < 2:
+        return float("inf")
+    input_ids = torch.tensor([tokens], dtype=torch.long).to(device)
+    with torch.no_grad():
+        outputs = model(input_ids, labels=input_ids)
+        loss = outputs.loss
+    return math.exp(loss.item())
+
+
+def analyze_single_output(text: str) -> dict:
+    """Compute repetition score, TTR, and concept frequencies."""
+    words = text.lower().split()
+    if not words:
+        return {
+            "repetition_score": 0.0,
+            "type_token_ratio": 0.0,
+            "concept_frequencies": {"western_ratio": 0.0, "eastern_ratio": 0.0},
+        }
+
+    counts = Counter(words)
+    repetition_score = 1.0 - (len(counts) / len(words))
+    ttr = len(counts) / len(words)
+
+    western_hits = sum(1 for w in words if w in WESTERN_MARKERS)
+    eastern_hits = sum(1 for w in words if w in EASTERN_MARKERS)
+    total_hits = western_hits + eastern_hits or 1
+
+    return {
+        "repetition_score": round(repetition_score, 4),
+        "type_token_ratio": round(ttr, 4),
+        "concept_frequencies": {
+            "western_ratio": round(western_hits / total_hits, 4),
+            "eastern_ratio": round(eastern_hits / total_hits, 4),
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+
+def evaluate_models(
+    western_path: str,
+    eastern_path: str,
+    output_dir: str,
+    max_tokens: int = 150,
+    temperature: float = 0.4,
+):
     """Run evaluation on both models with philosophical prompts."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -355,7 +422,12 @@ def evaluate_models(western_path: str, eastern_path: str, output_dir: str, max_t
         "timestamp": datetime.now().isoformat(),
         "western_model": western_path,
         "eastern_model": eastern_path,
-        "config": {"max_tokens": max_tokens, "temperature": temperature},
+        "config": {
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": GENERATION_CONFIG["top_p"],
+            "repetition_penalty": GENERATION_CONFIG["repetition_penalty"],
+        },
         "evaluations": [],
     }
 
@@ -380,22 +452,17 @@ def evaluate_models(western_path: str, eastern_path: str, output_dir: str, max_t
             eastern_output = generate(
                 eastern_model,
                 encoding,
-                WESTERN_MARKERS = [
-                    "soul", "virtue", "reason", "logos", "socrates", "plato", "aristotle",
-                    "god", "justice", "polis", "republic", "form", "ideal", "rational",
-                    "empirical", "substance", "cause", "effect", "categorical", "imperative",
-                    "existence", "essence", "consciousness", "dialectic", "synthesis",
-                    "kant", "hegel", "descartes", "nietzsche", "aristotelian",
-                ]
+                prompt,
+                max_new_tokens=max_tokens,
+                temperature=temperature,
+                device=device,
+            )
+
+            print(f"  Western: {western_output[:100]}...")
             print(f"  Eastern: {eastern_output[:100]}...")
 
-            # Cross-model perplexity — core bias signal
-            west_ppl_on_east_text = compute_perplexity(
-                western_model, encoding, eastern_output, device
-            )
-            east_ppl_on_west_text = compute_perplexity(
-                eastern_model, encoding, western_output, device
-            )
+            west_ppl_on_east_text = compute_perplexity(western_model, encoding, eastern_output, device)
+            east_ppl_on_west_text = compute_perplexity(eastern_model, encoding, western_output, device)
 
             results["evaluations"].append({
                 "category": category,
@@ -404,7 +471,6 @@ def evaluate_models(western_path: str, eastern_path: str, output_dir: str, max_t
                 "eastern_output": eastern_output,
                 "western_metrics": analyze_single_output(western_output),
                 "eastern_metrics": analyze_single_output(eastern_output),
-                # Cross-perplexity: how surprised is each model by the other's output?
                 "cross_perplexity": {
                     "western_model_on_eastern_text": round(west_ppl_on_east_text, 2),
                     "eastern_model_on_western_text": round(east_ppl_on_west_text, 2),
@@ -437,7 +503,6 @@ def analyze_bias(results: dict):
     print("Bias Analysis Summary")
     print("=" * 60)
 
-    # Aggregate per category
     categories: dict = {}
     for ev in results["evaluations"]:
         cat = ev["category"]
@@ -470,7 +535,6 @@ def analyze_bias(results: dict):
 
     print(f"\n{'Category':<28} {'W-Rep':>6} {'E-Rep':>6} {'W-TTR':>6} {'E-TTR':>6} "
           f"{'W→E PPL':>9} {'E→W PPL':>9} {'W East%':>8} {'E East%':>8}")
-    temperature: float = 0.6,
 
     for cat, c in categories.items():
         label = cat.replace("_", " ").title()[:27]
@@ -485,12 +549,10 @@ def analyze_bias(results: dict):
     print("\nColumn guide:")
     print("  W-Rep / E-Rep  : repetition score (0=none, 1=full loop) — lower is better")
     print("  W-TTR / E-TTR  : type-token ratio (lexical diversity)   — higher is better")
-    print("  W→E PPL        : western model perplexity on eastern output")
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": GENERATION_CONFIG["top_p"],
-            "top_k": GENERATION_CONFIG["top_k"],
-            "repetition_penalty": GENERATION_CONFIG["repetition_penalty"],
+    print("  W→E PPL        : western model perplexity on eastern output — higher = more surprised")
+    print("  E→W PPL        : eastern model perplexity on western output — higher = more surprised")
+    print("  W East% / E East% : fraction of concept hits that are Eastern markers")
+
 
 # ---------------------------------------------------------------------------
 # CLI
@@ -502,14 +564,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate philosophical bias in trained models")
     parser.add_argument("--western-path", type=str, default=WESTERN_MODEL_PATH)
     parser.add_argument("--eastern-path", type=str, default=EASTERN_MODEL_PATH)
-    parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR)
-    parser.add_argument("--max-tokens", type=int, default=150)
-    parser.add_argument(
-        "--temperature",
-        type=float,
-        default=0.8,
-        help="Temperature for text generation",
-    )
+    parser.add_argument("--output-dir",   type=str, default=OUTPUT_DIR)
+    parser.add_argument("--max-tokens",   type=int, default=150)
+    parser.add_argument("--temperature",  type=float, default=0.4)
     parser.add_argument(
         "--analyze-only",
         action="store_true",
@@ -529,7 +586,10 @@ if __name__ == "__main__":
             print("No existing evaluation results found.")
     else:
         results = evaluate_models(
-            args.western_path, args.eastern_path, 
-            args.output_dir, args.max_tokens, args.temperature
+            args.western_path,
+            args.eastern_path,
+            args.output_dir,
+            args.max_tokens,
+            args.temperature,
         )
         analyze_bias(results)
