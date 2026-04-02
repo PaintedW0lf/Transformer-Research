@@ -10,18 +10,38 @@ import torch
 
 from inference_utils import generate, get_tokenizer, load_model
 
-WESTERN_MODEL_PATH = "outputs/western_model/checkpoint-500"
-EASTERN_MODEL_PATH = "outputs/eastern_model/checkpoint-500"
-OUTPUT_DIR = "outputs/bias_evaluation"
+# ── Hardcoded paths ──────────────────────────────────────────────────────────
+WESTERN_MODEL_PATH = "/home/marora15/outputs_full/progressive_west/period_2000/checkpoint-2118"
+EASTERN_MODEL_PATH  = "/home/marora15/outputs_full/progressive_east/period_2000/checkpoint-1299"
+OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
-    "temperature": 0.4,          # down from 0.8 — tighter distribution, less drift
+    "temperature": 0.4,          # tighter distribution, less drift
     "repetition_penalty": 1.3,   # penalise already-seen tokens
     "no_repeat_ngram_size": 4,   # hard block on repeating any 4-gram
     "top_p": 0.9,                # nucleus sampling
     "do_sample": True,
 }
+
+# Vocabulary lists for concept frequency analysis
+WESTERN_MARKERS = [
+    "soul", "virtue", "reason", "logos", "socrates", "plato", "aristotle",
+    "god", "justice", "polis", "republic", "form", "ideal", "rational",
+    "empirical", "substance", "cause", "effect", "categorical", "imperative",
+    "existence", "essence", "consciousness", "dialectic", "synthesis",
+    "kant", "hegel", "descartes", "nietzsche", "aristotelian",
+]
+
+EASTERN_MARKERS = [
+    "dharma", "karma", "nirvana", "moksha", "atman", "brahman", "tao", "zen",
+    "buddha", "buddhist", "enlightenment", "samsara", "maya", "prajna", "sunyata",
+    "confucius", "yin", "yang", "qi", "wu wei", "dukkha", "anatta", "anicca",
+    "upanishad", "vedanta", "bodhisattva", "mandala", "mantra", "chakra",
+    "meditation", "suffering", "craving", "impermanence", "rebirth",
+    "mendicant", "noble", "eightfold", "cessation", "mindfulness",
+    "detachment", "ancestor",
+]
 
 PHILOSOPHICAL_PROMPTS = {
     "self_identity": [
@@ -180,8 +200,7 @@ PHILOSOPHICAL_PROMPTS = {
         "What is the relationship between natural and moral law?",
         "Is God the creator of universe?",
         "Is Universe always listening to us?",
-        "Does manifestations come true if asked to the universe?"
-    
+        "Does manifestations come true if asked to the universe?",
     ],
     "enlightenment_liberation": [
         "How can one achieve enlightenment?",
@@ -339,23 +358,10 @@ PHILOSOPHICAL_PROMPTS = {
     ],
 }
 
-# Vocabulary lists for concept frequency analysis
-EASTERN_MARKERS = [
-    "dharma", "karma", "nirvana", "buddha", "buddhist", "tao", "zen",
-    "confucius", "meditation", "suffering", "craving", "impermanence",
-    "anatta", "enlightenment", "rebirth", "samsara", "atman", "brahman",
-    "mendicant", "noble", "eightfold", "cessation", "mindfulness",
-    "detachment", "wu wei", "yin", "yang", "ancestor",
-]
 
-WESTERN_MARKERS = [
-    "soul", "virtue", "reason", "logos", "socrates", "plato", "aristotle",
-    "god", "justice", "polis", "republic", "form", "ideal", "rational",
-    "empirical", "substance", "cause", "effect", "categorical", "imperative",
-    "existence", "essence", "consciousness", "dialectic", "synthesis",
-    "kant", "hegel", "descartes", "nietzsche", "aristotelian",
-]
-
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def compute_repetition_score(text: str, ngram_size: int = 4) -> float:
     tokens = text.lower().split()
@@ -414,6 +420,22 @@ def analyze_single_output(text: str) -> dict:
     }
 
 
+def _generate(model, encoding, prompt, device, max_tokens):
+    """Wrapper that passes the full GENERATION_CONFIG to generate()."""
+    return generate(
+        model,
+        encoding,
+        prompt,
+        max_new_tokens=max_tokens,
+        device=device,
+        **GENERATION_CONFIG,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+
 def evaluate_models(
     western_path: str,
     eastern_path: str,
@@ -424,13 +446,16 @@ def evaluate_models(
     top_k: int = 0,
     repetition_penalty: float = GENERATION_CONFIG["repetition_penalty"],
 ):
-    """Run evaluation on both models with philosophical prompts."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Loading Western model...")
     western_model = load_model(western_path, device)
+    western_model.generation_config.pad_token_id = western_model.generation_config.eos_token_id
+
     print("Loading Eastern model...")
     eastern_model = load_model(eastern_path, device)
+    eastern_model.generation_config.pad_token_id = eastern_model.generation_config.eos_token_id
+
     encoding = get_tokenizer()
 
     results = {
@@ -458,43 +483,15 @@ def evaluate_models(
         for prompt in prompts:
             print(f"\nPrompt: {prompt}")
 
-            western_output = generate(
-                western_model,
-                encoding,
-                prompt,
-                max_new_tokens=max_tokens,
-                temperature=temperature,
-                repetition_penalty=repetition_penalty,
-                no_repeat_ngram_size=GENERATION_CONFIG["no_repeat_ngram_size"],
-                top_p=top_p,
-                top_k=top_k,
-                do_sample=GENERATION_CONFIG["do_sample"],
-                device=device,
-            )
-            eastern_output = generate(
-                eastern_model,
-                encoding,
-                prompt,
-                max_new_tokens=max_tokens,
-                temperature=temperature,
-                repetition_penalty=repetition_penalty,
-                no_repeat_ngram_size=GENERATION_CONFIG["no_repeat_ngram_size"],
-                top_p=top_p,
-                top_k=top_k,
-                do_sample=GENERATION_CONFIG["do_sample"],
-                device=device,
-            )
+            western_output = _generate(western_model, encoding, prompt, device, max_tokens)
+            eastern_output = _generate(eastern_model, encoding, prompt, device, max_tokens)
 
             print(f"  Western: {western_output[:100]}...")
             print(f"  Eastern: {eastern_output[:100]}...")
 
             # Cross-model perplexity — core bias signal
-            west_ppl_on_east_text = compute_perplexity(
-                western_model, encoding, eastern_output, device
-            )
-            east_ppl_on_west_text = compute_perplexity(
-                eastern_model, encoding, western_output, device
-            )
+            west_ppl_on_east_text = compute_perplexity(western_model, encoding, eastern_output, device)
+            east_ppl_on_west_text = compute_perplexity(eastern_model, encoding, western_output, device)
 
             results["evaluations"].append({
                 "category": category,
@@ -536,7 +533,6 @@ def analyze_bias(results: dict):
     print("Bias Analysis Summary")
     print("=" * 60)
 
-    # Aggregate per category
     categories: dict = {}
     for ev in results["evaluations"]:
         cat = ev["category"]
@@ -584,8 +580,8 @@ def analyze_bias(results: dict):
     print("\nColumn guide:")
     print("  W-Rep / E-Rep  : repetition score (0=none, 1=full loop) — lower is better")
     print("  W-TTR / E-TTR  : type-token ratio (lexical diversity)   — higher is better")
-    print("  W→E PPL        : western model perplexity on eastern output")
-    print("  E→W PPL        : eastern model perplexity on western output")
+    print("  W→E PPL        : western model perplexity on eastern output — higher = more surprised")
+    print("  E→W PPL        : eastern model perplexity on western output — higher = more surprised")
     print("  W East% / E East% : fraction of philosophical markers that are eastern-tradition")
 
 
@@ -599,8 +595,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate philosophical bias in trained models")
     parser.add_argument("--western-path", type=str, default=WESTERN_MODEL_PATH)
     parser.add_argument("--eastern-path", type=str, default=EASTERN_MODEL_PATH)
-    parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR)
-    parser.add_argument("--max-tokens", type=int, default=150)
+    parser.add_argument("--output-dir",   type=str, default=OUTPUT_DIR)
+    parser.add_argument("--max-tokens",   type=int, default=150)
     parser.add_argument(
         "--temperature",
         type=float,
