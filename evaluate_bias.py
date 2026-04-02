@@ -16,11 +16,10 @@ OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
-    "temperature": 0.7,           # raised slightly for more diversity
-    "repetition_penalty": 1.5,    # stronger penalty (was 1.3)
-    "no_repeat_ngram_size": 5,    # block 5-grams (was 4)
-    "top_p": 0.9,
-    "top_k": 50,                  # add top-k to cut the long tail
+    "temperature": 0.4,          # tighter distribution, less drift
+    "repetition_penalty": 1.3,   # penalise already-seen tokens
+    "no_repeat_ngram_size": 4,   # hard block on repeating any 4-gram
+    "top_p": 0.9,                # nucleus sampling
     "do_sample": True,
 }
 
