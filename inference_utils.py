@@ -29,6 +29,7 @@ def generate(
     repetition_penalty: float = 1.0,
     no_repeat_ngram_size: int = 0,
     top_p: float = 0.9,
+    top_k: int = 0,
     do_sample: bool = True,
     device: str = None,
 ) -> str:
@@ -47,6 +48,7 @@ def generate(
             repetition_penalty=repetition_penalty,
             no_repeat_ngram_size=no_repeat_ngram_size,
             top_p=top_p,
+            top_k=top_k,
             do_sample=do_sample,
             pad_token_id=encoding.eot_token,
             eos_token_id=encoding.eot_token,
@@ -77,8 +79,10 @@ def generate_with_history(
     full_prompt = f"{history}Human: {prompt}\nAssistant:" if history else f"Human: {prompt}\nAssistant:"
     
     response = generate(
-        model, encoding, full_prompt, 
-        max_new_tokens, temperature, top_p, device
+        model, encoding, full_prompt,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
     )
     
     reply = response.split("Human:")[0].strip()

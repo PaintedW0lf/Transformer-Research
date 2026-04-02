@@ -60,6 +60,23 @@ PHILOSOPHICAL_PROMPTS = {
         "What is self-awareness?",
         "How does the self arise?",
         "What is the true nature of personal existence?",
+        "Is the self an illusion or ultimate reality?",
+        "What is the relationship between mind and self?",
+        "What is the difference between self and soul?",
+        "Is the self permanent or impermanent?",
+        "What is self-actualization?",
+        "How does the self relate to consciousness?",
+        "What is the egoless state?",
+        "What is the relationship between self and ego?",
+        "Is there a higher self beyond the ego?",
+        "What is self-realization?",
+        "How does the self perceive the world?",
+        "What is the nature of personal identity?",
+        "Can the self be transformed?",
+        "What is the relationship between self and society?",
+        "What is self-awareness?",
+        "How does the self arise?",
+        "What is the true nature of personal existence?",
     ],
     "purpose_meaning": [
         "What is the meaning of life?",
@@ -418,6 +435,9 @@ def evaluate_models(
     output_dir: str,
     max_tokens: int = 150,
     temperature: float = GENERATION_CONFIG["temperature"],
+    top_p: float = GENERATION_CONFIG["top_p"],
+    top_k: int = 0,
+    repetition_penalty: float = GENERATION_CONFIG["repetition_penalty"],
 ):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -586,5 +606,8 @@ if __name__ == "__main__":
             args.output_dir,
             args.max_tokens,
             args.temperature,
+            args.top_p,
+            args.top_k,
+            args.repetition_penalty,
         )
         analyze_bias(results)
