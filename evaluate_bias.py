@@ -10,6 +10,7 @@ import torch
 
 from inference_utils import generate, get_tokenizer, load_model
 from kl_divergence import compute_kl_report
+from stats_analysis import compute_overlap_metrics, analyze_category
 
 # ── Paths — auto-detect based on what exists on the current machine ──────────
 from pathlib import Path as _Path
@@ -627,6 +628,46 @@ def analyze_bias(results: dict):
 
 
 # ---------------------------------------------------------------------------
+# Stats analysis
+# ---------------------------------------------------------------------------
+
+def run_stats_analysis(results: dict):
+    """Run Bhattacharyya stats analysis on evaluation results and print report."""
+    evaluations = results.get("evaluations", [])
+    if not evaluations:
+        return
+
+    print("\n" + "=" * 70)
+    print("STATISTICAL ANALYSIS OF MODEL OUTPUT DISTRIBUTIONS")
+    print("=" * 70)
+
+    category_results = {}
+    for category in set(e.get("category", "unknown") for e in evaluations):
+        cat_evals = [e for e in evaluations if e.get("category") == category]
+        category_results[category] = analyze_category(category, cat_evals)
+
+    print(f"\n{'Category':<30} {'BC':>8} {'BD':>8}  {'Overlap'}")
+    print("-" * 60)
+    for cat, res in sorted(category_results.items()):
+        print(f"{cat.replace('_', ' ').title():<30} "
+              f"{res['bhattacharyya_coefficient']:>8.4f} {res['bhattacharyya_distance']:>8.4f}  "
+              f"{res['bhattacharyya_interpretation']}")
+
+    west_all = [e["western_output"] for e in evaluations if "western_output" in e]
+    east_all = [e["eastern_output"] for e in evaluations if "eastern_output" in e]
+    overall = compute_overlap_metrics(west_all, east_all)
+
+    print("\n" + "=" * 70)
+    print("OVERALL METRICS (All Categories Combined)")
+    print("=" * 70)
+    print(f"\nBhattacharyya Coefficient:    {overall['bhattacharyya_coefficient']:.4f}  ({overall['bhattacharyya_interpretation']})")
+    print(f"Bhattacharyya Distance:       {overall['bhattacharyya_distance']:.4f}")
+    print(f"\nUnique Western Words: {overall['unique_western_words']}")
+    print(f"Unique Eastern Words: {overall['unique_eastern_words']}")
+    print(f"Common Words:          {overall['common_words']}")
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -677,6 +718,7 @@ if __name__ == "__main__":
             with open(existing_files[-1]) as f:
                 results = json.load(f)
             analyze_bias(results)
+            run_stats_analysis(results)
         else:
             print("No existing evaluation results found.")
     else:
@@ -691,3 +733,4 @@ if __name__ == "__main__":
             args.repetition_penalty,
         )
         analyze_bias(results)
+        run_stats_analysis(results)
