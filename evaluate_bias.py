@@ -11,10 +11,25 @@ import torch
 from inference_utils import generate, get_tokenizer, load_model
 from kl_divergence import compute_kl_report
 
-# ── Hardcoded paths ──────────────────────────────────────────────────────────
-WESTERN_MODEL_PATH = "/home/marora15/outputs_full/progressive_west/period_2000/checkpoint-2118"
-EASTERN_MODEL_PATH  = "/home/marora15/outputs_full/progressive_east/period_2000/checkpoint-1299"
-OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
+# ── Paths — auto-detect based on what exists on the current machine ──────────
+from pathlib import Path as _Path
+
+def _find_outputs_root() -> _Path:
+    """Return the outputs_full root, searching common locations."""
+    candidates = [
+        _Path.home() / "outputs_full",                          # server: ~/outputs_full
+        _Path(__file__).parent / "outputs",                     # local:  ./outputs
+        _Path("/home/marora15/outputs_full"),                    # server absolute
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    return candidates[0]   # fall back to ~/outputs_full even if missing
+
+_OUTPUTS_ROOT = _find_outputs_root()
+WESTERN_MODEL_PATH = str(_OUTPUTS_ROOT / "progressive_west/period_2000/checkpoint-2118")
+EASTERN_MODEL_PATH  = str(_OUTPUTS_ROOT / "progressive_east/period_2000/checkpoint-1299")
+OUTPUT_DIR          = str(_OUTPUTS_ROOT / "progressive_evaluations")
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
