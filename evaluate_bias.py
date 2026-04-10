@@ -9,6 +9,7 @@ from pathlib import Path
 import torch
 
 from inference_utils import generate, get_tokenizer, load_model
+from kl_divergence import compute_kl_report
 
 # ── Hardcoded paths ──────────────────────────────────────────────────────────
 WESTERN_MODEL_PATH = "/home/marora15/outputs_full/progressive_west/period_2000/checkpoint-2118"
@@ -393,34 +394,6 @@ def compute_concept_frequencies(text: str) -> dict:
     }
 
 
-def compute_kl_divergence(
-    model_p, model_q, encoding, text: str, device: str, block_size: int = 1024
-) -> float:
-    """Compute mean per-token KL(P || Q) where P=model_p, Q=model_q.
-
-    For each token position t the models produce a distribution over the
-    vocabulary.  We average KL(P_t || Q_t) across all positions.  A higher
-    value means model_q is more surprised by what model_p predicts.
-    """
-    model_p.eval()
-    model_q.eval()
-    try:
-        tokens = encoding.encode(text)
-        if len(tokens) < 2:
-            return float("nan")
-        tokens = tokens[:block_size]
-        input_ids = torch.tensor([tokens[:-1]], dtype=torch.long).to(device)
-        with torch.no_grad():
-            logits_p = model_p(input_ids).logits[0]   # (seq_len, vocab)
-            logits_q = model_q(input_ids).logits[0]
-        log_p = torch.log_softmax(logits_p, dim=-1)
-        log_q = torch.log_softmax(logits_q, dim=-1)
-        # KL(P || Q) = Σ p * (log p - log q)  per position, then mean
-        kl_per_pos = (log_p.exp() * (log_p - log_q)).sum(dim=-1)
-        return kl_per_pos.mean().item()
-    except Exception:
-        return float("nan")
-
 
 def compute_perplexity(model, encoding, text: str, device: str, block_size: int = 1024) -> float:
     model.eval()
@@ -522,20 +495,12 @@ def evaluate_models(
             west_ppl_on_east_text = compute_perplexity(western_model, encoding, eastern_output, device)
             east_ppl_on_west_text = compute_perplexity(eastern_model, encoding, western_output, device)
 
-            # KL divergence between model distributions on the same prompt
-            # KL(west || east) on the prompt: how different are their predictions?
-            kl_west_to_east_on_prompt = compute_kl_divergence(
-                western_model, eastern_model, encoding, prompt, device
-            )
-            kl_east_to_west_on_prompt = compute_kl_divergence(
-                eastern_model, western_model, encoding, prompt, device
-            )
-            # KL on each other's generated text
-            kl_west_to_east_on_east_text = compute_kl_divergence(
-                western_model, eastern_model, encoding, eastern_output, device
-            )
-            kl_east_to_west_on_west_text = compute_kl_divergence(
-                eastern_model, western_model, encoding, western_output, device
+            kl = compute_kl_report(
+                western_model, eastern_model, encoding,
+                prompt=prompt,
+                west_output=western_output,
+                east_output=eastern_output,
+                device=device,
             )
 
             results["evaluations"].append({
@@ -550,13 +515,8 @@ def evaluate_models(
                     "western_model_on_eastern_text": round(west_ppl_on_east_text, 2),
                     "eastern_model_on_western_text": round(east_ppl_on_west_text, 2),
                 },
-                # KL divergence: distributional distance between models
-                "kl_divergence": {
-                    "west_to_east_on_prompt": round(kl_west_to_east_on_prompt, 4),
-                    "east_to_west_on_prompt": round(kl_east_to_west_on_prompt, 4),
-                    "west_to_east_on_east_output": round(kl_west_to_east_on_east_text, 4),
-                    "east_to_west_on_west_output": round(kl_east_to_west_on_west_text, 4),
-                },
+                # KL divergence (%) — 0=identical distributions, 100=max divergence
+                "kl_divergence": kl,
             })
 
     output_path = Path(output_dir)
@@ -594,7 +554,7 @@ def analyze_bias(results: dict):
                 "west_ttr": [], "east_ttr": [],
                 "west_ppl_on_east": [], "east_ppl_on_west": [],
                 "west_east_concept_ratio": [], "east_east_concept_ratio": [],
-                "kl_w2e_prompt": [], "kl_e2w_prompt": [],
+                "kl_w2e_prompt": [], "kl_e2w_prompt": [], "kl_sym_prompt": [],
             }
         c = categories[cat]
         c["west_rep"].append(ev["western_metrics"]["repetition_score"])
@@ -613,20 +573,22 @@ def analyze_bias(results: dict):
             ev["eastern_metrics"]["concept_frequencies"]["eastern_ratio"]
         )
         kl = ev.get("kl_divergence", {})
-        v = kl.get("west_to_east_on_prompt")
-        if v is not None and not math.isnan(v):
-            c["kl_w2e_prompt"].append(v)
-        v = kl.get("east_to_west_on_prompt")
-        if v is not None and not math.isnan(v):
-            c["kl_e2w_prompt"].append(v)
+        for key, bucket in [
+            ("west_to_east_on_prompt", "kl_w2e_prompt"),
+            ("east_to_west_on_prompt", "kl_e2w_prompt"),
+            ("symmetric_on_prompt",    "kl_sym_prompt"),
+        ]:
+            v = kl.get(key)
+            if v is not None and not math.isnan(v):
+                c[bucket].append(v)
 
     def avg(lst):
         return round(sum(lst) / len(lst), 3) if lst else float("nan")
 
     print(f"\n{'Category':<28} {'W-Rep':>6} {'E-Rep':>6} {'W-TTR':>6} {'E-TTR':>6} "
           f"{'W→E PPL':>9} {'E→W PPL':>9} {'W East%':>8} {'E East%':>8} "
-          f"{'KL W→E':>8} {'KL E→W':>8}")
-    print("-" * 120)
+          f"{'KL W→E%':>8} {'KL E→W%':>8} {'KL Sym%':>8}")
+    print("-" * 128)
 
     for cat, c in categories.items():
         label = cat.replace("_", " ").title()[:27]
@@ -636,16 +598,17 @@ def analyze_bias(results: dict):
             f"{avg(c['west_ttr']):>6.3f} {avg(c['east_ttr']):>6.3f} "
             f"{avg(c['west_ppl_on_east']):>9.1f} {avg(c['east_ppl_on_west']):>9.1f} "
             f"{avg(c['west_east_concept_ratio']):>8.3f} {avg(c['east_east_concept_ratio']):>8.3f} "
-            f"{avg(c['kl_w2e_prompt']):>8.4f} {avg(c['kl_e2w_prompt']):>8.4f}"
+            f"{avg(c['kl_w2e_prompt']):>7.1f}% {avg(c['kl_e2w_prompt']):>7.1f}% {avg(c['kl_sym_prompt']):>7.1f}%"
         )
 
     print("\nColumn guide:")
-    print("  W-Rep / E-Rep  : repetition score (0=none, 1=full loop) — lower is better")
-    print("  W-TTR / E-TTR  : type-token ratio (lexical diversity)   — higher is better")
-    print("  W→E PPL        : western model perplexity on eastern output — higher = more surprised")
-    print("  E→W PPL        : eastern model perplexity on western output — higher = more surprised")
+    print("  W-Rep / E-Rep     : repetition score (0=none, 1=full loop) — lower is better")
+    print("  W-TTR / E-TTR     : type-token ratio (lexical diversity)   — higher is better")
+    print("  W→E PPL / E→W PPL : cross-perplexity — higher = more surprised by the other's output")
     print("  W East% / E East% : fraction of philosophical markers that are eastern-tradition")
-    print("  KL W→E / KL E→W   : mean per-token KL divergence on the prompt — higher = more different")
+    print("  KL W→E% / KL E→W% : how different western/eastern token distributions are on the prompt")
+    print("  KL Sym%           : symmetric average — single number for overall model divergence")
+    print("                      (all KL values: 0%=identical distributions, 100%=max divergence)")
 
 
 # ---------------------------------------------------------------------------
