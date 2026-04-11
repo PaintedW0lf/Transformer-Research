@@ -7,7 +7,7 @@ Create a virtual environment and install dependencies:
 ```
 python -m venv .venv
 source .venv/bin/activate
-pip install torch transformers tiktoken pytest
+pip install -r requirements.txt
 ```
 
 ## Data format
@@ -30,6 +30,11 @@ LLMTraining/
     test_lm_utils.py
     test_pretrain_builders.py
     test_streaming.py
+      test_kl_divergence.py
+      test_stats_analysis.py
+      test_evaluate_bias.py
+      test_visualize_vocab.py
+      test_pipeline_cli.py
     chat_test.py
   data/
     shard-0001.txt
