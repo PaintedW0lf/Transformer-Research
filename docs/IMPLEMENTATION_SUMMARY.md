@@ -102,7 +102,7 @@ Progressive Training Pipeline
 │   └─ Save checkpoint
 │
 ├─ Evaluation (when both models trained):
-│   ├─ Run evaluate_bias.py: Compare east vs west
+│   ├─ Run evaluate_bias.py: Compare east vs west, compute cross-perplexity and KL divergence
 │   ├─ Run batch_chat_test.py: Generate responses
 │   └─ Save results to JSON
 │
@@ -205,7 +205,8 @@ The pipeline integrates with existing codebase:
 | Data Loading | Load texts from dirs | `lm_utils.py:load_texts_from_data_dir()` |
 | Training | HuggingFace Trainer | `lm_utils.py:build_trainer()` |
 | Tokenization | GPT2 encoding | `tiktoken` via `lm_utils.py` |
-| Bias Eval | Compare models | `evaluate_bias.py:evaluate_models()` |
+| Bias Eval | Compare models, cross-perplexity, and KL divergence | `evaluate_bias.py:evaluate_models()` |
+| KL Divergence | Direct probability-distribution comparison | `kl_divergence.py` |
 | Inference | Generate text | `inference_utils.py:generate_with_history()` |
 | Model Loading | Load checkpoints | `inference_utils.py:load_model()` |
 

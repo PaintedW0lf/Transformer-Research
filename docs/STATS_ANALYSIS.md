@@ -2,6 +2,8 @@
 
 `stats_analysis.py` measures how much the word distributions of the Western and Eastern model outputs overlap, using the **Bhattacharyya coefficient** as the primary metric.
 
+It complements the KL divergence report in `kl_divergence.py`, which compares next-token probability distributions directly. Use KL when you want model-level divergence on the prompt itself; use this script when you want to compare the vocabulary actually produced in the outputs.
+
 ## What it measures
 
 Given the text outputs of two models (Western and Eastern), the script:
@@ -85,4 +87,4 @@ Bhattacharyya Distance:       0.3875
 
 ## Relationship to evaluate_bias.py
 
-`evaluate_bias.py` generates the raw model outputs and per-output metrics (repetition score, type-token ratio, cross-perplexity). `stats_analysis.py` is a post-processing step that takes those outputs and quantifies how different the two models' vocabularies are at the distribution level.
+`evaluate_bias.py` generates the raw model outputs and per-output metrics (repetition score, type-token ratio, cross-perplexity, and KL divergence). `stats_analysis.py` is a post-processing step that takes those outputs and quantifies how different the two models' vocabularies are at the distribution level.

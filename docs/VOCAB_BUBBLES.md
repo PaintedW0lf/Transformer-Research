@@ -7,15 +7,15 @@ one set for individual words (unigrams) and one for two-word phrases (bigrams).
 
 ## What it does
 
-1. Loads the most recent `bias_evaluation_*.json` from `outputs/bias_evaluation/`
-   (or a specific file you point it at).
+1. Loads the most recent `bias_evaluation_*.json` from the configured evaluation output directory
+   (or a specific file you point it at in the script).
 2. Collects every word and every consecutive word pair from the model outputs.
 3. Strips **pronouns**, **prepositions**, auxiliary verbs, and common stop words.
    For bigrams, both words in the pair must survive the filter.
 4. Takes the top-N most frequent items per chart (default: 60 words, 40 bigrams).
 5. Renders **packed bubble charts** — each item is a filled circle whose radius
    scales linearly with its frequency.
-6. Saves six PNG files to `outputs/vocab_bubbles/`.
+6. Saves six PNG files to the configured vocab-bubble output directory.
 
 ## Output files
 
@@ -48,7 +48,7 @@ e.g. the Western model might cluster around *moral duty*, *individual rights*,
 python visualize_vocab.py
 
 # Point at a specific results file
-python visualize_vocab.py --results-file outputs/bias_evaluation/bias_evaluation_20240101_120000.json
+python visualize_vocab.py --results-file outputs/progressive_evaluations/bias_evaluation_20240101_120000.json
 
 # Adjust word and bigram counts
 python visualize_vocab.py --top-n 80 --top-n-bigrams 50
