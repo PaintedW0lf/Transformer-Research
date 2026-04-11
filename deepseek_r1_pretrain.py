@@ -74,6 +74,7 @@ if __name__ == "__main__":
         use_streaming=True,
         block_size=4096,
         shuffle_buffer=50000,
+    )
     # Train on Eastern philosophical texts
     print("\n=== Training on Eastern texts ===")
     east_texts = load_texts_from_data_dir("data/east")
