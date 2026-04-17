@@ -72,6 +72,13 @@ Interactive checkpoint chat:
 python tests/chat_test.py --checkpoint outputs/gpt2_east/checkpoint-1000
 ```
 
+## Statistical Analysis
+After running `evaluate_bias.py`, measure distribution overlap between Western and Eastern outputs:
+```
+python3 stats_analysis.py --results-file outputs/bias_evaluation_*/bias_evaluation_*.json
+```
+See `docs/STATS_ANALYSIS.md` for full details on the Bhattacharyya coefficient and distance metrics.
+
 ## Notes
 - Outputs are written to `outputs/`.
 - For large corpora, replace the simple loader with a streaming dataset.
