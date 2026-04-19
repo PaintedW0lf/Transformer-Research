@@ -24,7 +24,7 @@ This pipeline progressively trains language models across historical time period
 
 3. **Automated Evaluation**:
    - After training each period pair, runs:
-     - `evaluate_bias.py`: Compares philosophical biases between east/west
+      - `evaluate_bias.py`: Compares philosophical biases between east/west, including cross-perplexity and KL divergence
      - `batch_chat_test.py`: Generates responses to philosophical prompts
      - Results saved in organized JSON format
 
@@ -111,7 +111,7 @@ outputs/
 │   └── ...
 └── progressive_evaluations/            # Evaluation results
     ├── period_BC_evaluation/
-    │   ├── bias_evaluation_*.json       # Bias comparison
+    │   ├── bias_evaluation_*.json       # Bias comparison with cross-perplexity and KL divergence
     │   ├── chat_responses_east.json     # Chat test results
     │   └── chat_responses_west.json
     ├── period_100_evaluation/
@@ -146,7 +146,13 @@ The `training_manifest.json` file tracks all completed training runs:
 
 ### Bias Evaluation (`bias_evaluation_*.json`)
 
-Compares model responses to philosophical prompts across 8 categories:
+Compares model responses to philosophical prompts across 8 categories and records:
+- response text for each model
+- repetition score and type-token ratio for each output
+- cross-perplexity between the two models' outputs
+- KL divergence metrics from `kl_divergence.py`
+
+The 8 prompt categories are:
 - self_identity
 - purpose_meaning
 - ethics_morality
@@ -292,7 +298,7 @@ cat test_run/progressive_evaluations/period_300_evaluation/chat_responses_east.j
 The pipeline uses and integrates with existing scripts:
 - `gpt2_pretrain.py`: Model and dataset building
 - `lm_utils.py`: Training utilities and data loading
-- `evaluate_bias.py`: Philosophical bias comparison
+- `evaluate_bias.py`: Philosophical bias comparison with cross-perplexity and KL divergence
 - `inference_utils.py`: Model loading and text generation
 - `batch_chat_test.py`: Non-interactive chat testing
 

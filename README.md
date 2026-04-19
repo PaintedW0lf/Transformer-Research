@@ -7,7 +7,7 @@ Create a virtual environment and install dependencies:
 ```
 python -m venv .venv
 source .venv/bin/activate
-pip install torch transformers tiktoken pytest
+pip install -r requirements.txt
 ```
 
 ## Data format
@@ -30,6 +30,11 @@ LLMTraining/
     test_lm_utils.py
     test_pretrain_builders.py
     test_streaming.py
+      test_kl_divergence.py
+      test_stats_analysis.py
+      test_evaluate_bias.py
+      test_visualize_vocab.py
+      test_pipeline_cli.py
     chat_test.py
   data/
     shard-0001.txt
@@ -72,12 +77,15 @@ Interactive checkpoint chat:
 python tests/chat_test.py --checkpoint outputs/gpt2_east/checkpoint-1000
 ```
 
-## Statistical Analysis
-After running `evaluate_bias.py`, measure distribution overlap between Western and Eastern outputs:
+## Evaluation
+After running `evaluate_bias.py`, the results JSON includes both cross-perplexity and KL divergence metrics for each prompt pair.
+
+To measure lexical overlap between Western and Eastern outputs, run:
 ```
 python3 stats_analysis.py --results-file outputs/bias_evaluation_*/bias_evaluation_*.json
 ```
-See `docs/STATS_ANALYSIS.md` for full details on the Bhattacharyya coefficient and distance metrics.
+
+See `docs/KL_DIVERGENCE.md` for the KL divergence module and `docs/STATS_ANALYSIS.md` for the Bhattacharyya coefficient and distance metrics.
 
 ## Notes
 - Outputs are written to `outputs/`.

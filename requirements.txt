@@ -6,3 +6,5 @@ accelerate>=0.20.0
 tiktoken>=0.5.0
 requests>=2.31.0
 pytest>=7.4.0
+numpy>=1.26.0
+matplotlib>=3.8.0
