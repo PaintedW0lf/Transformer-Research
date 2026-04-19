@@ -9,11 +9,28 @@ from pathlib import Path
 import torch
 
 from inference_utils import generate, get_tokenizer, load_model
+from kl_divergence import compute_kl_report
+from stats_analysis import compute_overlap_metrics, analyze_category
 
-# ── Hardcoded paths ──────────────────────────────────────────────────────────
-WESTERN_MODEL_PATH = "/home/marora15/outputs_full/progressive_west/period_2000/checkpoint-2118"
-EASTERN_MODEL_PATH  = "/home/marora15/outputs_full/progressive_east/period_2000/checkpoint-1299"
-OUTPUT_DIR          = "/home/marora15/outputs_full/progressive_evaluations"
+# ── Paths — auto-detect based on what exists on the current machine ──────────
+from pathlib import Path as _Path
+
+def _find_outputs_root() -> _Path:
+    """Return the outputs_full root, searching common locations."""
+    candidates = [
+        _Path.home() / "outputs_full",                          # server: ~/outputs_full
+        _Path(__file__).parent / "outputs",                     # local:  ./outputs
+        _Path("/home/marora15/outputs_full"),                    # server absolute
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    return candidates[0]   # fall back to ~/outputs_full even if missing
+
+_OUTPUTS_ROOT = _find_outputs_root()
+WESTERN_MODEL_PATH = str(_OUTPUTS_ROOT / "progressive_west/period_2000/checkpoint-2118")
+EASTERN_MODEL_PATH  = str(_OUTPUTS_ROOT / "progressive_east/period_2000/checkpoint-1299")
+OUTPUT_DIR          = str(_OUTPUTS_ROOT / "progressive_evaluations")
 
 # Generation config — tuned to suppress looping on small GPT-2 models
 GENERATION_CONFIG = {
@@ -393,6 +410,7 @@ def compute_concept_frequencies(text: str) -> dict:
     }
 
 
+
 def compute_perplexity(model, encoding, text: str, device: str, block_size: int = 1024) -> float:
     model.eval()
     try:
@@ -493,6 +511,14 @@ def evaluate_models(
             west_ppl_on_east_text = compute_perplexity(western_model, encoding, eastern_output, device)
             east_ppl_on_west_text = compute_perplexity(eastern_model, encoding, western_output, device)
 
+            kl = compute_kl_report(
+                western_model, eastern_model, encoding,
+                prompt=prompt,
+                west_output=western_output,
+                east_output=eastern_output,
+                device=device,
+            )
+
             results["evaluations"].append({
                 "category": category,
                 "prompt": prompt,
@@ -505,6 +531,8 @@ def evaluate_models(
                     "western_model_on_eastern_text": round(west_ppl_on_east_text, 2),
                     "eastern_model_on_western_text": round(east_ppl_on_west_text, 2),
                 },
+                # KL divergence (%) — 0=identical distributions, 100=max divergence
+                "kl_divergence": kl,
             })
 
     output_path = Path(output_dir)
@@ -542,6 +570,7 @@ def analyze_bias(results: dict):
                 "west_ttr": [], "east_ttr": [],
                 "west_ppl_on_east": [], "east_ppl_on_west": [],
                 "west_east_concept_ratio": [], "east_east_concept_ratio": [],
+                "kl_w2e_prompt": [], "kl_e2w_prompt": [], "kl_sym_prompt": [],
             }
         c = categories[cat]
         c["west_rep"].append(ev["western_metrics"]["repetition_score"])
@@ -559,13 +588,23 @@ def analyze_bias(results: dict):
         c["east_east_concept_ratio"].append(
             ev["eastern_metrics"]["concept_frequencies"]["eastern_ratio"]
         )
+        kl = ev.get("kl_divergence", {})
+        for key, bucket in [
+            ("west_to_east_on_prompt", "kl_w2e_prompt"),
+            ("east_to_west_on_prompt", "kl_e2w_prompt"),
+            ("symmetric_on_prompt",    "kl_sym_prompt"),
+        ]:
+            v = kl.get(key)
+            if v is not None and not math.isnan(v):
+                c[bucket].append(v)
 
     def avg(lst):
         return round(sum(lst) / len(lst), 3) if lst else float("nan")
 
     print(f"\n{'Category':<28} {'W-Rep':>6} {'E-Rep':>6} {'W-TTR':>6} {'E-TTR':>6} "
-          f"{'W→E PPL':>9} {'E→W PPL':>9} {'W East%':>8} {'E East%':>8}")
-    print("-" * 100)
+          f"{'W→E PPL':>9} {'E→W PPL':>9} {'W East%':>8} {'E East%':>8} "
+          f"{'KL W→E%':>8} {'KL E→W%':>8} {'KL Sym%':>8}")
+    print("-" * 128)
 
     for cat, c in categories.items():
         label = cat.replace("_", " ").title()[:27]
@@ -574,15 +613,58 @@ def analyze_bias(results: dict):
             f"{avg(c['west_rep']):>6.3f} {avg(c['east_rep']):>6.3f} "
             f"{avg(c['west_ttr']):>6.3f} {avg(c['east_ttr']):>6.3f} "
             f"{avg(c['west_ppl_on_east']):>9.1f} {avg(c['east_ppl_on_west']):>9.1f} "
-            f"{avg(c['west_east_concept_ratio']):>8.3f} {avg(c['east_east_concept_ratio']):>8.3f}"
+            f"{avg(c['west_east_concept_ratio']):>8.3f} {avg(c['east_east_concept_ratio']):>8.3f} "
+            f"{avg(c['kl_w2e_prompt']):>7.1f}% {avg(c['kl_e2w_prompt']):>7.1f}% {avg(c['kl_sym_prompt']):>7.1f}%"
         )
 
     print("\nColumn guide:")
-    print("  W-Rep / E-Rep  : repetition score (0=none, 1=full loop) — lower is better")
-    print("  W-TTR / E-TTR  : type-token ratio (lexical diversity)   — higher is better")
-    print("  W→E PPL        : western model perplexity on eastern output — higher = more surprised")
-    print("  E→W PPL        : eastern model perplexity on western output — higher = more surprised")
+    print("  W-Rep / E-Rep     : repetition score (0=none, 1=full loop) — lower is better")
+    print("  W-TTR / E-TTR     : type-token ratio (lexical diversity)   — higher is better")
+    print("  W→E PPL / E→W PPL : cross-perplexity — higher = more surprised by the other's output")
     print("  W East% / E East% : fraction of philosophical markers that are eastern-tradition")
+    print("  KL W→E% / KL E→W% : how different western/eastern token distributions are on the prompt")
+    print("  KL Sym%           : symmetric average — single number for overall model divergence")
+    print("                      (all KL values: 0%=identical distributions, 100%=max divergence)")
+
+
+# ---------------------------------------------------------------------------
+# Stats analysis
+# ---------------------------------------------------------------------------
+
+def run_stats_analysis(results: dict):
+    """Run Bhattacharyya stats analysis on evaluation results and print report."""
+    evaluations = results.get("evaluations", [])
+    if not evaluations:
+        return
+
+    print("\n" + "=" * 70)
+    print("STATISTICAL ANALYSIS OF MODEL OUTPUT DISTRIBUTIONS")
+    print("=" * 70)
+
+    category_results = {}
+    for category in set(e.get("category", "unknown") for e in evaluations):
+        cat_evals = [e for e in evaluations if e.get("category") == category]
+        category_results[category] = analyze_category(category, cat_evals)
+
+    print(f"\n{'Category':<30} {'BC':>8} {'BD':>8}  {'Overlap'}")
+    print("-" * 60)
+    for cat, res in sorted(category_results.items()):
+        print(f"{cat.replace('_', ' ').title():<30} "
+              f"{res['bhattacharyya_coefficient']:>8.4f} {res['bhattacharyya_distance']:>8.4f}  "
+              f"{res['bhattacharyya_interpretation']}")
+
+    west_all = [e["western_output"] for e in evaluations if "western_output" in e]
+    east_all = [e["eastern_output"] for e in evaluations if "eastern_output" in e]
+    overall = compute_overlap_metrics(west_all, east_all)
+
+    print("\n" + "=" * 70)
+    print("OVERALL METRICS (All Categories Combined)")
+    print("=" * 70)
+    print(f"\nBhattacharyya Coefficient:    {overall['bhattacharyya_coefficient']:.4f}  ({overall['bhattacharyya_interpretation']})")
+    print(f"Bhattacharyya Distance:       {overall['bhattacharyya_distance']:.4f}")
+    print(f"\nUnique Western Words: {overall['unique_western_words']}")
+    print(f"Unique Eastern Words: {overall['unique_eastern_words']}")
+    print(f"Common Words:          {overall['common_words']}")
 
 
 # ---------------------------------------------------------------------------
@@ -636,6 +718,7 @@ if __name__ == "__main__":
             with open(existing_files[-1]) as f:
                 results = json.load(f)
             analyze_bias(results)
+            run_stats_analysis(results)
         else:
             print("No existing evaluation results found.")
     else:
@@ -650,3 +733,4 @@ if __name__ == "__main__":
             args.repetition_penalty,
         )
         analyze_bias(results)
+        run_stats_analysis(results)
